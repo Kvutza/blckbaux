@@ -1,6 +1,6 @@
 """Buck2 renderer for BLCKBAUX's shared logical program catalogue."""
 
-load("//buck2:reindeer_rules.bzl", "app_rust_binary")
+load("//build/buck2:reindeer_rules.bzl", "app_rust_binary")
 
 def _local_program_dep(name):
     return "//rust/crates/" + name + ":" + name
@@ -10,7 +10,7 @@ def _program_deps(program):
     deps += ["//rust:" + crate for crate in program["crate_deps"]]
     if "blckbaux" in program["local_deps"]:
         deps += select({
-            "//:macos-arm64": ["//buck2/native:openmp-macos"],
+            "//:macos-arm64": ["//build/buck2/native:openmp-macos"],
             "DEFAULT": [],
         })
     return deps

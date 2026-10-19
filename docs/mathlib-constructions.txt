@@ -261,7 +261,7 @@ Execution: Generic Fin numbering is not native packing or tensor-key addressing.
 CONSTRUCTION packing
 Definition: Distinguish independent logical parameters, physical buffers,
   buffer element order, transposition, padding, and shared readout views.
-Source: cuda/src/model/weights.rs ProposalSpec/checkpoint_specs;
+Source: backends/cuda/src/model/weights.rs ProposalSpec/checkpoint_specs;
   rust/crates/blckbaux/src/bf16_metal/layout.rs; Program.readout.
 Mathlib: Fin, product/sigma indices, Equiv, and finite cardinality are available.
   No theorem equating the backend address maps is currently invoked.

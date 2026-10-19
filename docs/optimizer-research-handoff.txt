@@ -178,7 +178,7 @@ it with the best incumbent. result.json's `tell.accepted` means any improvement
 over initialization occurred, not that the last candidate was accepted. Its
 `committed_tokens` is generated_tokens_per_round times accepted_updates, not the
 number of causally committed tokens across all generated trajectories. Consult
-the writer in cuda/src/model/run.rs before interpreting field names.
+the writer in backends/cuda/src/model/run.rs before interpreting field names.
 
 The runner reads tokens after its last candidate evaluation; restoration of
 weights does not by itself recompute token buffers. Therefore tokens.json must
@@ -191,9 +191,9 @@ reconstructing them.
 3. What actually ran, mathematically
 
 Source entry points:
-  cuda/src/model/run.rs: hnet_bo_bench, enn_acquisition, descriptor_distance
-  cuda/src/model/weights.rs: materialize_gaussian
-  cuda/device/src/fbt.rs: gaussian_fp16
+  backends/cuda/src/model/run.rs: hnet_bo_bench, enn_acquisition, descriptor_distance
+  backends/cuda/src/model/weights.rs: materialize_gaussian
+  backends/cuda/device/src/fbt.rs: gaussian_fp16
 
 Audit the recorded revision plus patch before asserting exact reproducibility.
 Current source and the saved result agree on these structural facts:
@@ -527,13 +527,13 @@ the checkpoint/recovery question in section 2.
 
 The first T4 `./blckbaux cuda model-check` passed the FP16 portion, then raised a
 CUDA 719 fault. `./blckbaux cuda sanitize model-check` located an out-of-bounds
-route-table read in `routed_compact` in `cuda/device/src/fbt.rs`. Its launch
+route-table read in `routed_compact` in `backends/cuda/device/src/fbt.rs`. Its launch
 allocates four 16-row subtiles per routed tile. The kernel had indexed the
 route table with the raw Y block and started every subtile at row zero. Once Y
 reached route-table capacity, it read beyond the table. That was an actual
 correctness bug, not evidence that the workload simply needed fewer blocks.
 
-Current kernel mapping in `cuda/device/src/fbt.rs`, around line 2908:
+Current kernel mapping in `backends/cuda/device/src/fbt.rs`, around line 2908:
 
   let block = thread::blockIdx_y();
   let tile = block / 4;
@@ -742,7 +742,7 @@ symbolic Lean latency object, then use that connection to choose a testable
 way to reduce the sequential evaluation critical path. Work in this order:
 
   1. Re-read the 128-round T4 artifact, the T4/A100 stage JSON, and the
-     current `cuda/src/model/run.rs` objective-evaluation path. Identify the
+     current `backends/cuda/src/model/run.rs` objective-evaluation path. Identify the
      incumbent/reference and candidate evaluations, which outputs each
      contributes to the response posterior and acceptance rule, and where
      synchronization and materialization occur. Record exact source locations.
@@ -835,11 +835,11 @@ under explicit models. It is not the GPU runtime.
 
 Key source locations:
 
-  cuda/src/model/run.rs                CUDA BO loop, objective calls, response
-  cuda/src/model/weights.rs            parameter materialization
-  cuda/src/model/readout.rs            model output and scoring readout
-  cuda/src/model/routing.rs            routed execution
-  cuda/device/src/fbt.rs              device kernels, compact MoE correction
+  backends/cuda/src/model/run.rs                CUDA BO loop, objective calls, response
+  backends/cuda/src/model/weights.rs            parameter materialization
+  backends/cuda/src/model/readout.rs            model output and scoring readout
+  backends/cuda/src/model/routing.rs            routed execution
+  backends/cuda/device/src/fbt.rs              device kernels, compact MoE correction
   rust/crates/blckbaux/src/bf16_metal/     Metal proposal, selection, ask/tell
   rust/crates/semantics/src/optimizer/          optimizer abstraction and experiments
   rust/crates/ptx-synth/src/          synthesized PTX probes and kernels
@@ -1674,7 +1674,7 @@ EVIDENCE STATUS: the extreme-value expression and exact K=4 roofline optimum
 below are hypotheses with missing premises, not derived BLCKBAUX results. See section 67.
 
 1. Deconstruction of the K = 4 Heuristic:
-   - Root Origin: `CANDIDATES = 4` in `paired_response_reliability.rs` and `cuda/src/main.rs` was a legacy GPU warp-lane / 1x4 threadgroup layout constant, not an intrinsic optimization invariant.
+   - Root Origin: `CANDIDATES = 4` in `paired_response_reliability.rs` and `backends/cuda/src/main.rs` was a legacy GPU warp-lane / 1x4 threadgroup layout constant, not an intrinsic optimization invariant.
    - High-Dimensional Zeroth-Order Barrier: In dimension $d \approx 1.178 \times 10^9$, isotropic gradient variance scales as $\mathcal{O}(d / K)$. Setting $K = 4$ reduces variance by a trivial factor of 4, leaving residual error variance of $\sim 2.5 \times 10^8$. Finite candidate widths cannot reconstruct full-parameter gradients without operator-subspace structure.
    - Extreme Value Selection Law: When treating $K$ as candidate acquisition pool (Thompson/UCB), maximal expected improvement scales sub-linearly as $\mathbb{E}[\max_{k \le K} (-\Delta L_k)] \le \sigma_L \sqrt{2 \ln K}$. Returns decay as $\frac{1}{K \sqrt{\ln K}}$.
    - Hardware Roofline Bound & Optimal $K^*$: In memory-bandwidth-bound transformer forward passes, weights are read once and reused across $K$ candidates. Arithmetic intensity $\mathcal{I}(K) \approx S \cdot K$. For context slice $S = 16$ on Apple Silicon (50 TFLOPS, 800 GB/s, knee at 62.5 FLOPs/B), $K = 4$ exactly hits the roofline knee. For $K \le 4$, evaluation latency $T(K) \approx \text{const}$; for $K > 4$, $T(K) \propto K$.

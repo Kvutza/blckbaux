@@ -12,13 +12,13 @@ def test_bundle():
         if member.startswith("rust/crates/"):
             name = Path(member).name
             assert f'"{name}": "//{member}:' in build
-    rule = (ROOT / "buck2/cuda/defs.bzl").read_text()
+    rule = (ROOT / "build/buck2/cuda/defs.bzl").read_text()
     assert "srcs = [package, workspace, cuda, click] + crates.values()" in rule
     assert "for crate, label in crates.items()" in rule
 
 
 def test_atomic():
-    source = (ROOT / "buck2/cuda/defs.bzl").read_text(encoding="utf-8")
+    source = (ROOT / "build/buck2/cuda/defs.bzl").read_text(encoding="utf-8")
     lockfile = "cargo generate-lockfile --manifest-path $ROOT/Cargo.toml;"
     build = (
         "cargo oxide build --arch sm_75 --cargo-target-dir $OUT_DIR/target "

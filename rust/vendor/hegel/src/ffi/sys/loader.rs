@@ -57,7 +57,7 @@ pub(super) fn candidate_paths(
     if let Ok(cwd) = std::env::current_dir() {
         let mut cur = Some(cwd.as_path());
         while let Some(dir) = cur {
-            let candidate = dir.join("buck2/native").join(LIB_FILE_NAME);
+            let candidate = dir.join("build/buck2/native").join(LIB_FILE_NAME);
             if candidate.is_file() {
                 paths.push(candidate);
                 break;
@@ -68,7 +68,7 @@ pub(super) fn candidate_paths(
     if let Some(ref dir) = exe_dir {
         let mut cur = Some(dir.as_path());
         while let Some(d) = cur {
-            let candidate = d.join("buck2/native").join(LIB_FILE_NAME);
+            let candidate = d.join("build/buck2/native").join(LIB_FILE_NAME);
             if candidate.is_file() {
                 paths.push(candidate);
                 break;

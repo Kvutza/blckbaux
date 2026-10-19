@@ -118,7 +118,7 @@ for index in "${!python_versions[@]}"; do
     python_bin=${python_bins[$index]}
     targets=(//:wheel)
     if [ "$index" -eq 0 ]; then
-        targets+=(//buck2/tests:all //rust/crates/cli:blckbaux)
+        targets+=(//build/buck2/tests:all //rust/crates/cli:blckbaux)
     fi
     build_report=$(mktemp "${TMPDIR:-/tmp}/blckbaux-buck2-report.XXXXXX")
     ./buck2w \

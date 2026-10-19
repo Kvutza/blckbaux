@@ -11,7 +11,7 @@ rust/crates/blckbaux/src/weights/metal_weights.rs
 rust/crates/blckbaux/src/weights/opencl_weights.rs
 # CUDA-Oxide kernels and their host bridge require an NVIDIA device. They are
 # exercised by the Bazel CUDA parity and wheel gates rather than lexical KISS.
-cuda/
+backends/cuda/
 rust/crates/blckbaux/build.rs
 rust/crates/blckbaux/src/bf16_search.rs
 rust/crates/blckbaux/src/dense/bf16/cuda.rs
@@ -50,7 +50,7 @@ rust/crates/blckbaux/src/fbt_moe.rs
 rust/crates/dev-cli/src/bin/blckbaux/main.rs
 # The Metal parity benchmark deliberately owns its fixtures so it can be built
 # independently by Buck; KISS's duplicate/size rules are not actionable here.
-buck2/tests/metal.rs
+build/buck2/tests/metal.rs
 # These are intentional multi-platform dispatch facades. Their dependency
 # breadth is the supported CPU/Metal/OpenCL/CUDA surface, not hidden coupling;
 # portable implementations remain subject to runtime tests. KISS cannot follow

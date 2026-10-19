@@ -16,6 +16,7 @@ kernel_processing
 **/__pycache__/
 **/*.py[cod]
 **/*.so
+**/*.dylib
 **/*.rs.bk
 .malvin/
 results/

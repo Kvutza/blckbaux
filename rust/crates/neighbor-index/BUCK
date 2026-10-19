@@ -1,4 +1,4 @@
-load("//buck2:reindeer_rules.bzl", "app_rust_library")
+load("//build/buck2:reindeer_rules.bzl", "app_rust_library")
 load("//build:targets.bzl", "NEIGHBOR_INDEX_CRATES", "NEIGHBOR_INDEX_TEST_CRATES", "RUST_EDITION")
 
 filegroup(
@@ -23,6 +23,6 @@ rust_test(
     crate = "blckbaux_neighbor_index",
     crate_root = "src/lib.rs",
     edition = RUST_EDITION,
-    visibility = ["//buck2/tests:all"],
+    visibility = ["//build/buck2/tests:all"],
     deps = ["//rust:" + crate for crate in NEIGHBOR_INDEX_TEST_CRATES] + ["//rust/crates/artifact:artifact"],
 )

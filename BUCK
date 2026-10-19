@@ -1,11 +1,11 @@
 load(
-    "//buck2:python.bzl",
+    "//build/buck2:python.bzl",
     "PYTHON_ABI",
     "PYTHON_REQUIRES",
     "python_extension_suffix",
 )
-load("//buck2/cuda:defs.bzl", "cuda_oxide")
-load("//buck2/wheel:wheel.bzl", "python_wheel")
+load("//build/buck2/cuda:defs.bzl", "cuda_oxide")
+load("//build/buck2/wheel:wheel.bzl", "python_wheel")
 
 http_file(
     name = "click-wheel",
@@ -126,7 +126,7 @@ cuda_oxide(
         "ptx-synth": "//rust/crates/ptx-synth:ptx-source",
         "semantics": "//rust/crates/semantics:source",
     },
-    cuda = "//cuda:source",
+    cuda = "//backends/cuda:source",
     parity = "ops/bf16_parity.py",
     click = ":click-wheel",
 )
@@ -186,7 +186,7 @@ python_wheel(
     python_requires = PYTHON_REQUIRES,
     python_srcs = glob(["src/blckbaux/**/*.py"]),
     readme = "README.md",
-    runtime_libraries = ["//buck2/native:openmp-build[lib]"],
+    runtime_libraries = ["//build/buck2/native:openmp-build[lib]"],
     target_compatible_with = [
         "prelude//cpu/constraints:arm64",
         "prelude//os/constraints:macos",

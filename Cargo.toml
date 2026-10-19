@@ -1,7 +1,7 @@
 [workspace]
 members = [
-    "cuda",
-    "cuda/device",
+    "backends/cuda",
+    "backends/cuda/device",
     "rust/crates/neighbor-index",
     "rust/crates/corpus",
     "rust/crates/semantics",

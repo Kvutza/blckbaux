@@ -72,8 +72,8 @@ pub fn perf_sources(root: &Path, backend: Backend) -> Result<Vec<PathBuf>, Strin
             }
         }
         Backend::CudaOxide => {
-            collect(&root.join("cuda/src"), &mut files)?;
-            collect(&root.join("cuda/device/src"), &mut files)?;
+            collect(&root.join("backends/cuda/src"), &mut files)?;
+            collect(&root.join("backends/cuda/device/src"), &mut files)?;
             collect(&root.join("rust/crates/modal-runner/src"), &mut files)?;
             files.push(root.join("rust/crates/runner/src/cuda_tune.rs"));
         }

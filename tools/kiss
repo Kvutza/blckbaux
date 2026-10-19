@@ -116,7 +116,7 @@ while [ "$#" -gt 0 ]; do
             cat <<'EOF'
 Usage: kiss test [--lang rust|python] [--dry-run] [-j JOBS] [-- ARGS...]
 
-Rust tests run through Buck2 at //buck2/tests:all. Python tests are delegated
+Rust tests run through Buck2 at //build/buck2/tests:all. Python tests are delegated
 to the upstream KISS executable.
 EOF
             exit 0
@@ -174,15 +174,15 @@ if [ -n "$target" ] && [ "$target" != "." ]; then
 fi
 
 if [ "$dry_run" -eq 1 ]; then
-    exec "$repo_dir/buck2w" targets //buck2/tests:all
+    exec "$repo_dir/buck2w" targets //build/buck2/tests:all
 fi
 
 if [ -n "$jobs" ] && [ "$has_passthrough" -eq 1 ]; then
-    exec "$repo_dir/buck2w" test //buck2/tests:all --local-only -j "$jobs" -- "$@"
+    exec "$repo_dir/buck2w" test //build/buck2/tests:all --local-only -j "$jobs" -- "$@"
 elif [ -n "$jobs" ]; then
-    exec "$repo_dir/buck2w" test //buck2/tests:all --local-only -j "$jobs"
+    exec "$repo_dir/buck2w" test //build/buck2/tests:all --local-only -j "$jobs"
 elif [ "$has_passthrough" -eq 1 ]; then
-    exec "$repo_dir/buck2w" test //buck2/tests:all --local-only -- "$@"
+    exec "$repo_dir/buck2w" test //build/buck2/tests:all --local-only -- "$@"
 else
-    exec "$repo_dir/buck2w" test //buck2/tests:all --local-only
+    exec "$repo_dir/buck2w" test //build/buck2/tests:all --local-only
 fi

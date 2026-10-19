@@ -4,7 +4,7 @@ import Mathlib.Probability.Distributions.Gaussian.Real
 /-!
 # Paired responses and dependent evaluation patches
 
-Real-arithmetic views of the patch mean/scatter in `cuda/src/model/run.rs`
+Real-arithmetic views of the patch mean/scatter in `backends/cuda/src/model/run.rs`
 and baseline-plus-improvement observations in both runners. These are not
 floating-point refinement proofs. Mathlib's variance is population variance;
 `patchVariance` is the statistic computed from one realized batch.

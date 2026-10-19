@@ -1,4 +1,4 @@
-load("//buck2:reindeer_rules.bzl", "app_rust_library")
+load("//build/buck2:reindeer_rules.bzl", "app_rust_library")
 load("//build:targets.bzl", "RUST_EDITION")
 
 app_rust_library(
@@ -16,11 +16,11 @@ app_rust_library(
     deps = [
         "//rust:parking_lot",
         "//rust/vendor/hegel/hegel-macros:hegel-macros",
-        "//buck2/native:hegel-c",
+        "//build/buck2/native:hegel-c",
     ],
     env = {
         "HEGEL_C_EXPECTED_VERSION": "0.47.1",
-        "HEGEL_C_BAKED_LIB_DIR": "buck2/native",
+        "HEGEL_C_BAKED_LIB_DIR": "build/buck2/native",
     },
     visibility = ["PUBLIC"],
 )

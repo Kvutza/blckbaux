@@ -231,7 +231,7 @@ fn fresh(root: &Path, index: &Path) -> Result<bool, String> {
     for path in [
         root.join("Cargo.toml"),
         root.join("rust"),
-        root.join("cuda"),
+        root.join("backends/cuda"),
     ] {
         if newer(&path, index_time)? {
             return Ok(false);

@@ -1,5 +1,5 @@
-load("//buck2:blckbaux_targets.bzl", "blckbaux_program_targets")
-load("//buck2:reindeer_rules.bzl", "app_rust_library")
+load("//build/buck2:blckbaux_targets.bzl", "blckbaux_program_targets")
+load("//build/buck2:reindeer_rules.bzl", "app_rust_library")
 load("//build:targets.bzl", "TOOLING_PROGRAMS", "RUST_EDITION")
 
 filegroup(
@@ -41,7 +41,7 @@ rust_test(
     crate = "blckbaux_tooling",
     crate_root = "src/lib.rs",
     edition = RUST_EDITION,
-    visibility = ["//buck2/tests:all"],
+    visibility = ["//build/buck2/tests:all"],
     deps = [
         "//rust:clap",
         "//rust/crates/artifact:artifact",

@@ -106,9 +106,9 @@ jobs:
           path: |
             .buck2-tools
             buck-out/dev
-          key: ${{ runner.os }}-${{ runner.arch }}-buck2-v3-${{ hashFiles('.buckconfig', 'BUCK', 'buck2/**', 'toolchains/**', 'tools/**', 'rust-toolchain.toml', 'rust/BUCK', 'rust/crates/**/BUCK', 'Cargo.toml', 'rust/**/*.toml', 'pixi.toml', '.github/workflows/*.yml') }}-${{ github.sha }}
+          key: ${{ runner.os }}-${{ runner.arch }}-buck2-v3-${{ hashFiles('.buckconfig', 'BUCK', 'build/buck2/**', 'build/toolchains/**', 'tools/**', 'rust-toolchain.toml', 'rust/BUCK', 'rust/crates/**/BUCK', 'Cargo.toml', 'rust/**/*.toml', 'pixi.toml', '.github/workflows/*.yml') }}-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-buck2-v3-${{ hashFiles('.buckconfig', 'BUCK', 'buck2/**', 'toolchains/**', 'tools/**', 'rust-toolchain.toml', 'rust/BUCK', 'rust/crates/**/BUCK', 'Cargo.toml', 'rust/**/*.toml', 'pixi.toml', '.github/workflows/*.yml') }}-
+            ${{ runner.os }}-${{ runner.arch }}-buck2-v3-${{ hashFiles('.buckconfig', 'BUCK', 'build/buck2/**', 'build/toolchains/**', 'tools/**', 'rust-toolchain.toml', 'rust/BUCK', 'rust/crates/**/BUCK', 'Cargo.toml', 'rust/**/*.toml', 'pixi.toml', '.github/workflows/*.yml') }}-
 
       - name: Verify release checkout
         env:

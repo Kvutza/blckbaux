@@ -145,7 +145,7 @@ host with CUDA 13.0 and an NVIDIA runtime. Repository CUDA builds and runs use
 the remaining `./blckbaux cuda` commands.
 
 The CUDA-Oxide revision is pinned in `Cargo.toml`; Rust and LLVM versions are in
-`cuda/rust-toolchain.toml` and `tools/cuda-setup`.
+`backends/cuda/rust-toolchain.toml` and `tools/cuda-setup`.
 
 T4 verification on 2026-10-03: 36 parity cases passed, resident search passed,
 Compute Sanitizer reported zero errors, and the 16,777,216-element perturbation

@@ -1,6 +1,6 @@
 load("@prelude//rust:cargo_package.bzl", "cargo")
 load("@prelude//rust:cargo_buildscript.bzl", _buildscript_run = "buildscript_run")
-load("//buck2:python.bzl", "PYTHON_VERSION")
+load("//build/buck2:python.bzl", "PYTHON_VERSION")
 
 _PYO3_CONFIG = {
     "3.12": "696d706c656d656e746174696f6e3d43507974686f6e0a76657273696f6e3d332e31320a7368617265643d747275650a706f696e7465725f77696474683d36340a6275696c645f666c6167733d0a73757070726573735f6275696c645f7363726970745f6c696e6b5f6c696e65733d66616c73650a",

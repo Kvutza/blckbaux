@@ -1,4 +1,4 @@
-load("//buck2:reindeer_rules.bzl", "app_rust_library")
+load("//build/buck2:reindeer_rules.bzl", "app_rust_library")
 
 app_rust_library(
     name = "ptx-synth",
@@ -17,7 +17,7 @@ rust_test(
     crate_root = "src/lib.rs",
     edition = "2021",
     deps = [],
-    visibility = ["//buck2/tests:all"],
+    visibility = ["//build/buck2/tests:all"],
 )
 
 filegroup(

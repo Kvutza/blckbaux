@@ -27,7 +27,7 @@ def python_wheel(
         srcs = python_srcs + fixture_srcs + runtime_libraries + [extension, license, notice, readme],
         out = filename,
         cmd = " ".join([
-            "$(exe //buck2/wheel:pack)",
+            "$(exe //build/buck2/wheel:pack)",
             "--src-dir",
             "$SRCDIR",
             "--out",

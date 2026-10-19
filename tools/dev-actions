@@ -35,7 +35,7 @@ format() {
 
 test_repository() {
     case "${BLCKBAUX_BUILD_SYSTEM:-buck2}" in
-        buck2) ./buck2w test //buck2/tests:all --local-only ;;
+        buck2) ./buck2w test //build/buck2/tests:all --local-only ;;
         bazel) bazel test //:check --config=release --config=constrained ;;
     esac
 }

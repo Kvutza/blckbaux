@@ -3,7 +3,7 @@ import sys
 import types
 import zipfile
 
-from bazel.audit_wheel import audit_macos, audit_wheel, wheel_paths
+from build.bazel.audit_wheel import audit_macos, audit_wheel, wheel_paths
 
 
 def test_audit(tmp_path, monkeypatch):

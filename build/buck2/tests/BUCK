@@ -5,7 +5,7 @@ rust_test(
     srcs = ["metal.rs"],
     crate_root = "metal.rs",
     deps = [
-        "//buck2/native:openmp-macos",
+        "//build/buck2/native:openmp-macos",
         "//rust/crates/blckbaux:blckbaux",
         "//rust:ndarray",
     ],
@@ -27,7 +27,7 @@ rust_test(
     crate_root = "dense.rs",
     deps = ["//rust/crates/blckbaux:blckbaux"] + select({
         "//:macos-arm64": [
-            "//buck2/native:openmp-macos",
+            "//build/buck2/native:openmp-macos",
         ],
         "DEFAULT": [],
     }),

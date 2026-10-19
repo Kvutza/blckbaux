@@ -1,6 +1,6 @@
 load("@crates//:defs.bzl", "aliases", "crate_edition")
 load("@rules_rust//rust:defs.bzl", "rust_shared_library")
-load("//:bazel/python_extension.bzl", "copy_extension")
+load("//build/bazel:python_extension.bzl", "copy_extension")
 load("//build:targets.bzl", "BLCKBAUX_PY_CRATES")
 load("//rust/crates/blckbaux:defs.bzl", "blckbaux_crate_deps")
 

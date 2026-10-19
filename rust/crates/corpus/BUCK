@@ -1,4 +1,4 @@
-load("//buck2:reindeer_rules.bzl", "app_rust_binary")
+load("//build/buck2:reindeer_rules.bzl", "app_rust_binary")
 
 filegroup(
     name = "source",

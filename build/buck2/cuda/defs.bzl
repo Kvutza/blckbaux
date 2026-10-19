@@ -12,7 +12,7 @@ def cuda_oxide(name, package, workspace, crates, cuda, parity, click):
         cacheable = False,
         labels = ["uses_undeclared_inputs"],
         # CUDA-Oxide pins this compiler; the host workspace uses a newer nightly.
-        # Keep CUDA compilation on the toolchain recorded by cuda/rust-toolchain.toml.
+        # Keep CUDA compilation on the toolchain recorded by backends/cuda/rust-toolchain.toml.
         env = {"RUSTUP_TOOLCHAIN": "nightly-2026-08-28"},
         cmd = " ".join([
             "set -euo pipefail;",
@@ -20,15 +20,15 @@ def cuda_oxide(name, package, workspace, crates, cuda, parity, click):
             "OUT_DIR=$PWD/$OUT;",
             "OUT_FILE=$OUT_DIR/{};".format(filename),
             "ROOT=$TMP/repo;",
-            "mkdir -p $ROOT/rust/crates $ROOT/cuda;",
+            "mkdir -p $ROOT/rust/crates $ROOT/backends/cuda;",
             "cp -R $(location {})/. $ROOT/;".format(package),
             "cp -R $(location {})/. $ROOT/;".format(workspace),
         ] + [
             "cp -R $(location {}) $ROOT/rust/crates/{};".format(label, crate)
             for crate, label in crates.items()
         ] + [
-            "cp -R $(location {})/. $ROOT/cuda/;".format(cuda),
-            "cd $ROOT/cuda;",
+            "cp -R $(location {})/. $ROOT/backends/cuda/;".format(cuda),
+            "cd $ROOT/backends/cuda;",
             "cargo generate-lockfile --manifest-path $ROOT/Cargo.toml;",
             "cargo oxide build --arch sm_75 --cargo-target-dir $OUT_DIR/target --device-codegen-crate blckbaux_cuda_device -- -p blckbaux-py -p blckbaux-cuda --features cuda --release --locked --manifest-path $ROOT/Cargo.toml;",
             "cd $ROOT;",

@@ -2,7 +2,7 @@
 # Regenerate with: tools/reindeerw buckify
 
 load("@prelude//rust:cargo_package.bzl", "cargo")
-load("//buck2:reindeer_rules.bzl", "buildscript_run", "reindeer_rust_binary", "reindeer_rust_library")
+load("//build/buck2:reindeer_rules.bzl", "buildscript_run", "reindeer_rust_binary", "reindeer_rust_library")
 
 git_fetch(
     name = "cuda-oxide-b3835ab4e1359278.git",

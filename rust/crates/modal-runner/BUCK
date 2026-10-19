@@ -1,4 +1,4 @@
-load("//buck2:blckbaux_targets.bzl", "blckbaux_program_targets")
+load("//build/buck2:blckbaux_targets.bzl", "blckbaux_program_targets")
 load("//build:targets.bzl", "MODAL_RUNNER_PROGRAMS", "RUST_EDITION")
 
 blckbaux_program_targets(MODAL_RUNNER_PROGRAMS, RUST_EDITION, glob(["src/**/*.rs"]))

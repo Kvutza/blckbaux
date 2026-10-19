@@ -12,7 +12,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
-PIN_FILE = ROOT / "toolchains/rust_pins.bzl"
+PIN_FILE = ROOT / "build/toolchains/rust_pins.bzl"
 TRIPLES = (
     "aarch64-apple-darwin",
     "aarch64-unknown-linux-gnu",
@@ -55,7 +55,7 @@ def source_state(channel_override: str | None) -> tuple[str, str, str]:
 
 
 def update_text(path: str, text: str, channel: str, date: str, edition: str) -> str:
-    if path == "cuda/rust-toolchain.toml":
+    if path == "backends/cuda/rust-toolchain.toml":
         return replace_channel(text, channel, path)
     if path == "MODULE.bazel":
         text = replace_one(text, r'^    edition = "[^"]+",$', f'    edition = "{edition}",', path)
@@ -81,7 +81,7 @@ def update_text(path: str, text: str, channel: str, date: str, edition: str) -> 
             f'const RUST_NIGHTLY: &str = "{channel}";',
             path,
         )
-    if path == "buck2/cuda/defs.bzl":
+    if path == "build/buck2/cuda/defs.bzl":
         return replace_one(
             text,
             r'^        env = \{"RUSTUP_TOOLCHAIN": "[^"]+"\},$',
@@ -91,7 +91,7 @@ def update_text(path: str, text: str, channel: str, date: str, edition: str) -> 
     if path == "docs/buck2.md":
         return replace_one(
             text,
-            r"Rust (?:[^ ]+|`[^`]+`) is pinned (?:in `toolchains/rust\.bzl`|through `rust-toolchain\.toml`)\.",
+            r"Rust (?:[^ ]+|`[^`]+`) is pinned (?:in `build/toolchains/rust\.bzl`|through `rust-toolchain\.toml`)\.",
             f"Rust `{channel}` is pinned through `rust-toolchain.toml`.",
             path,
         )
@@ -104,16 +104,16 @@ def update_text(path: str, text: str, channel: str, date: str, edition: str) -> 
 
 def synchronized_files(channel: str, date: str, edition: str) -> dict[str, str]:
     paths = [
-        "cuda/rust-toolchain.toml",
-        "cuda/Cargo.toml",
-        "cuda/device/Cargo.toml",
+        "backends/cuda/rust-toolchain.toml",
+        "backends/cuda/Cargo.toml",
+        "backends/cuda/device/Cargo.toml",
         "MODULE.bazel",
         ".buckconfig",
         "ops/cuoxtool.py",
         "rust/crates/modal-runner/src/main.rs",
-        "buck2/cuda/defs.bzl",
+        "build/buck2/cuda/defs.bzl",
         "docs/buck2.md",
-        "buck2/wheel/BUCK",
+        "build/buck2/wheel/BUCK",
     ]
     paths.extend(
         str(path.relative_to(ROOT))
@@ -208,7 +208,7 @@ def sync(channel_override: str | None) -> None:
         updates["rust-toolchain.toml"] = replace_channel(
             read("rust-toolchain.toml"), channel, "rust-toolchain.toml"
         )
-    updates["toolchains/rust_pins.bzl"] = pins
+    updates["build/toolchains/rust_pins.bzl"] = pins
     for path, text in updates.items():
         (ROOT / path).write_text(text, encoding="utf-8")
     print(f"Synchronized Rust toolchain: {channel}, edition {edition}")

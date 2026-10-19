@@ -19,8 +19,8 @@ def test_version():
     config.read(ROOT / ".buckconfig")
     versions = {
         read_version(ROOT / "Cargo.toml", ("workspace", "package", "version")),
-        read_version(ROOT / "cuda/Cargo.toml", ("package", "version")),
-        read_version(ROOT / "cuda/device/Cargo.toml", ("package", "version")),
+        read_version(ROOT / "backends/cuda/Cargo.toml", ("package", "version")),
+        read_version(ROOT / "backends/cuda/device/Cargo.toml", ("package", "version")),
         config["blckbaux"]["release_version"],
     }
     assert len(versions) == 1, versions

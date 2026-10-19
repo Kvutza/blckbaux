@@ -1,6 +1,6 @@
-load("//buck2:reindeer_rules.bzl", "app_rust_binary", "app_rust_library")
-load("//buck2:blckbaux_targets.bzl", "blckbaux_program_targets")
-load("//buck2/tests:suite.bzl", "test_suite")
+load("//build/buck2:reindeer_rules.bzl", "app_rust_binary", "app_rust_library")
+load("//build/buck2:blckbaux_targets.bzl", "blckbaux_program_targets")
+load("//build/buck2/tests:suite.bzl", "test_suite")
 load("//build:targets.bzl", "BLCKBAUX_CRATES", "BLCKBAUX_PROGRAMS", "BLCKBAUX_TEST_CRATES", "RUST_EDITION")
 
 BLCKBAUX_BUCK_DEPS = ["//rust:" + crate for crate in BLCKBAUX_CRATES] + [
@@ -48,7 +48,7 @@ rust_test(
         "//:linux-arm64": [],
         "//:linux-x86_64": [],
         "//:macos-arm64": [
-            "//buck2/native:openmp-macos",
+            "//build/buck2/native:openmp-macos",
             "//rust:metal",
         ],
     }),
@@ -81,7 +81,7 @@ cxx_library(
         "-std=c++17",
         "-Wno-unknown-pragmas",
     ],
-    deps = ["//buck2/native:usearch"],
+    deps = ["//build/buck2/native:usearch"],
     exported_linker_flags = select({
         "//:linux-arm64": ["-lstdc++"],
         "//:linux-x86_64": ["-lstdc++"],
@@ -130,14 +130,14 @@ rust_test(
         "//:linux-x86_64": ["buck2-test-data", "opencl", "usearch-native"],
         "//:macos-arm64": ["buck2-test-data", "metal", "usearch-native"],
     }),
-    visibility = ["//buck2/tests:all"],
+    visibility = ["//build/buck2/tests:all"],
     deps = BLCKBAUX_BUCK_TEST_DEPS + [
         ":usearch-bridge",
     ] + select({
         "//:linux-arm64": ["//rust:opencl3"],
         "//:linux-x86_64": ["//rust:opencl3"],
         "//:macos-arm64": [
-            "//buck2/native:openmp-macos",
+            "//build/buck2/native:openmp-macos",
             "//rust:metal",
         ],
     }),
@@ -197,7 +197,7 @@ blckbaux_program_targets(BLCKBAUX_PROGRAMS, RUST_EDITION, glob(["src/**/*.rs", "
             "//rust/vendor/hegel:hegel",
         ] + select({
             "//:macos-arm64": [
-                "//buck2/native:openmp-macos",
+                "//build/buck2/native:openmp-macos",
                 "//rust:metal",
             ],
             "DEFAULT": [],
@@ -222,7 +222,7 @@ _TESTS = [
 test_suite(
     name = "integration",
     tests = _TESTS,
-    visibility = ["//buck2/tests:all"],
+    visibility = ["//build/buck2/tests:all"],
 )
 
 rust_test(
@@ -232,5 +232,5 @@ rust_test(
     crate_root = [program["root"] for program in BLCKBAUX_PROGRAMS if program["name"] == "turbo-enn"][0],
     edition = RUST_EDITION,
     deps = [":blckbaux", "//rust:anstream", "//rust/crates/tooling:tooling", "//rust:tempfile"],
-    visibility = ["//buck2/tests:all"],
+    visibility = ["//build/buck2/tests:all"],
 )

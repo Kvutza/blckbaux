@@ -452,7 +452,9 @@ esac
 def assert_builds(test, invocations):
     test.assertEqual(len(invocations), 4)
     test.assertTrue(all("//:wheel" in command for command in invocations))
-    test.assertEqual(sum("//buck2/tests:all" in command for command in invocations), 1)
+    test.assertEqual(
+        sum("//build/buck2/tests:all" in command for command in invocations), 1
+    )
     test.assertEqual(
         sum("//rust/crates/cli:blckbaux" in command for command in invocations),
         1,

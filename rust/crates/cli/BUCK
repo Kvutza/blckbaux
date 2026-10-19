@@ -1,4 +1,4 @@
-load("//buck2:blckbaux_targets.bzl", "blckbaux_program_targets")
+load("//build/buck2:blckbaux_targets.bzl", "blckbaux_program_targets")
 load("//build:targets.bzl", "CLI_CRATES", "CLI_PROGRAMS", "RUST_EDITION")
 
 filegroup(
@@ -20,5 +20,5 @@ rust_test(
         "//rust/crates/tooling:tooling",
         "//rust/crates/artifact:artifact",
     ],
-    visibility = ["//buck2/tests:all"],
+    visibility = ["//build/buck2/tests:all"],
 )

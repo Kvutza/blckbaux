@@ -23,7 +23,7 @@ from cuoxtool import (
 )
 
 DEFAULT_WORKSPACE = Path("/content/cuda-oxide")
-DEFAULT_PROJECT = Path(__file__).resolve().parents[1] / "cuda"
+DEFAULT_PROJECT = Path(__file__).resolve().parents[1] / "backends/cuda"
 LLVM_KEY_URL = "https://apt.llvm.org/llvm-snapshot.gpg.key"
 TOOLCHAIN_STATE = Path.home() / ".cache/blckbaux/cuda-oxide-toolchain.json"
 CUDA_TOOLKIT_ROOT = Path(f"/usr/local/cuda-{CUDA_TOOLKIT_VERSION}")

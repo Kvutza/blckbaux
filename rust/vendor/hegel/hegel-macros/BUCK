@@ -1,4 +1,4 @@
-load("//buck2:reindeer_rules.bzl", "reindeer_rust_library")
+load("//build/buck2:reindeer_rules.bzl", "reindeer_rust_library")
 load("//build:targets.bzl", "RUST_EDITION")
 
 reindeer_rust_library(

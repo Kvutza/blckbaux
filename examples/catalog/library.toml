@@ -179,7 +179,7 @@ id = "execution.source"
 family = "runtime"
 options = ["host", "iphone"]
 access = "./blckbaux iphone"
-sources = ["rust/crates/cli/src/bin/blckbaux/iphone.rs", "apple/iphone/BlckbauxCompute/BlckbauxCompute.swift"]
+sources = ["rust/crates/cli/src/bin/blckbaux/iphone.rs", "backends/apple/iphone/BlckbauxCompute/BlckbauxCompute.swift"]
 constraints = "A source names the machine that owns resident state; Metal remains the iPhone backend. Source discovery and addresses are runtime state and do not belong in experiment TOML."
 
 [[component]]

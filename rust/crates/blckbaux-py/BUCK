@@ -1,4 +1,4 @@
-load("//buck2:reindeer_rules.bzl", "app_rust_library")
+load("//build/buck2:reindeer_rules.bzl", "app_rust_library")
 load("//build:targets.bzl", "BLCKBAUX_PY_CRATES", "RUST_EDITION")
 
 filegroup(
@@ -34,7 +34,7 @@ app_rust_library(
         "//rust/crates/blckbaux:usearch-bridge",
         "//rust/crates/blckbaux:blckbaux",
     ] + ["//rust:" + crate for crate in BLCKBAUX_PY_CRATES] + select({
-        "//:macos-arm64": ["//buck2/native:openmp-macos", "//rust:metal"],
+        "//:macos-arm64": ["//build/buck2/native:openmp-macos", "//rust:metal"],
         "DEFAULT": [],
     }),
 )
