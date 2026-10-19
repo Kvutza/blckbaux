@@ -1,6 +1,6 @@
 {
   "schema": "blckbaux.performance-certificate.v1",
-  "config": "examples/tuning/hnet-1m-gaussian.toml",
+  "config": "experiments/hnet-1m-gaussian.toml",
   "static-contract": {
     "model": "fbt-pisa1-hnet-mhc4-v1",
     "program-version": 2,

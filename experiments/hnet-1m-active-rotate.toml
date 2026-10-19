@@ -1,6 +1,8 @@
-#:schema ../../schemas/tune-spec.schema.json
-# Continuous representation Lie algebra operator flow with ENN at 1M context.
-# Proposals evolve along W(s) = W * exp(s * X) with X in k (+) p.
+#:schema ../schemas/tune-spec.schema.json
+# Active subspace Bayesian optimization with ENN across rotating H-Net parameter families at 1M context.
+# In each round, proposal energy is concentrated onto one structural family (MLP experts, projections,
+# router/feedback, norms/biases) with zero dilution into inactive parameters, preserving exact total energy
+# while escaping the FP16 discretization deadzone.
 version = 4
 
 experiment = "pretrain"
@@ -24,9 +26,9 @@ interval = 25
 algorithm = "turbo-enn"
 
 [optimizer.candidate-generation]
-generator = "lie"
-arms = 2
-candidates = 4
+generator = "independent"
+arms = 1
+candidates = 1
 
 [optimizer.candidate-generation.perturbation]
 distribution = "gaussian"
@@ -52,6 +54,7 @@ initial = 0.02
 min = 0.01
 max = 0.2
 failure-tolerance = 4
+shape = "active-rotate"
 
 [seeds]
 model = 240105308887621659

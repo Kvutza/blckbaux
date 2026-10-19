@@ -1,4 +1,4 @@
-#:schema ../../schemas/tune-spec.schema.json
+#:schema ../schemas/tune-spec.schema.json
 # ENN with additive parameter-pair rotation and Gaussian innovations.
 # The proposal is not a learned Lie commutator or an exact orthogonal update.
 version = 4

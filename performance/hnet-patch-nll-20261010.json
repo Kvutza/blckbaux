@@ -9,7 +9,7 @@
   },
   "metal": {
     "hardware": "Apple M4, 10 GPU cores, 24 GB unified memory",
-    "config": "examples/tuning/hnet-64k-gaussian.toml",
+    "config": "experiments/hnet-64k-gaussian.toml",
     "run": ".cache/blckbaux/runs/pretrain/76b20718fa7e936adb18/run-1791647652592-99236-0",
     "rounds": 128,
     "accepted_updates": 41,
@@ -51,7 +51,7 @@
   },
   "cuda": {
     "hardware": "NVIDIA Tesla T4, sm_75",
-    "config": "examples/tuning/hnet-4k-gaussian.toml",
+    "config": "experiments/hnet-4k-gaussian.toml",
     "artifact": "results/cuda/hnet-4k-patch-profile/result.json",
     "objective_reduce_device_ms": 0.014336,
     "candidate_evaluation_device_ms": 211.157,

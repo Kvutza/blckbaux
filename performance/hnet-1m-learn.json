@@ -11,7 +11,7 @@
     "api": "Metal 4"
   },
   "experiment": {
-    "config": "examples/tuning/hnet-1m-gaussian.toml",
+    "config": "experiments/hnet-1m-gaussian.toml",
     "parameters": 1177756440,
     "rounds": 128,
     "context_tokens": 1048576,

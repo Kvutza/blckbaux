@@ -26,6 +26,4 @@ acceptance; [history](src/bf16_metal/history.rs) commits and archives the trial;
 
 Each module documents its assumptions, state changes, and limitations. Historical
 `bf16` filenames do not establish the actual storage precision, and `latent`
-history does not mean a reduced-dimensional model parameterization. The repository
-[source-contract standard](../../../docs/testing.md#source-contracts) applies to
-owned code; documentation-only changes must preserve executable behavior.
+history does not mean a reduced-dimensional model parameterization.

@@ -2,7 +2,7 @@
   "schema": "blckbaux.pool-rank-summary.v1",
   "measured_at": "2026-10-09",
   "run": ".cache/blckbaux/runs/pretrain/60fea303507e1cb6970e/run-1791603473893-41578-0",
-  "configuration": "examples/tuning/hnet-4k-gaussian.toml",
+  "configuration": "experiments/hnet-4k-gaussian.toml",
   "context_tokens": 4096,
   "pool_candidates": 4,
   "frozen_points": 16,

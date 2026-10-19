@@ -6,7 +6,7 @@ import Mathlib.Topology.MetricSpace.Basic
 /-!
 # Trajectory distribution reduction and total-variation reward bounds
 
-This module formalizes Reduction 3 from `docs/operator-bo-theory.md`:
+This module formalizes the trajectory-distribution reduction:
 "A generation-level trust region has a precise meaning."
 
 For a causal model generating token trajectories, raw parameter distance does

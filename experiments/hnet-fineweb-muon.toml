@@ -1,4 +1,4 @@
-#:schema ../../schemas/tune-spec.schema.json
+#:schema ../schemas/tune-spec.schema.json
 # Muon baseline on FineWeb for the H-Net/PISA/mHC/MoE model.
 version = 4
 

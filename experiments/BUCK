@@ -1,5 +1,5 @@
 filegroup(
-    name = "turbo-enn.toml",
+    name = "specs",
     srcs = glob(["*.toml"]),
     visibility = ["PUBLIC"],
 )

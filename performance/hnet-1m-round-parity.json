@@ -1,6 +1,6 @@
 {
   "schema": "blckbaux.experiment-regression.v1",
-  "config": "examples/tuning/hnet-1m-gaussian.toml",
+  "config": "experiments/hnet-1m-gaussian.toml",
   "model": "fbt-pisa1-hnet-mhc4-v1",
   "parameters": 1177756440,
   "truth": {

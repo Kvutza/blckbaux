@@ -1,4 +1,4 @@
-#:schema ../../schemas/tune-spec.schema.json
+#:schema ../schemas/tune-spec.schema.json
 # FineWeb benchmark with 1-forward-pass active subspace Bayesian optimization on H-Net.
 # Targets the cached FineWeb-Edu pretraining corpus with active-subspace energy concentration
 # across rotating parameter families on Apple Silicon Metal.

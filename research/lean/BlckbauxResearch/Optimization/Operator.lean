@@ -5,8 +5,8 @@ import Mathlib.Topology.MetricSpace.Basic
 /-!
 # Operator perturbation theory and reached-state reduction
 
-This module formalizes Reduction 2 from `docs/operator-bo-theory.md`:
-"Only acted-on input directions are visible locally."
+This module formalizes the reached-state reduction: only acted-on input
+directions are visible locally.
 
 In high-dimensional transformer optimization, parameters act through operators
 `W : Input → Output`.  At any round, the model visits a finite set of reached

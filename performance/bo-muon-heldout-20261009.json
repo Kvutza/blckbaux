@@ -14,7 +14,7 @@
     "initial_mean_nll": 12.485830903053284
   },
   "bayesian_optimization": {
-    "config": "examples/tuning/hnet-4k-gaussian.toml",
+    "config": "experiments/hnet-4k-gaussian.toml",
     "rounds": 512,
     "accepted": 104,
     "loop_seconds": 50.89176242899997,
@@ -27,7 +27,7 @@
     "run": ".cache/blckbaux/runs/pretrain/fd55c1e5e284ccfdc2bc/run-1791591369953-18299-0"
   },
   "muon": {
-    "config": "examples/tuning/hnet-4k-muon.toml",
+    "config": "experiments/hnet-4k-muon.toml",
     "rounds": 4,
     "loop_seconds": 54.886481168,
     "mean_round_ms": 13721.620292000001,

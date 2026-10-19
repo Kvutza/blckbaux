@@ -1,4 +1,4 @@
-#:schema ../../schemas/tune-spec.schema.json
+#:schema ../schemas/tune-spec.schema.json
 # Gaussian Bayesian optimization with ENN across the complete H-Net parameter space at 1M context.
 # Proposals are drawn from independent Gaussian innovations via a 256-strip Ziggurat sampler.
 version = 4

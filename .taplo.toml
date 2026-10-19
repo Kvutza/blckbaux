@@ -7,7 +7,7 @@ enabled = true
 
 [[rule]]
 include = [
-  "examples/tuning/**/*.toml",
+  "experiments/**/*.toml",
   "performance/configs/**/*.toml",
   "configs/**/*.toml",
 ]

@@ -9,7 +9,7 @@
   "objective": "held-out-conditional-cross-entropy",
   "initial_mean_nll": 12.485830890625003,
   "bayesian_optimization": {
-    "config": "examples/tuning/hnet-4k-gaussian.toml",
+    "config": "experiments/hnet-4k-gaussian.toml",
     "run": ".cache/blckbaux/runs/pretrain/fd55c1e5e284ccfdc2bc/run-1791597958472-25403-0",
     "rounds": 512,
     "accepted": 104,
@@ -31,7 +31,7 @@
     }
   },
   "muon": {
-    "config": "examples/tuning/hnet-4k-muon.toml",
+    "config": "experiments/hnet-4k-muon.toml",
     "run": ".cache/blckbaux/runs/pretrain/9fee45d624c7459408c6/run-1791598102066-25889-0",
     "rounds": 4,
     "loop_seconds": 55.26437824999999,

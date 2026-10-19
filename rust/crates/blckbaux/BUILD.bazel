@@ -121,7 +121,7 @@ rust_test(
         proc_macro_dev = True,
     ),
     crate = ":blckbaux_cpu",
-    compile_data = ["//examples/tuning:turbo-enn.toml"],
+    compile_data = ["//experiments:specs"],
     deps = BLCKBAUX_TEST_DEPS,
 )
 
@@ -134,7 +134,7 @@ rust_test(
         normal_dev = True,
         proc_macro_dev = True,
     ),
-    compile_data = ["//examples/tuning:turbo-enn.toml"],
+    compile_data = ["//experiments:specs"],
     crate = ":blckbaux_metal",
     crate_features = [
         "metal",

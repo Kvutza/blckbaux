@@ -3,15 +3,14 @@ use super::*;
 const PRETRAIN_MUON: &str = "version=4\nexperiment='pretrain'\nmodel='fbt-pisa1-hnet-mhc4-v1'\n[data]\nrecipe='stack-v3-rust-go-v1'\n[optimizer]\nalgorithm='muon'\n[objective]\nfunction='cross-entropy'\nsampling='natural'\n";
 
 #[cfg(feature = "buck2-test-data")]
-const GAUSSIAN: &str = include_str!("../../../turbo-enn.toml/hnet-4k-gaussian.toml");
+const GAUSSIAN: &str = include_str!("../../../specs/hnet-4k-gaussian.toml");
 #[cfg(not(feature = "buck2-test-data"))]
-const GAUSSIAN: &str = include_str!("../../../../../../examples/tuning/hnet-4k-gaussian.toml");
+const GAUSSIAN: &str = include_str!("../../../../../../experiments/hnet-4k-gaussian.toml");
 
 #[cfg(feature = "buck2-test-data")]
-const OPERATOR_BO: &str = include_str!("../../../turbo-enn.toml/hnet-1m-operator-bo.toml");
+const OPERATOR_BO: &str = include_str!("../../../specs/hnet-1m-operator-bo.toml");
 #[cfg(not(feature = "buck2-test-data"))]
-const OPERATOR_BO: &str =
-    include_str!("../../../../../../examples/tuning/hnet-1m-operator-bo.toml");
+const OPERATOR_BO: &str = include_str!("../../../../../../experiments/hnet-1m-operator-bo.toml");
 
 fn resident(acquisition: &str, candidates: u32, arms: u32, fit: &str) -> String {
     format!(
@@ -25,9 +24,9 @@ fn roundtrip() {
         ($($name:literal),+ $(,)?) => {
             [$({
                 #[cfg(feature = "buck2-test-data")]
-                let text = include_str!(concat!("../../../turbo-enn.toml/", $name));
+                let text = include_str!(concat!("../../../specs/", $name));
                 #[cfg(not(feature = "buck2-test-data"))]
-                let text = include_str!(concat!("../../../../../../examples/tuning/", $name));
+                let text = include_str!(concat!("../../../../../../experiments/", $name));
                 ($name, text)
             }),+]
         };

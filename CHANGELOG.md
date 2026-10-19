@@ -15,8 +15,7 @@ Breaking release. Renamed APIs have no compatibility aliases.
 ### Python API
 
 Added BoTorch, Optuna, and Ax adapters. All three libraries are now required
-Python dependencies. See [Python integrations](docs/interop.md) for supported
-features and limitations.
+Python dependencies.
 
 The primary model is now `ENN`:
 
