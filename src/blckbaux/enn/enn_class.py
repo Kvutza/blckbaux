@@ -112,6 +112,44 @@ class ENN:
     def ensure_sync(self) -> None:
         self._rust_model.ensure_sync()
 
+    def device_posterior(
+        self, x, params: ENNParams, *, flags: PosteriorFlags | None = None
+    ):
+        """Return a native posterior with DLPack mean, SE, and joint draw arrays.
+
+        Queries must be contiguous FP32 device arrays on the explicitly selected
+        CUDA or Metal index. Query/result arrays never pass through NumPy. Model
+        observations are synchronized from ENN storage. Snapshots own their
+        arrays and survive subsequent queries and model updates. Array exports
+        are read-only. Calls are synchronous; this is not a JAX jit primitive.
+
+        Torch CUDA and Torch MPS arrays are supported. JAX CUDA arrays are
+        supported through DLPack. JAX Metal arrays are intentionally rejected:
+        current Metal PJRT runtimes do not expose their buffers through DLPack,
+        and BLCKBAUX never silently copies them through host memory.
+        """
+        if type(x).__module__.startswith(("jax.", "jaxlib.")):
+            try:
+                device, _ = x.__dlpack_device__()
+            except BufferError as error:
+                raise ValueError(
+                    "JAX Metal arrays are not supported by device_posterior; "
+                    "use Torch MPS or JAX CUDA"
+                ) from error
+        else:
+            device, _ = x.__dlpack_device__()
+        if int(device) == 8 and type(x).__module__.startswith("torch"):
+            import torch
+
+            torch.mps.synchronize()
+        if hasattr(x, "block_until_ready"):
+            x.block_until_ready()
+        flags = _posteriorcoerced(flags)
+        self._rust_model.set_neighbors(flags.tie_neighbors)
+        kwargs = _rustkwargs(params, flags, [])
+        kwargs.pop("function_seeds")
+        return self._rust_model.device_posterior(x, **kwargs)
+
     def schedule_flush(self) -> None:
         self._rust_model.schedule_flush()
 

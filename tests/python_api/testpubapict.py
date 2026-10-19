@@ -45,6 +45,14 @@ class TestPublicAPIExports:
 
         assert callable(create_optimizer)
 
+    def test_optimizer_name(self):
+        import blckbaux
+        from blckbaux import bo
+
+        assert blckbaux.Optimizer is bo.Optimizer
+        assert blckbaux.BayesOptimizer is blckbaux.Optimizer
+        assert blckbaux.Optimizer.__name__ == "Optimizer"
+
     def test_configclasses(self):
         """All config classes are available and constructible."""
         from blckbaux import (
@@ -102,7 +110,7 @@ class TestPublicAPIExports:
         assert callable(experimental.quantize_e2m1)
         for name in [
             "ParamBlock",
-            "ParamBuffer",
+            "ParameterBuffer",
             "Proposals",
             "SearchState",
             "turbo_enn",
@@ -111,7 +119,8 @@ class TestPublicAPIExports:
             assert hasattr(experimental, name)
         if experimental.SearchState is not None:
             assert inspect.isclass(experimental.ParamBlock)
-            assert inspect.isclass(experimental.ParamBuffer)
+            assert inspect.isclass(experimental.ParameterBuffer)
+            assert experimental.ParameterBuffer is experimental.ParamBuffer
             assert inspect.isclass(experimental.Proposals)
             assert inspect.isclass(experimental.SearchState)
             assert callable(experimental.turbo_enn)

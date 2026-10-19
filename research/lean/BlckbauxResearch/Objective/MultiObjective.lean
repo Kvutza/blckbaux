@@ -98,4 +98,38 @@ theorem WeaklyDominates.trans
     (firstDominatesSecond objective)
     (secondDominatesThird objective)
 
+/-- A candidate minimizing a strictly positive weighted loss is Pareto optimal.
+This establishes that strictly positive scalarization (such as UCB with beta > 0)
+always selects an element from the non-dominated Pareto frontier. -/
+theorem Weighted.paretoOptimal
+    {objectiveCount : ℕ}
+    (weights : Fin objectiveCount → NNReal)
+    (hPos : ∀ i, 0 < weights i)
+    (feasible : Set (LossVector objectiveCount))
+    (candidate : LossVector objectiveCount)
+    (hMem : candidate ∈ feasible)
+    (hMin : ∀ alt ∈ feasible, weightedLoss weights candidate ≤ weightedLoss weights alt) :
+    ParetoOptimal feasible candidate := by
+  refine ⟨hMem, ?_⟩
+  rintro ⟨alt, hAltMem, hDom⟩
+  rcases hDom with ⟨hWeak, j, hStrict⟩
+  have hDiff : 0 < weightedLoss weights candidate - weightedLoss weights alt := by
+    unfold weightedLoss
+    rw [← Finset.sum_sub_distrib]
+    have hNonneg : ∀ i ∈ Finset.univ, 0 ≤ (weights i : ℝ) * candidate i - (weights i : ℝ) * alt i := by
+      intro i _
+      rw [← mul_sub]
+      have hW : 0 ≤ (weights i : ℝ) := (weights i).property
+      have hSub : 0 ≤ candidate i - alt i := sub_nonneg.mpr (hWeak i)
+      exact mul_nonneg hW hSub
+    have hStrictTerm : 0 < (weights j : ℝ) * candidate j - (weights j : ℝ) * alt j := by
+      rw [← mul_sub]
+      have hW : 0 < (weights j : ℝ) := hPos j
+      have hSub : 0 < candidate j - alt j := sub_pos.mpr hStrict
+      exact mul_pos hW hSub
+    have hLe := Finset.single_le_sum hNonneg (Finset.mem_univ j)
+    exact lt_of_lt_of_le hStrictTerm hLe
+  have hAltMin := hMin alt hAltMem
+  linarith
+
 end BlckbauxResearch.Objective.MultiObjective

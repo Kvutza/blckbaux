@@ -47,6 +47,7 @@ dense_dist2 = _ext.optimizer.dense_dist2
 dense_linear = _ext.optimizer.dense_linear
 DenseLinear = _ext.optimizer.DenseLinear
 ParamBuffer = getattr(_ext.optimizer, "ParamBuffer", None)
+ParameterBuffer = getattr(_ext.optimizer, "ParameterBuffer", ParamBuffer)
 ParamBlock = getattr(_ext.optimizer, "ParamBlock", None)
 SearchState = getattr(_ext.optimizer, "SearchState", None)
 Proposals = getattr(_ext.optimizer, "Proposals", None)
@@ -65,10 +66,11 @@ ResidentBoSession = _ext.experimental.ResidentBoSession
 
 __all__ = [
     "ENN",
+    "BayesOptimizer",
     "BpannHistory",
     "DenseLinear",
-    "ENNParams",
     "ENNFitter",
+    "ENNParams",
     "FlameEvaluator",
     "MetalFlameEvaluator",
     "MetalParamBlock",
@@ -78,9 +80,9 @@ __all__ = [
     "ModelPackage",
     "MultiTrustRegion",
     "NativeKdaModel",
-    "BayesOptimizer",
     "ParamBlock",
     "ParamBuffer",
+    "ParameterBuffer",
     "Proposals",
     "ResidentBoSession",
     "SearchState",

@@ -4,9 +4,9 @@ import numpy as np
 import pytest
 
 from blckbaux import create_optimizer, turbo_enn, turbo_one, turbo_zero
+from blckbaux.bo import Optimizer
 from blckbaux.turbo.config import ENNSurrogate, lhd_only
 from blckbaux.turbo.config.encode import ENN_K, enn_k, supports
-from blckbaux.bo import BayesOptimizer
 
 pytest.importorskip("blckbaux._rust")
 
@@ -20,7 +20,7 @@ BOUNDS = np.array([[0.0, 1.0], [0.0, 1.0]])
 def test_001(cfg):
     assert supports(cfg)
     opt = create_optimizer(bounds=BOUNDS, config=cfg, rng=np.random.default_rng(0))
-    assert isinstance(opt, BayesOptimizer)
+    assert isinstance(opt, Optimizer)
 
 
 def test_defaultennk():

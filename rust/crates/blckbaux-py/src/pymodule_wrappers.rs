@@ -49,6 +49,8 @@ pub fn pymodule_util(m: &Bound<'_, PyModule>) -> PyResult<()> {
 #[pymodule]
 #[pyo3(name = "model")]
 pub fn pymodule_model(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_class::<crate::py_posterior::PyDevicePosterior>()?;
+    m.add_class::<crate::py_posterior::PyDeviceArray>()?;
     m.add_class::<crate::py_model::PyENN>()?;
     m.add_class::<crate::py_model::PyENNParams>()?;
     Ok(())
@@ -107,6 +109,8 @@ pub fn pymodule_optimizer(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<crate::py_weights::PyDenseLinear>()?;
     #[cfg(all(target_os = "linux", target_arch = "x86_64", feature = "cuda"))]
     m.add_class::<crate::py_weights::PyParamBuffer>()?;
+    #[cfg(all(target_os = "linux", target_arch = "x86_64", feature = "cuda"))]
+    m.add("ParamBuffer", m.getattr("ParameterBuffer")?)?;
     #[cfg(all(target_os = "linux", target_arch = "x86_64", feature = "cuda"))]
     m.add_class::<crate::py_bf16::PyParamBlock>()?;
     #[cfg(all(target_os = "linux", target_arch = "x86_64", feature = "cuda"))]

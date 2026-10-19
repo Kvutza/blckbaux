@@ -10,6 +10,52 @@ use pyo3::prelude::*;
 use rand::SeedableRng;
 use rand::rngs::StdRng;
 
+/// Inspect this extension's native operations; runtime initialization is opt-in.
+#[pyfunction]
+#[pyo3(signature = (*, probe=false))]
+pub fn capabilities(py: Python<'_>, probe: bool) -> PyResult<Bound<'_, pyo3::types::PyList>> {
+    use blckbaux::capability::{Backend, backends, operations, support};
+    use pyo3::types::{PyDict, PyList};
+
+    let rows = PyList::empty(py);
+    for &backend in backends() {
+        let compiled = backend.compiled();
+        let (available, reason) = if !compiled {
+            (
+                Some(false),
+                Some("backend was not compiled into this library".to_string()),
+            )
+        } else if backend == Backend::Cpu {
+            (Some(true), None)
+        } else if probe {
+            match py.detach(|| backend.probe()) {
+                Ok(()) => (Some(true), None),
+                Err(error) => (Some(false), Some(error)),
+            }
+        } else {
+            (None, None)
+        };
+        let row = PyDict::new(py);
+        row.set_item("name", backend.name())?;
+        row.set_item("compiled", compiled)?;
+        row.set_item("available", available)?;
+        row.set_item("reason", reason)?;
+        let ops = PyDict::new(py);
+        let mut host = Vec::new();
+        for &operation in operations() {
+            let status = support(backend, operation);
+            ops.set_item(operation.name(), status.name())?;
+            if status != blckbaux::Support::Missing && operation.host_arrays() {
+                host.push(operation.name());
+            }
+        }
+        row.set_item("operations", ops)?;
+        row.set_item("host_operations", host)?;
+        rows.append(row)?;
+    }
+    Ok(rows)
+}
+
 /// Python wrapper for standardize_y
 #[pyfunction(name = "standardize_y")]
 pub fn y_py<'py>(py: Python<'py>, y: PyReadonlyArray1<f64>) -> PyResult<(f64, f64)> {

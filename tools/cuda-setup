@@ -16,8 +16,13 @@ fail() {
 [ "$(uname -s)" = Linux ] || fail "requires Linux"
 [ "$(uname -m)" = x86_64 ] || fail "requires x86_64"
 command -v nvidia-smi >/dev/null 2>&1 || fail "requires an NVIDIA runtime"
-[ -x "$cuda_root/bin/nvcc" ] || fail "requires CUDA 13.0 at $cuda_root"
 [ "$(id -u)" -eq 0 ] || fail "fresh hosted setup requires root"
+
+if [ ! -x "$cuda_root/bin/nvcc" ]; then
+    apt-get update
+    apt-get install -y --no-install-recommends cuda-toolkit-13-0
+fi
+[ -x "$cuda_root/bin/nvcc" ] || fail "could not install CUDA 13.0 at $cuda_root"
 
 if [ ! -x "/usr/bin/clang-$llvm_major" ] || [ ! -x "/usr/bin/llc-$llvm_major" ]; then
     apt-get update

@@ -105,16 +105,28 @@ fn launch_modal(job: &HnetJob<'_>) -> Result<std::process::ExitStatus, String> {
 }
 
 fn launch_local(job: &HnetJob<'_>) -> Result<std::process::ExitStatus, String> {
-    let build = Command::new(job.root.join("tools/cuda-run"))
-        .current_dir(job.root)
-        .env_remove("RUSTUP_TOOLCHAIN")
-        .arg("build")
-        .status()
-        .map_err(|error| format!("build local CUDA experiment: {error}"))?;
-    if !build.success() {
-        return Ok(build);
-    }
-    let mut command = Command::new(job.root.join("target/release/blckbaux-cuda"));
+    let executable = if let Some(path) = std::env::var_os("BLCKBAUX_CUDA_EXECUTABLE") {
+        let path = PathBuf::from(path);
+        if !path.is_file() {
+            return Err(format!(
+                "BLCKBAUX_CUDA_EXECUTABLE is not a file: {}",
+                path.display()
+            ));
+        }
+        path
+    } else {
+        let build = Command::new(job.root.join("tools/cuda-run"))
+            .current_dir(job.root)
+            .env_remove("RUSTUP_TOOLCHAIN")
+            .arg("build")
+            .status()
+            .map_err(|error| format!("build local CUDA experiment: {error}"))?;
+        if !build.success() {
+            return Ok(build);
+        }
+        job.root.join("target/release/blckbaux-cuda")
+    };
+    let mut command = Command::new(executable);
     command
         .current_dir(job.root)
         .arg("hnet-bo-bench")
@@ -163,8 +175,15 @@ fn launch_local(job: &HnetJob<'_>) -> Result<std::process::ExitStatus, String> {
 }
 
 pub(crate) fn run(root: &Path, path: &Path, out: &Path) -> Result<(), String> {
-    let source_digest =
-        blckbaux::experimental::perf_digest(root, blckbaux::experimental::Backend::CudaOxide)?;
+    let source_digest = match std::env::var("BLCKBAUX_SOURCE_DIGEST") {
+        Ok(value) if value.len() == 64 && value.bytes().all(|byte| byte.is_ascii_hexdigit()) => {
+            value
+        }
+        Ok(_) => return Err("BLCKBAUX_SOURCE_DIGEST must be a SHA-256 digest".into()),
+        Err(_) => {
+            blckbaux::experimental::perf_digest(root, blckbaux::experimental::Backend::CudaOxide)?
+        }
+    };
     let config_path = absolute(root, path);
     let (source, _) = blckbaux::config::load_tune(&config_path)?;
     let resolved;

@@ -37,6 +37,7 @@ _LAZY_ATTRS: dict[str, tuple[str, str]] = {
     "experimental": (".experimental", "experimental"),
     "create_optimizer": (".bo", "create_optimizer"),
     "BayesOptimizer": (".bo", "BayesOptimizer"),
+    "Optimizer": (".bo", "Optimizer"),
     "enn_optimizer": ("._rust", "enn_optimizer"),
     "create_zero": ("._rust", "create_zero"),
     "create_lhd": ("._rust", "create_lhd"),
@@ -52,6 +53,8 @@ _LAZY_ATTRS: dict[str, tuple[str, str]] = {
     "CandidateSampler": (".turbo.config", "CandidateSampler"),
     "InitStrategy": (".turbo.config", "InitStrategy"),
     "AcquisitionKind": (".turbo.config", "AcquisitionKind"),
+    "BackendCapabilities": (".runtime", "BackendCapabilities"),
+    "capabilities": (".runtime", "capabilities"),
 }
 
 
@@ -60,21 +63,24 @@ def __getattr__(name: str):
 
 
 __all__: list[str] = [
+    "ENN",
     "AcquisitionKind",
+    "BackendCapabilities",
     "BayesOptimizer",
     "CandidateSampler",
     "ENNFitter",
-    "ENN",
     "InitStrategy",
     "MorboTrustRegion",
     "NoTrustRegion",
+    "Optimizer",
     "OptimizerConfig",
     "Telemetry",
     "TurboTrustRegion",
-    "create_optimizer",
-    "enn_optimizer",
-    "create_zero",
+    "capabilities",
     "create_lhd",
+    "create_optimizer",
+    "create_zero",
+    "enn_optimizer",
     "experimental",
     "lhd_only",
     "turbo_enn",

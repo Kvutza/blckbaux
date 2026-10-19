@@ -4,8 +4,8 @@
 //! source records. Tokenizer and boundary identities must agree across all splits.
 
 use super::{
-    canonical, file_hash, max_repetitions, mix_parts, mix_seed, prepare_named, recipe, recipe_key,
-    run_worker, string, verify,
+    canonical, corpus_path, file_hash, max_repetitions, mix_parts, mix_seed, prepare_named, recipe,
+    recipe_key, run_worker, string, verify,
 };
 use blckbaux::config::ExperimentSpec;
 use blckbaux_artifact::json::{Value, json};
@@ -203,7 +203,7 @@ fn training(
             }))
         })
         .collect::<Result<Vec<_>, String>>()?;
-    let executable = engine.build_artifact(root, "//rust/crates/corpus:corpus")?;
+    let executable = corpus_path(root, engine)?;
     let job = json!({
         "kind":"mix",
         "output":artifact,
@@ -213,7 +213,7 @@ fn training(
         "seed":mix_seed(document)?,
         "parts":job_parts,
     });
-    run_worker(&executable.path, &job, stage, "corpus interleave")?;
+    run_worker(&executable, &job, stage, "corpus interleave")?;
     let report_value: Value = blckbaux_artifact::json::from_reader(
         fs::File::open(&report).map_err(|error| error.to_string())?,
     )

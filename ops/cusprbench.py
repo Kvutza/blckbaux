@@ -7,7 +7,7 @@ import time
 
 import numpy as np
 
-from blckbaux.search import Optimizer, Parameter
+from blckbaux.search import Parameter, ParameterOptimizer
 
 
 def main() -> None:
@@ -23,7 +23,7 @@ def main() -> None:
             radius=0.25,
         )
     ]
-    search = Optimizer(
+    search = ParameterOptimizer(
         base,
         0.0,
         leaves,
@@ -41,7 +41,7 @@ def main() -> None:
         search.tell(trial, float(round_index + 1))
     measured = elapsed[8:]
     median = statistics.median(measured)
-    p95 = sorted(measured)[-1]
+    p95 = max(measured)
     print(
         "CUDA_SPARSE "
         f"dimensions={dimensions} candidates=8 history=8 num_pert=20 "

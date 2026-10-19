@@ -180,7 +180,7 @@ theorem commitBound {State Move : Type*} {capacity : ℕ}
     unfold accepts
     unfold progress at useful
     linarith
-  simp only [scalarCommit, if_pos accepted]
+  simp only [scalarCommit, accepted, ite_true]
   exact useful
 
 /-- The same source ENN decision contracts simple regret when the transported
@@ -447,7 +447,7 @@ theorem windowCommit {State Move : Type*} {capacity : ℕ}
     unfold accepts
     unfold progress at useful
     linarith
-  simp only [scalarCommit, if_pos accepted]
+  simp only [scalarCommit, accepted, ite_true]
   exact useful
 
 #print axioms baseBound

@@ -3,6 +3,10 @@
 from __future__ import annotations
 
 import json
+import os
+import shutil
+import subprocess
+from importlib.metadata import version
 from pathlib import Path
 from typing import Any
 
@@ -47,6 +51,59 @@ def read_trace(path: str | Path) -> dict[str, Any]:
     ):
         raise ValueError(f"{source} is not an Blckbaux initialized trace")
     return report
+
+
+def run(config: str | Path, output: str | Path) -> Path:
+    """Run a complete CUDA pre-training experiment from a TOML specification."""
+    source = Path(config).expanduser().resolve()
+    destination = Path(output).expanduser().resolve()
+    if not source.is_file():
+        raise FileNotFoundError(source)
+    if destination.exists():
+        raise FileExistsError(destination)
+
+    package = Path(__file__).resolve().parent
+    packaged = package / "bin"
+    digest = package / "source.sha256"
+    names = ("blckbaux-runner", "blckbaux-corpus", "blckbaux-cuda")
+    missing = [packaged / name for name in names if not (packaged / name).is_file()]
+    if not digest.is_file():
+        missing.append(digest)
+    if missing:
+        names = ", ".join(path.name for path in missing)
+        raise RuntimeError(f"CUDA wheel is incomplete; missing: {names}")
+
+    workspace = Path.home() / ".cache" / "blckbaux" / "wheel" / version("blckbaux")
+    binaries = workspace / "bin"
+    binaries.mkdir(parents=True, exist_ok=True)
+    for name in names:
+        target = binaries / name
+        shutil.copy2(packaged / name, target)
+        target.chmod(0o755)
+    runner = binaries / "blckbaux-runner"
+    corpus = binaries / "blckbaux-corpus"
+    cuda = binaries / "blckbaux-cuda"
+    recipes = workspace / "data" / "recipes"
+    if not recipes.is_dir():
+        recipes.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(package / "data" / "recipes", recipes)
+
+    environment = os.environ.copy()
+    environment.update(
+        {
+            "BUILD_WORKSPACE_DIRECTORY": str(workspace),
+            "BLCKBAUX_CORPUS_EXECUTABLE": str(corpus),
+            "BLCKBAUX_CUDA_EXECUTABLE": str(cuda),
+            "BLCKBAUX_SOURCE_DIGEST": digest.read_text(encoding="utf-8").strip(),
+        }
+    )
+    subprocess.run(
+        [str(runner), "cuda-tune-t4", str(source), "--out", str(destination)],
+        cwd=workspace,
+        env=environment,
+        check=True,
+    )
+    return destination
 
 
 @click.group(help=__doc__)

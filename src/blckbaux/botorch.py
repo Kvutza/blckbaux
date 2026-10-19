@@ -1,7 +1,8 @@
 """BoTorch integration using BLCKBAUX's native, correlated function draws.
 
-This is a CPU tensor boundary without autograd;
-evaluate acquisitions on candidate sets instead of gradient-based optimization.
+GPU queries use the matching native CUDA/Metal posterior and DLPack arrays.
+CPU queries use the original host-array interface. Explicit compatibility mode
+``allow_host_transfer=True`` permits the host-array path for GPU queries.
 """
 
 from __future__ import annotations
@@ -27,12 +28,15 @@ class Model(BaseModel):
     conditioning/fantasies, and input gradients are deliberately unsupported.
     """
 
-    def __init__(self, enn: ENN, params: ENNParams) -> None:
+    def __init__(
+        self, enn: ENN, params: ENNParams, *, allow_host_transfer: bool = False
+    ) -> None:
         super().__init__()
         if np.isfinite(enn.y_bounds).any():
             raise ValueError("bounded outputs do not expose exact posterior moments")
         self.enn = enn
         self.params = params
+        self.allow_host_transfer = allow_host_transfer
 
     @property
     def num_outputs(self):
@@ -46,9 +50,13 @@ class Model(BaseModel):
     def posterior(
         self, X, output_indices=None, observation_noise=False, posterior_transform=None
     ):
-        if X.device.type != "cpu" or X.dtype not in (torch.float32, torch.float64):
+        if X.device.type not in ("cpu", "cuda", "mps") or X.dtype not in (
+            torch.float32,
+            torch.float64,
+        ):
             raise ValueError(
-                "BLCKBAUX's BoTorch boundary requires CPU float32/float64 tensors"
+                "BLCKBAUX's BoTorch boundary requires CPU, CUDA, or MPS "
+                "float32/float64 tensors"
             )
         if X.requires_grad:
             raise NotImplementedError(
@@ -78,22 +86,63 @@ class Model(BaseModel):
             )
         ):
             raise ValueError("output indices must be distinct valid output positions")
-        return Posterior(self.enn, self.params, X, indices, observation_noise)
+        return Posterior(
+            self.enn,
+            self.params,
+            X,
+            indices,
+            observation_noise,
+            allow_host_transfer=self.allow_host_transfer,
+        )
 
 
 class Posterior(BasePosterior):
     """Native marginals and joint draws with one function seed per MC sample."""
 
-    def __init__(self, enn, params, queries, indices, noise):
+    def __init__(self, enn, params, queries, indices, noise, *, allow_host_transfer):
         self._enn = enn
         self._params = params
         self._indices = indices
         self._flags = PosteriorFlags(observation_noise=noise)
         self._rows = len(enn)
         self._dtype = queries.dtype
+        self._device = queries.device
+        self._allow_host_transfer = allow_host_transfer
         self._shape = queries.shape[:-1] + torch.Size([len(indices)])
+        self._native = None
+        if queries.device.type != "cpu" and not allow_host_transfer:
+            device_queries = (
+                queries.detach()
+                .to(dtype=torch.float32)
+                .reshape(-1, queries.shape[-1])
+                .contiguous()
+            )
+            if not torch.isfinite(device_queries).all():
+                raise ValueError("device queries must be representable as finite FP32")
+            self._native = enn.device_posterior(
+                device_queries, params, flags=self._flags
+            )
+            self._mean = (
+                torch.from_dlpack(self._native.mean)
+                .to(dtype=self.dtype)[..., indices]
+                .reshape(self._shape)
+            )
+            self._variance = (
+                torch.from_dlpack(self._native.se)
+                .to(dtype=self.dtype)
+                .square()[..., indices]
+                .reshape(self._shape)
+            )
+            return
         self._queries = (
-            queries.detach().double().numpy().reshape(-1, queries.shape[-1]).copy()
+            queries.detach()
+            # Transfer before widening: combined MPS -> CPU float64 conversion
+            # returned zero queries on the supported local Torch runtime.
+            .to(device="cpu")
+            .to(dtype=torch.float64)
+            .numpy()
+            .reshape(-1, queries.shape[-1])
+            .copy()
         )
         marginal = enn.posterior(self._queries, params=params, flags=self._flags)
         self._mean = self._tensor(marginal.mu[:, indices])
@@ -104,13 +153,13 @@ class Posterior(BasePosterior):
             raise RuntimeError("BLCKBAUX changed; request a fresh posterior")
 
     def _tensor(self, values):
-        return torch.as_tensor(np.ascontiguousarray(values), dtype=self.dtype).reshape(
-            self._shape
-        )
+        return torch.as_tensor(
+            np.ascontiguousarray(values), dtype=self.dtype, device=self._device
+        ).reshape(self._shape)
 
     @property
     def device(self):
-        return torch.device("cpu")
+        return self._device
 
     @property
     def dtype(self):
@@ -127,7 +176,9 @@ class Posterior(BasePosterior):
         return self._variance
 
     @override
-    def _extended_shape(self, sample_shape=torch.Size()):
+    def _extended_shape(self, sample_shape=None):
+        if sample_shape is None:
+            sample_shape = torch.Size()
         return sample_shape + self._shape
 
     @override
@@ -139,24 +190,41 @@ class Posterior(BasePosterior):
     @override
     def rsample_from_base_samples(self, sample_shape, base_samples):
         self._check()
-        if base_samples.dtype != torch.int64 or base_samples.device.type != "cpu":
-            raise ValueError("BLCKBAUX base samples must be CPU int64 function seeds")
+        if base_samples.dtype != torch.int64:
+            raise ValueError("BLCKBAUX base samples must be int64 function seeds")
+        if base_samples.device.type != "cpu" and not self._allow_host_transfer:
+            raise NotImplementedError(
+                "function seeds require host arrays; pass "
+                "allow_host_transfer=True to permit device-to-host exchange"
+            )
         if base_samples.shape != sample_shape:
             raise ValueError(
                 "BLCKBAUX requires exactly one function seed per MC sample"
             )
         if sample_shape.numel() == 0:
-            return torch.empty(self._extended_shape(sample_shape), dtype=self.dtype)
+            return torch.empty(
+                self._extended_shape(sample_shape),
+                dtype=self.dtype,
+                device=self._device,
+            )
+        if self._native is not None:
+            # Function seeds are small host metadata, never query/parameter rows.
+            native = self._native.draw(base_samples.detach().reshape(-1).tolist())
+            values = torch.from_dlpack(native).to(dtype=self.dtype)
+            values = values.reshape(
+                sample_shape + self._shape[:-1] + torch.Size([self._enn.num_outputs])
+            )
+            return values[..., self._indices]
         draws, _ = self._enn.posterior_draw(
             self._queries,
             self._params,
-            function_seeds=base_samples.reshape(-1).numpy(),
+            function_seeds=base_samples.detach().to(device="cpu").reshape(-1).numpy(),
             flags=self._flags,
         )
         values = np.moveaxis(draws[:, self._indices, :], -1, 0)
-        return torch.as_tensor(np.ascontiguousarray(values), dtype=self.dtype).reshape(
-            self._extended_shape(sample_shape)
-        )
+        return torch.as_tensor(
+            np.ascontiguousarray(values), dtype=self.dtype, device=self._device
+        ).reshape(self._extended_shape(sample_shape))
 
 
 class Sampler(MCSampler):

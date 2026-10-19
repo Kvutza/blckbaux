@@ -1,4 +1,3 @@
-# ruff: noqa: E402
 import pytest
 
 pytest.importorskip("ax")
@@ -6,7 +5,14 @@ from ax.api.client import Client
 from ax.api.configs import RangeParameterConfig
 from ax.generation_strategy.generation_strategy import GenerationStrategy
 
-from blckbaux.ax import Node
+from blckbaux.ax import GenerationNode
+
+
+def test_public_name():
+    from blckbaux.ax import Node
+
+    assert Node is GenerationNode
+    assert GenerationNode.__name__ == "GenerationNode"
 
 
 def client(node, objective="-loss"):
@@ -26,7 +32,7 @@ def client(node, objective="-loss"):
     "objective,weight", [("-loss", -1), ("loss", 1), ("2*loss", 2)]
 )
 def test_trials(config, objective, weight):
-    node = Node(config=config, seed=9)
+    node = GenerationNode(config=config, seed=9)
     study = client(node, objective)
     scores = {}
     for _ in range(5):
@@ -44,7 +50,7 @@ def test_trials(config, objective, weight):
 
 
 def test_pending(config):
-    node = Node(config=config)
+    node = GenerationNode(config=config)
     study = client(node)
     trials = study.get_next_trials(max_trials=3)
     assert len(trials) == 3
@@ -59,11 +65,11 @@ def test_pending(config):
 
 
 def test_restart(config):
-    node = Node(config=config)
+    node = GenerationNode(config=config)
     study = client(node)
     for index in study.get_next_trials(max_trials=2):
         study.complete_trial(index, raw_data={"loss": (1.0, 0.0)})
-    restored = Node(config=config)
+    restored = GenerationNode(config=config)
     restored.update_generator_state(study._experiment, study._experiment.lookup_data())
     assert len(restored._loop._seen) == 2
     proposal = restored.get_next_candidate([])
@@ -71,7 +77,7 @@ def test_restart(config):
 
 
 def test_contract(config):
-    node = Node(config=config)
+    node = GenerationNode(config=config)
     with pytest.raises(RuntimeError, match="update"):
         node.get_next_candidate([])
     study = client(node)
@@ -79,13 +85,13 @@ def test_contract(config):
     study.configure_optimization(objective="loss")
     with pytest.raises(ValueError, match="contract changes"):
         study.get_next_trials(max_trials=1)
-    multi = client(Node(config=config), objective="loss, other")
+    multi = client(GenerationNode(config=config), objective="loss, other")
     with pytest.raises(ValueError, match="one unscalarized"):
         multi.get_next_trials(max_trials=1)
 
 
 def test_missing(config):
-    node = Node(config=config)
+    node = GenerationNode(config=config)
     study = client(node)
     for index in study.get_next_trials(max_trials=1):
         study.complete_trial(index)
@@ -94,7 +100,7 @@ def test_missing(config):
 
 
 def test_corrections(config):
-    node = Node(config=config)
+    node = GenerationNode(config=config)
     study = client(node)
     for index in study.get_next_trials(max_trials=1):
         study.complete_trial(index, raw_data={"loss": (1.0, 0.1)})

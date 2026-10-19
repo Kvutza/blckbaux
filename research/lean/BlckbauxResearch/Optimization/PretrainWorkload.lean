@@ -1,76 +1,92 @@
 import BlckbauxResearch.Foundation
-import Mathlib.Data.Real.Basic
+import Mathlib.Basic.Real.Basic
 
 /-!
-# Active pretraining workload
+# Sample and budget complexity of pretraining workloads
 
-The one-million-token value is the size of one objective-evaluation window, not
-the duration of pretraining. A pretraining horizon is expressed by the total
-number of evaluated tokens. Optimizer transactions merely partition that token
-stream, so this module fixes no transaction count.
+A pretraining or optimization horizon is expressed by the total evaluation budget
+consumed (e.g. evaluated sample units, sequences, or tokens). Optimizer
+transactions partition this evaluation stream into batches or windows of size `w`.
+This module formalizes budget accounting and quality threshold achievement in a
+domain-agnostic manner.
 -/
 
 /-!
-Let `T(n) = ∑_{t<n} tokensAt(t)` be evaluated-token time.  Under the current
-fixed natural-window protocol, `T(n) = n * windowTokens`.  This is accounting,
-not a claim that `n` transactions suffice for a useful pretrained checkpoint;
-the latter depends on a separately defined loss path and threshold.
+Let `B(n) = ∑_{t<n} costAt(t)` be the cumulative evaluation budget consumed after
+`n` transactions.  Under a fixed window protocol of size `w`, `B(n) = n * w`.
+This is accounting, not a claim that `n` transactions suffice for convergence;
+the latter depends on the optimization policy and population loss path.
 -/
 
 namespace BlckbauxResearch.Optimization.PretrainWorkload
 
 open scoped BigOperators
 
-/-- Tokens in one active objective-evaluation window. -/
-def windowTokens : ℕ := currentTarget.contextTokens
+/-- Cumulative evaluated budget units after an arbitrary number of transactions. -/
+def budgetClock (costAt : ℕ → ℕ) (steps : ℕ) : ℕ :=
+  ∑ step ∈ Finset.range steps, costAt step
 
-/-- Complete transaction target latency in milliseconds. -/
-def targetMs : ℕ := currentTarget.targetMs
+theorem budgetSucc (costAt : ℕ → ℕ) (steps : ℕ) :
+    budgetClock costAt (steps + 1) = budgetClock costAt steps + costAt steps := by
+  simp [budgetClock, Finset.sum_range_succ]
 
-/-- Model parameter count for `fbt-pisa1-hnet-mhc4-v1`. -/
-def paramCount : ℕ := currentTarget.parameterCount
+/-- Under a fixed window protocol of size `windowSize`, `steps` transactions consume
+exactly `steps * windowSize` evaluation budget units. -/
+theorem budgetFixed (windowSize steps : ℕ) :
+    budgetClock (fun _ => windowSize) steps = steps * windowSize := by
+  simp [budgetClock]
 
-/-- Complete candidate states evaluated per transaction. -/
-def candidateCount : ℕ := currentTarget.candidates
+/-- A declared quality criterion stated as a loss threshold reached within a budget. -/
+structure BudgetGoal where
+  lossAfter : ℕ → ℝ
+  threshold : ℝ
 
-/-- Nearest neighbors queried by the ENN surrogate. -/
-def neighborK : ℕ := currentTarget.neighbors
+/-- The quality criterion has been reached after consuming this evaluation budget. -/
+def BudgetGoal.reached (goal : BudgetGoal) (budget : ℕ) : Prop :=
+  goal.lossAfter budget ≤ goal.threshold
 
-theorem activeContract :
-    windowTokens = currentTarget.contextTokens ∧
-    targetMs = currentTarget.targetMs ∧
-    paramCount = currentTarget.parameterCount ∧
-    candidateCount = 1 ∧ neighborK = 10 := by
-  decide
+/-- A budget is sufficient when the criterion is reached within it. -/
+def BudgetGoal.sufficient (goal : BudgetGoal) (budget : ℕ) : Prop :=
+  ∃ consumed ≤ budget, goal.reached consumed
 
-/-- Cumulative evaluated tokens after an arbitrary number of transactions. -/
-def tokenClock (tokensAt : ℕ → ℕ) (steps : ℕ) : ℕ :=
-  ∑ step ∈ Finset.range steps, tokensAt step
+/-- A budget requirement is the minimal sufficient budget for the declared criterion. -/
+def BudgetGoal.required (goal : BudgetGoal) (budget : ℕ) : Prop :=
+  goal.sufficient budget ∧ ∀ smaller < budget, ¬goal.sufficient smaller
 
-theorem clockSucc (tokensAt : ℕ → ℕ) (steps : ℕ) :
-    tokenClock tokensAt (steps + 1) = tokenClock tokensAt steps + tokensAt steps := by
-  simp [tokenClock, Finset.sum_range_succ]
+theorem BudgetGoal.sufficientMono
+    {goal : BudgetGoal} {smaller larger : ℕ}
+    (enough : goal.sufficient smaller) (order : smaller ≤ larger) :
+    goal.sufficient larger := by
+  obtain ⟨consumed, within, reached⟩ := enough
+  exact ⟨consumed, within.trans order, reached⟩
 
-/-- With the active natural-window protocol, `steps` transactions mean exactly
-`steps * windowTokens` evaluated candidate tokens. -/
-theorem clockFixed (steps : ℕ) :
-    tokenClock (fun _ => windowTokens) steps = steps * windowTokens := by
-  simp [tokenClock]
+theorem BudgetGoal.requiredUnique
+    {goal : BudgetGoal} {left right : ℕ}
+    (leftReq : goal.required left) (rightReq : goal.required right) :
+    left = right := by
+  rcases leftReq with ⟨leftEnough, leftLeast⟩
+  rcases rightReq with ⟨rightEnough, rightLeast⟩
+  apply Nat.le_antisymm
+  · by_contra notOrder
+    exact leftLeast right (Nat.lt_of_not_ge notOrder) rightEnough
+  · by_contra notOrder
+    exact rightLeast left (Nat.lt_of_not_ge notOrder) leftEnough
 
-/-- A declared base-model quality criterion stated as a loss threshold. -/
+/-- Backward-compatible structure for token-based workloads. -/
 structure LossGoal where
   lossAfter : ℕ → ℝ
   threshold : ℝ
 
-/-- The quality criterion has been reached after processing this many tokens. -/
+def LossGoal.toBudgetGoal (goal : LossGoal) : BudgetGoal where
+  lossAfter := goal.lossAfter
+  threshold := goal.threshold
+
 def LossGoal.reached (goal : LossGoal) (tokens : ℕ) : Prop :=
   goal.lossAfter tokens ≤ goal.threshold
 
-/-- A token budget is sufficient when the criterion is reached within it. -/
 def LossGoal.sufficient (goal : LossGoal) (budget : ℕ) : Prop :=
   ∃ tokens ≤ budget, goal.reached tokens
 
-/-- A token requirement is the least sufficient budget for the declared criterion. -/
 def LossGoal.required (goal : LossGoal) (budget : ℕ) : Prop :=
   goal.sufficient budget ∧ ∀ smaller < budget, ¬goal.sufficient smaller
 
@@ -93,9 +109,37 @@ theorem LossGoal.requiredUnique
   · by_contra notOrder
     exact rightLeast left (Nat.lt_of_not_ge notOrder) leftEnough
 
-#print axioms clockSucc
-#print axioms clockFixed
-#print axioms LossGoal.requiredUnique
-#print axioms activeContract
+/-- Backward-compatible alias for token-based workloads. -/
+abbrev tokenClock := budgetClock
+
+theorem clockSucc (tokensAt : ℕ → ℕ) (steps : ℕ) :
+    tokenClock tokensAt (steps + 1) = tokenClock tokensAt steps + tokensAt steps :=
+  budgetSucc tokensAt steps
+
+/-- Evaluation window size specialized to the benchmark configuration. -/
+def windowTokens : ℕ := currentTarget.contextTokens
+
+theorem clockFixed (steps : ℕ) :
+    tokenClock (fun _ => windowTokens) steps = steps * windowTokens :=
+  budgetFixed windowTokens steps
+
+/-- Complete transaction target latency in milliseconds. -/
+def targetMs : ℕ := currentTarget.targetMs
+
+/-- Model parameter count for `fbt-pisa1-hnet-mhc4-v1`. -/
+def paramCount : ℕ := currentTarget.parameterCount
+
+/-- Complete candidate states evaluated per transaction. -/
+def candidateCount : ℕ := currentTarget.candidates
+
+/-- Nearest neighbors queried by the ENN surrogate. -/
+def neighborK : ℕ := currentTarget.neighbors
+
+theorem activeContract :
+    windowTokens = currentTarget.contextTokens ∧
+    targetMs = currentTarget.targetMs ∧
+    paramCount = currentTarget.parameterCount ∧
+    candidateCount = 1 ∧ neighborK = 10 := by
+  decide
 
 end BlckbauxResearch.Optimization.PretrainWorkload

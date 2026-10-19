@@ -266,7 +266,7 @@ theorem goalBound
           regret steps world} := by
         refine measureReal_mono ?_ (by finiteness)
         intro world missed
-        simp only [Set.mem_setOf_eq, PretrainWorkload.LossGoal.reached,
+        simp only [Set.mem_ofPred_eq, PretrainWorkload.LossGoal.reached,
           PretrainWorkload.clockFixed, lossEq, not_le] at missed ⊢
         have target := envelopeReached world
         linarith

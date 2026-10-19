@@ -1,8 +1,8 @@
 filegroup(
     name = "source",
-    srcs = glob(["**/*.rs"]) + [
+    srcs = glob(["**/*.rs", "native/*"]) + [
         "Cargo.toml",
-        "kernels/Cargo.toml",
+        "device/Cargo.toml",
         "rust-toolchain.toml",
     ],
     visibility = ["PUBLIC"],

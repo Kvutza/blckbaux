@@ -1,4 +1,4 @@
-"""Package a CUDA-enabled Blckbaux extension as a CPython 3.12 Linux wheel."""
+"""Package a CUDA-enabled Blckbaux extension as a CPython Linux wheel."""
 
 from __future__ import annotations
 
@@ -15,8 +15,6 @@ from pathlib import Path
 
 import click
 
-TAG = "cp312-cp312-manylinux_2_28_x86_64"
-
 
 def _digest(path: Path) -> str:
     value = base64.urlsafe_b64encode(hashlib.sha256(path.read_bytes()).digest())
@@ -28,21 +26,37 @@ def _write(path: Path, value: str) -> None:
     path.write_text(value, encoding="utf-8", newline="\n")
 
 
-def build_wheel(root: Path, extension: Path, output: Path, version: str) -> Path:
-    if sys.version_info[:2] != (3, 12):
-        raise RuntimeError("CUDA wheel packaging requires CPython 3.12")
+def build_wheel(
+    root: Path,
+    extension: Path,
+    runner: Path,
+    corpus: Path,
+    cuda: Path,
+    digest: Path,
+    output: Path,
+    version: str,
+    python_abi: str,
+    python_requires: str,
+) -> Path:
+    actual_abi = f"cp{sys.version_info.major}{sys.version_info.minor}"
+    if python_abi != actual_abi or not 12 <= sys.version_info.minor <= 15:
+        raise RuntimeError(
+            f"CUDA wheel requested {python_abi}, running interpreter is {actual_abi}"
+        )
     if sys.platform != "linux":
         raise RuntimeError("CUDA wheels are built on Linux")
-    if not extension.is_file():
-        raise FileNotFoundError(extension)
+    for artifact in (extension, runner, corpus, cuda, digest):
+        if not artifact.is_file():
+            raise FileNotFoundError(artifact)
 
     suffix = sysconfig.get_config_var("EXT_SUFFIX")
-    if not suffix or "cpython-312" not in suffix:
+    if not suffix or f"cpython-{actual_abi[2:]}" not in suffix:
         raise RuntimeError(f"unexpected extension suffix: {suffix!r}")
 
     version = version + "+cuda75"
+    tag = f"{python_abi}-{python_abi}-manylinux_2_28_x86_64"
     output.mkdir(parents=True, exist_ok=True)
-    wheel = output / f"blckbaux-{version}-{TAG}.whl"
+    wheel = output / f"blckbaux-{version}-{tag}.whl"
     with tempfile.TemporaryDirectory(prefix="blckbaux-cuda-wheel-") as directory:
         stage = Path(directory)
         package = stage / "blckbaux"
@@ -52,6 +66,12 @@ def build_wheel(root: Path, extension: Path, output: Path, version: str) -> Path
             ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.so"),
         )
         shutil.copy2(extension, package / f"blckbaux_rust{suffix}")
+        binary_dir = package / "bin"
+        binary_dir.mkdir()
+        for source in (runner, corpus, cuda):
+            shutil.copy2(source, binary_dir / source.name)
+        shutil.copytree(root / "data" / "recipes", package / "data" / "recipes")
+        shutil.copy2(digest, package / "source.sha256")
 
         dist = stage / f"blckbaux-{version}.dist-info"
         _write(
@@ -62,7 +82,7 @@ def build_wheel(root: Path, extension: Path, output: Path, version: str) -> Path
                     "Name: blckbaux",
                     f"Version: {version}",
                     "Summary: Epistemic Nearest Neighbors with CUDA-Oxide sm_75 support",
-                    "Requires-Python: >=3.12,<3.13",
+                    f"Requires-Python: {python_requires}",
                     "Requires-Dist: numpy>=2.1",
                     "Requires-Dist: scipy>=1.11",
                     "Requires-Dist: click==8.5.0",
@@ -80,7 +100,7 @@ def build_wheel(root: Path, extension: Path, output: Path, version: str) -> Path
                     "Wheel-Version: 1.0",
                     "Generator: blckbaux.cuda_wheel",
                     "Root-Is-Purelib: false",
-                    f"Tag: {TAG}",
+                    f"Tag: {tag}",
                     "",
                 ]
             ),
@@ -122,6 +142,10 @@ def build_wheel(root: Path, extension: Path, output: Path, version: str) -> Path
 @click.argument(
     "extension", type=click.Path(exists=True, dir_okay=False, path_type=Path)
 )
+@click.argument("runner", type=click.Path(exists=True, dir_okay=False, path_type=Path))
+@click.argument("corpus", type=click.Path(exists=True, dir_okay=False, path_type=Path))
+@click.argument("cuda", type=click.Path(exists=True, dir_okay=False, path_type=Path))
+@click.argument("digest", type=click.Path(exists=True, dir_okay=False, path_type=Path))
 @click.argument("output", type=click.Path(file_okay=False, path_type=Path))
 @click.option(
     "--root",
@@ -130,9 +154,33 @@ def build_wheel(root: Path, extension: Path, output: Path, version: str) -> Path
     show_default=True,
 )
 @click.option("--version", required=True)
-def main(extension: Path, output: Path, root: Path, version: str) -> None:
+@click.option("--python-abi", required=True)
+@click.option("--python-requires", required=True)
+def main(
+    extension: Path,
+    runner: Path,
+    corpus: Path,
+    cuda: Path,
+    digest: Path,
+    output: Path,
+    root: Path,
+    version: str,
+    python_abi: str,
+    python_requires: str,
+) -> None:
     try:
-        wheel = build_wheel(root, extension, output, version)
+        wheel = build_wheel(
+            root,
+            extension,
+            runner,
+            corpus,
+            cuda,
+            digest,
+            output,
+            version,
+            python_abi,
+            python_requires,
+        )
     except (FileNotFoundError, RuntimeError, ValueError) as error:
         raise click.ClickException(str(error)) from error
     click.echo(wheel)

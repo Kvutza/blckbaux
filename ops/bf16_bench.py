@@ -37,9 +37,10 @@ def main() -> None:
         elapsed.append((time.perf_counter() - started) * 1_000)
         profiles.append(search.last_profile)
         search.tell(proposals, [float(round_index + 1)])
+        if search.sync() != [True]:
+            raise RuntimeError("increasing objective was not accepted")
 
-    accepted = search.sync()
-    if accepted != [True] or search.best != 18.0 or search.history_len != 8:
+    if search.best != 18.0 or search.history_len != 8:
         raise RuntimeError("resident rounds did not preserve CUDA search state")
 
     measured = elapsed[8:]

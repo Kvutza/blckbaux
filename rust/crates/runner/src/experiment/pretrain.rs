@@ -46,7 +46,7 @@ fn prepare_named(root: &Path, recipe_name: &str, engine: BuildSystem) -> Result<
     fs::create_dir_all(&parent).map_err(|error| error.to_string())?;
     let stage = parent.join(format!(".{id}.{}.preparing", std::process::id()));
     fs::create_dir(&stage).map_err(|error| error.to_string())?;
-    let executable = engine.build_artifact(root, "//rust/crates/corpus:corpus")?;
+    let executable = corpus_path(root, engine)?;
     let job = match string(&recipe, "serialization")? {
         "repository_file_v1" => {
             let source = &recipe["source"];
@@ -86,11 +86,27 @@ fn prepare_named(root: &Path, recipe_name: &str, engine: BuildSystem) -> Result<
         }
     };
 
-    run_worker(&executable.path, &job, &stage, "corpus preparation")?;
+    run_worker(&executable, &job, &stage, "corpus preparation")?;
     if !stage.join("manifest.json").is_file() {
         return Err("corpus worker did not write a manifest".into());
     }
     fs::rename(stage, destination).map_err(|error| error.to_string())
+}
+
+pub(super) fn corpus_path(root: &Path, engine: BuildSystem) -> Result<PathBuf, String> {
+    if let Some(path) = std::env::var_os("BLCKBAUX_CORPUS_EXECUTABLE") {
+        let path = PathBuf::from(path);
+        if path.is_file() {
+            return Ok(path);
+        }
+        return Err(format!(
+            "BLCKBAUX_CORPUS_EXECUTABLE is not a file: {}",
+            path.display()
+        ));
+    }
+    Ok(engine
+        .build_artifact(root, "//rust/crates/corpus:corpus")?
+        .path)
 }
 
 fn run_worker(executable: &Path, job: &Value, stage: &Path, label: &str) -> Result<(), String> {

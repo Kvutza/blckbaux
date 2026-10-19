@@ -44,7 +44,7 @@ pub fn disk_driver(driver: IndexDriver) -> bool {
 use std::sync::Mutex;
 
 pub struct ENNIndex {
-    inner: KnnBackend,
+    pub(crate) inner: KnnBackend,
     num_dim: usize,
     x_scale: Mutex<Array1<f64>>,
     scale_x: bool,

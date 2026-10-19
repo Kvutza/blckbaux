@@ -18,6 +18,9 @@ const GRAM_QUERIES: usize = 8;
 const MAX_K: usize = 2048;
 const SOURCE: &str = include_str!("metal_index.metal");
 
+mod posterior;
+pub(crate) use posterior::MetalPosterior;
+
 #[repr(C)]
 #[derive(Clone, Copy)]
 struct Params {
@@ -495,7 +498,11 @@ impl MetalIndex {
             tile_start: 0,
             tile_rows: 0,
             k: to_u32(k, "neighbor count").map_err(|error| error.to_string())?,
-            lanes: self.distance_lanes(),
+            lanes: if plan == Plan::Wide {
+                1
+            } else {
+                self.distance_lanes()
+            },
             tiles: to_u32(scan_lists, "list count").map_err(|error| error.to_string())?,
             lists: 0,
             groups: 0,

@@ -119,7 +119,7 @@ theorem marginalTail
         epsilon ≤ candidateLoss origin - corpusMean candidateLoss} := by
           refine measureReal_mono ?_ (by finiteness)
           intro origin failed
-          simp only [Set.mem_setOf_eq] at failed ⊢
+          simp only [Set.mem_ofPred_eq] at failed ⊢
           by_contra scoreNotHigh
           have scoreUpper :
               candidateLoss origin - corpusMean candidateLoss < epsilon :=
@@ -140,7 +140,7 @@ theorem marginalTail
             simp only [Regret.simpleRegret] at retained ⊢
             dsimp [candidate]
             linarith
-          rw [ObjectiveSearch.commit, if_pos accepted] at failed
+          simp only [ObjectiveSearch.commit, accepted, ite_true] at failed
           exact (not_lt_of_ge contracted) failed
     _ ≤ Real.exp (-epsilon ^ 2 /
         (2 * ((‖upper - lower‖₊ / 2) ^ 2))) := eventBound
@@ -202,7 +202,7 @@ theorem regretTail
         epsilon + bias ≤ meanLoss batch sampleCount world - target} := by
           refine measureReal_mono ?_ (by finiteness)
           intro world failed
-          simp only [Set.mem_setOf_eq] at failed ⊢
+          simp only [Set.mem_ofPred_eq] at failed ⊢
           by_contra scoreNotHigh
           have scoreUpper :
               meanLoss batch sampleCount world - target < epsilon + bias :=
@@ -223,7 +223,7 @@ theorem regretTail
             simp only [Regret.simpleRegret] at retained ⊢
             dsimp [candidate]
             linarith
-          rw [ObjectiveSearch.commit, if_pos accepted] at failed
+          simp only [ObjectiveSearch.commit, accepted, ite_true] at failed
           exact (not_lt_of_ge contracted) failed
     _ ≤ Real.exp (-((sampleCount : ℝ) * epsilon) ^ 2 /
         (2 * ∑ index ∈ Finset.range sampleCount, batch.scale index)) := eventBound
@@ -327,7 +327,7 @@ theorem sourceTail
         epsilon ≤ windowLoss origin - corpusMean windowLoss} := by
           refine measureReal_mono ?_ (by finiteness)
           intro origin failed
-          simp only [Set.mem_setOf_eq] at failed ⊢
+          simp only [Set.mem_ofPred_eq] at failed ⊢
           by_contra scoreNotHigh
           have scoreUpper :
               windowLoss origin - corpusMean windowLoss < epsilon :=
@@ -347,7 +347,7 @@ theorem sourceTail
             unfold progress at useful
             simp only [Regret.simpleRegret] at retained ⊢
             linarith
-          rw [EnnCommit.scalarCommit, if_pos accepted] at failed
+          simp only [EnnCommit.scalarCommit, accepted, ite_true] at failed
           exact (not_lt_of_ge contracted) failed
     _ ≤ Real.exp (-epsilon ^ 2 /
         (2 * ((‖upper - 0‖₊ / 2) ^ 2))) := eventBound

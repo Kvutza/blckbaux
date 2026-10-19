@@ -57,7 +57,7 @@ def _objective(experiment):
     return metric, weight
 
 
-class Node(ExternalGenerationNode):
+class GenerationNode(ExternalGenerationNode):
     """Keep Ax orchestration and use BLCKBAUX to generate continuous candidates.
 
     Known SEMs are squared before passing observation variance to BLCKBAUX. Failed,
@@ -136,4 +136,7 @@ class Node(ExternalGenerationNode):
         return self._loop.suggest(pending_parameters)
 
 
-__all__ = ["Node"]
+# Existing callers retain the identical class, including Ax state semantics.
+Node = GenerationNode
+
+__all__ = ["GenerationNode"]

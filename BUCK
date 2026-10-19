@@ -99,7 +99,7 @@ filegroup(
 
 filegroup(
     name = "cuda-package",
-    srcs = glob(["src/blckbaux/**/*.py"]) + [
+    srcs = glob(["src/blckbaux/**/*.py", "data/recipes/*.json"]) + [
         "LICENSE",
         "NOTICE",
         "README.md",
@@ -130,6 +130,8 @@ cuda_oxide(
     cuda = "//backends/cuda:source",
     parity = "ops/bf16_parity.py",
     click = ":click-wheel",
+    python_abi = PYTHON_ABI,
+    python_requires = PYTHON_REQUIRES,
 )
 
 python_wheel(

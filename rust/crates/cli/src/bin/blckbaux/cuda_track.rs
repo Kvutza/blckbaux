@@ -11,6 +11,12 @@ pub(crate) enum Action {
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         args: Vec<String>,
     },
+    /// Build and validate the sm75 CUDA wheel on a Modal T4.
+    Wheel {
+        /// Local directory for the validated wheel.
+        #[arg(long, default_value = "dist")]
+        out: PathBuf,
+    },
     /// Compile CUDA-Oxide device modules and synthesized PTX kernels for the detected GPU.
     ///
     /// Selects the exact SM75 (T4), SM80 (A100), or SM90a (H100) build target.
@@ -176,6 +182,7 @@ impl Action {
     fn label(&self) -> &'static str {
         match self {
             Self::Setup { .. } => "setup",
+            Self::Wheel { .. } => "wheel",
             Self::Build => "build",
             Self::Parity => "parity",
             Self::Resident => "resident",
@@ -319,6 +326,15 @@ mod tests {
             }
         );
     }
+
+    #[test]
+    fn wheel_directory() {
+        let parsed = crate::Cli::try_parse_from(["blckbaux", "cuda", "wheel"]).unwrap();
+        let crate::Action::Cuda { command } = parsed.action else {
+            panic!("expected CUDA action");
+        };
+        assert_eq!(command, Action::Wheel { out: "dist".into() });
+    }
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -395,6 +411,18 @@ fn tune_t4(root: &Path, path: &Path, out: &Path) -> Result<(), String> {
 }
 
 pub(crate) fn run(root: &Path, action: Action) -> Result<(), String> {
+    if let Action::Wheel { out } = &action {
+        let status = Command::new("modal")
+            .current_dir(root)
+            .args(["run", "ops/modal_build.py", "--output-directory"])
+            .arg(out)
+            .status()
+            .map_err(|error| error.to_string())?;
+        return status
+            .success()
+            .then_some(())
+            .ok_or_else(|| format!("Modal CUDA wheel exited with {status}"));
+    }
     let label = action.label();
     blckbaux_tooling::terminal::stderr(
         blckbaux_tooling::terminal::Tag::Kernel,

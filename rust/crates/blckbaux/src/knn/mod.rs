@@ -8,9 +8,9 @@ pub use mmap_store::MmapColumnStore;
 mod usearch_backend;
 
 #[cfg(all(target_os = "linux", target_arch = "x86_64", feature = "cuda"))]
-mod cuda_index;
+pub(crate) mod cuda_index;
 #[cfg(all(target_os = "macos", feature = "metal"))]
-mod metal_index;
+pub(crate) mod metal_index;
 #[cfg(all(target_os = "macos", feature = "metal"))]
 mod metal_plan;
 #[cfg(feature = "opencl")]

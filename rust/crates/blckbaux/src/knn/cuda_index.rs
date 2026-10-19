@@ -7,7 +7,7 @@ use crate::draw::DrawInternals;
 use crate::index::IndexError;
 
 pub(crate) struct CudaIndex {
-    inner: blckbaux_cuda::CudaIndex,
+    pub(crate) inner: blckbaux_cuda::CudaIndex,
     dims: usize,
 }
 

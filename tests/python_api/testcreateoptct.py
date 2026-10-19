@@ -6,8 +6,8 @@ import numpy as np
 import pytest
 
 from blckbaux import Telemetry, create_optimizer, turbo_enn, turbo_zero
+from blckbaux.bo import Optimizer
 from blckbaux.turbo.config import lhd_only
-from blckbaux.bo import BayesOptimizer
 
 
 def test_factorysignature():
@@ -31,7 +31,7 @@ def test_optimizercontract(cfg):
     opt = create_optimizer(bounds=bounds, config=cfg, rng=np.random.default_rng(42))
     x = opt.ask(2)
 
-    assert isinstance(opt, BayesOptimizer)
+    assert isinstance(opt, Optimizer)
     assert x.shape == (2, 2)
     assert np.all((bounds[:, 0] <= x) & (x <= bounds[:, 1]))
     assert isinstance(opt.telemetry(), Telemetry)

@@ -1,4 +1,3 @@
-# ruff: noqa: E402
 import numpy as np
 import pytest
 
@@ -158,6 +157,64 @@ def test_rng(model):
     assert torch.equal(before, torch.random.get_rng_state())
     assert values.dtype == torch.float32
     assert torch.equal(values, Sampler(torch.Size([4]), seed=17)(model.posterior(x)))
+
+
+@pytest.mark.parametrize("backend", ["metal", "cuda"])
+@pytest.mark.parametrize("noise", [False, True])
+def test_backends(backend, noise):
+    """Exercise the existing ENN backend through the real BoTorch interface."""
+    from blckbaux import capabilities
+    from blckbaux.turbo.config.surrogate import NeighborIndex
+
+    row = next(row for row in capabilities(probe=True) if row.name == backend)
+    if not row.available:
+        pytest.skip(row.reason or f"{backend} runtime unavailable")
+    train = np.arange(16, dtype=float).reshape(8, 2) / 16
+    values = np.column_stack((np.sin(train[:, 0]), np.cos(train[:, 1])))
+    variance = np.full_like(values, 0.01)
+    params = ENNParams(3, 0.7, 0.13)
+    reference = Model(ENN(train, values, variance), params)
+    native = Model(
+        ENN(train, values, variance, index_driver=NeighborIndex[backend.upper()]),
+        params,
+    )
+    queries = torch.tensor([[0.125, 0.25], [0.5, 0.625], [0.125, 0.25]])
+    expected = reference.posterior(queries, observation_noise=noise)
+    actual = native.posterior(queries, observation_noise=noise)
+    torch.testing.assert_close(actual.mean, expected.mean, rtol=2e-5, atol=2e-6)
+    torch.testing.assert_close(actual.variance, expected.variance, rtol=2e-5, atol=2e-6)
+    sampler = Sampler(torch.Size([16]), seed=41)
+    draws = sampler(actual)
+    torch.testing.assert_close(draws, sampler(expected), rtol=2e-5, atol=2e-6)
+    assert torch.equal(draws[:, 0], draws[:, 2])
+    assert torch.equal(draws, sampler(actual))
+
+
+def test_transfers(model):
+    """Host exchange is opt-in and preserves the caller's output device."""
+    if torch.cuda.is_available():
+        device = "cuda"
+    elif torch.backends.mps.is_available():
+        device = "mps"
+    else:
+        pytest.skip("no Torch CUDA or MPS runtime")
+    queries = torch.tensor([[0.125, 0.25], [0.5, 0.625]], device=device)
+    with pytest.raises(ValueError, match="explicit CUDA or Metal"):
+        model.posterior(queries)
+    permitted = Model(model.enn, model.params, allow_host_transfer=True)
+    actual = permitted.posterior(queries)
+    reference = model.posterior(queries.cpu())
+    assert actual.mean.device == queries.device
+    assert actual.variance.device == queries.device
+    torch.testing.assert_close(actual.mean.cpu(), reference.mean)
+    seeds = torch.tensor([13, 17], device=device)
+    samples = actual.rsample_from_base_samples(torch.Size([2]), seeds)
+    assert samples.device == queries.device
+    torch.testing.assert_close(
+        samples.cpu(), reference.rsample_from_base_samples(torch.Size([2]), seeds.cpu())
+    )
+    with pytest.raises(NotImplementedError, match="host arrays"):
+        reference.rsample_from_base_samples(torch.Size([2]), seeds)
 
 
 def assert_batch(acquisition, x):

@@ -1,5 +1,17 @@
 use super::{Center, LeafStep, Parameter, RoundConfig, SparseEdit, Tile, make_steps, make_tiles};
 
+fn cuda_config(config: RoundConfig) -> blckbaux_cuda::RoundConfig {
+    blckbaux_cuda::RoundConfig {
+        neighbors: config.surrogate.neighbors,
+        acquisition: crate::weights::acquisition_code(config.acquisition.kind),
+        epistemic_scale: config.surrogate.epistemic_scale,
+        aleatoric_scale: config.surrogate.aleatoric_scale,
+        y_scale: config.surrogate.output_scale,
+        beta: config.acquisition.beta,
+        adaptive_neighbors: false,
+    }
+}
+
 pub(super) struct Engine {
     inner: blckbaux_cuda::TrialEngine,
 }
@@ -49,16 +61,7 @@ impl Engine {
             seeds,
             &draws,
             &steps,
-            {
-                let mut config = RoundConfig::default();
-                config.surrogate.neighbors = config.surrogate.neighbors;
-                config.acquisition.kind = crate::weights::acquisition_code(config.acquisition.kind);
-                config.surrogate.epistemic_scale = config.surrogate.epistemic_scale;
-                config.surrogate.aleatoric_scale = config.surrogate.aleatoric_scale;
-                config.surrogate.output_scale = config.surrogate.output_scale;
-                config.acquisition.beta = config.acquisition.beta;
-                config
-            },
+            cuda_config(config),
             materialize_row,
         )?;
         Ok((index, score))
@@ -105,16 +108,7 @@ impl Engine {
             &edits,
             num_pert,
             &steps,
-            {
-                let mut config = RoundConfig::default();
-                config.surrogate.neighbors = config.surrogate.neighbors;
-                config.acquisition.kind = crate::weights::acquisition_code(config.acquisition.kind);
-                config.surrogate.epistemic_scale = config.surrogate.epistemic_scale;
-                config.surrogate.aleatoric_scale = config.surrogate.aleatoric_scale;
-                config.surrogate.output_scale = config.surrogate.output_scale;
-                config.acquisition.beta = config.acquisition.beta;
-                config
-            },
+            cuda_config(config),
         )
     }
 
@@ -232,16 +226,7 @@ impl Engine {
             &centers,
             &region_centers,
             &steps,
-            {
-                let mut config = RoundConfig::default();
-                config.surrogate.neighbors = config.surrogate.neighbors;
-                config.acquisition.kind = crate::weights::acquisition_code(config.acquisition.kind);
-                config.surrogate.epistemic_scale = config.surrogate.epistemic_scale;
-                config.surrogate.aleatoric_scale = config.surrogate.aleatoric_scale;
-                config.surrogate.output_scale = config.surrogate.output_scale;
-                config.acquisition.beta = config.acquisition.beta;
-                config
-            },
+            cuda_config(config),
         )
     }
 

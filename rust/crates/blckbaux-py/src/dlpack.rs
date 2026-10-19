@@ -81,32 +81,58 @@ pub(crate) struct Input {
     kind: InputKind,
     pub(crate) pointer: u64,
     pub(crate) len: usize,
+    pub(crate) offset: usize,
+    pub(crate) shape: Vec<usize>,
 }
 
 impl Input {
     pub(crate) fn new(source: &Bound<'_, PyAny>) -> PyResult<Self> {
-        Self::read(source, BF16, 16, "BF16")
+        Self::read(source, BF16, 16, "BF16", CUDA)
     }
 
     pub(crate) fn f32(source: &Bound<'_, PyAny>) -> PyResult<Self> {
-        Self::read(source, FLOAT, 32, "FP32")
+        Self::read(source, FLOAT, 32, "FP32", CUDA)
     }
 
-    fn read(source: &Bound<'_, PyAny>, code: u8, bits: u8, name: &str) -> PyResult<Self> {
+    pub(crate) fn posterior(source: &Bound<'_, PyAny>, device: i32) -> PyResult<Self> {
+        Self::read(source, FLOAT, 32, "FP32", device)
+    }
+
+    fn read(
+        source: &Bound<'_, PyAny>,
+        code: u8,
+        bits: u8,
+        name: &str,
+        kind_expected: i32,
+    ) -> PyResult<Self> {
         let device: (i32, i32) = source.call_method0("__dlpack_device__")?.extract()?;
-        if device != (CUDA, 0) {
+        if device != (kind_expected, 0) || ![CUDA, 8].contains(&kind_expected) {
             return Err(PyValueError::new_err(format!(
-                "{name} input requires CUDA device 0"
+                "{name} input requires DLPack device ({kind_expected}, 0)"
             )));
         }
         let kwargs = PyDict::new(source.py());
-        kwargs.set_item("stream", 1_u64)?;
+        kwargs.set_item(
+            "stream",
+            if kind_expected == CUDA {
+                Some(1_i64)
+            } else {
+                None
+            },
+        )?;
         kwargs.set_item("max_version", (1_u32, 3_u32))?;
         let capsule = match source.call_method("__dlpack__", (), Some(&kwargs)) {
             Ok(capsule) => capsule,
             Err(error) if error.is_instance_of::<PyTypeError>(source.py()) => {
                 let kwargs = PyDict::new(source.py());
-                kwargs.set_item("stream", 1_u64)?;
+                kwargs.set_item(
+                    "stream",
+                    if kind_expected == CUDA {
+                        Some(1_i64)
+                    } else {
+                        None
+                    },
+                )?;
                 source.call_method("__dlpack__", (), Some(&kwargs))?
             }
             Err(error) => return Err(error),
@@ -133,7 +159,7 @@ impl Input {
                 return Err(PyBufferError::new_err("invalid DLPack capsule"));
             }
         };
-        validate_tensor(tensor, code, bits, name)?;
+        validate_tensor(tensor, code, bits, name, kind_expected)?;
         let dimensions = usize::try_from(tensor.ndim)
             .map_err(|_| PyValueError::new_err("invalid DLPack rank"))?;
         let shape = unsafe { std::slice::from_raw_parts(tensor.shape, dimensions) };
@@ -154,13 +180,23 @@ impl Input {
             )));
         }
         let pointer = (tensor.data as u64)
-            .checked_add(tensor.byte_offset)
+            .checked_add(if kind_expected == CUDA {
+                tensor.byte_offset
+            } else {
+                0
+            })
             .ok_or_else(|| PyValueError::new_err("DLPack pointer overflow"))?;
         Ok(Self {
             capsule: capsule.unbind(),
             kind,
             pointer,
             len,
+            offset: if kind_expected == CUDA {
+                0
+            } else {
+                tensor.byte_offset as usize
+            },
+            shape: shape.iter().map(|&v| v as usize).collect(),
         })
     }
 }
@@ -221,6 +257,7 @@ struct VersionOwner {
 enum Lease {
     Flag(Arc<AtomicBool>),
     Count(Arc<AtomicUsize>),
+    Shared,
 }
 
 #[derive(Clone, Copy)]
@@ -228,6 +265,9 @@ struct ExportShape {
     values: [i64; 2],
     strides: [i64; 2],
     rank: i32,
+    device: i32,
+    bits: u8,
+    code: u8,
 }
 
 impl ExportShape {
@@ -238,6 +278,9 @@ impl ExportShape {
             values: [len, 1],
             strides: [1, 1],
             rank: 1,
+            device: CUDA,
+            bits: 16,
+            code: BF16,
         })
     }
 
@@ -250,6 +293,9 @@ impl ExportShape {
             values: [rows, columns],
             strides: [columns, 1],
             rank: 2,
+            device: CUDA,
+            bits: 16,
+            code: BF16,
         })
     }
 }
@@ -257,6 +303,7 @@ impl ExportShape {
 impl Lease {
     fn release(&self) {
         match self {
+            Self::Shared => {}
             Self::Flag(lease) => lease.store(false, Ordering::Release),
             Self::Count(lease) => {
                 lease.fetch_sub(1, Ordering::AcqRel);
@@ -373,6 +420,23 @@ pub(crate) fn export_batch(
     )
 }
 
+pub(crate) fn export_array(
+    py: Python<'_>,
+    owner: PyObject,
+    pointer: u64,
+    rows: usize,
+    columns: usize,
+    device: i32,
+    bits: u8,
+    max_version: Option<(u32, u32)>,
+) -> PyResult<PyObject> {
+    let mut shape = ExportShape::matrix(rows, columns)?;
+    shape.device = device;
+    shape.bits = bits;
+    shape.code = FLOAT;
+    export_with(py, owner, Lease::Shared, pointer, shape, max_version)
+}
+
 fn export_with(
     py: Python<'_>,
     owner: PyObject,
@@ -406,6 +470,7 @@ fn export_legacy(
                 shape.rank,
                 std::ptr::null_mut(),
                 std::ptr::null_mut(),
+                shape,
             ),
             context: std::ptr::null_mut(),
             deleter: Some(release_legacy),
@@ -442,6 +507,7 @@ fn export_versioned(
                 shape.rank,
                 std::ptr::null_mut(),
                 std::ptr::null_mut(),
+                shape,
             ),
         },
         shape: shape.values,
@@ -459,17 +525,23 @@ fn export_versioned(
     })
 }
 
-fn tensor(pointer: u64, rank: i32, shape: *mut i64, strides: *mut i64) -> Tensor {
+fn tensor(
+    pointer: u64,
+    rank: i32,
+    shape: *mut i64,
+    strides: *mut i64,
+    format: ExportShape,
+) -> Tensor {
     Tensor {
         data: pointer as *mut c_void,
         device: Device {
-            kind: CUDA,
+            kind: format.device,
             index: 0,
         },
         ndim: rank,
         dtype: DataType {
-            code: BF16,
-            bits: 16,
+            code: format.code,
+            bits: format.bits,
             lanes: 1,
         },
         shape,
@@ -498,8 +570,8 @@ where
     }
 }
 
-fn validate_tensor(tensor: &Tensor, code: u8, bits: u8, name: &str) -> PyResult<()> {
-    if tensor.device.kind != CUDA || tensor.device.index != 0 {
+fn validate_tensor(tensor: &Tensor, code: u8, bits: u8, name: &str, device: i32) -> PyResult<()> {
+    if tensor.device.kind != device || tensor.device.index != 0 {
         return Err(PyBufferError::new_err(format!(
             "{name} input requires a CUDA device-0 DLPack tensor"
         )));

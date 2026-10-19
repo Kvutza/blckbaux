@@ -1,6 +1,5 @@
-from pathlib import Path
 import tomllib
-
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -13,7 +12,7 @@ def test_bundle():
             name = Path(member).name
             assert f'"{name}": "//{member}:' in build
     rule = (ROOT / "build/buck2/cuda/defs.bzl").read_text()
-    assert "srcs = [package, workspace, cuda, click] + crates.values()" in rule
+    assert "srcs = sources" in rule
     assert "for crate, label in crates.items()" in rule
 
 
@@ -23,6 +22,7 @@ def test_atomic():
     build = (
         "cargo oxide build --arch sm_75 --cargo-target-dir $OUT_DIR/target "
         "--device-codegen-crate blckbaux_cuda_device -- -p blckbaux-py -p blckbaux-cuda "
+        "-p blckbaux-runner -p blckbaux-corpus "
         "--features cuda --release --locked --manifest-path $ROOT/Cargo.toml;"
     )
 
@@ -32,3 +32,30 @@ def test_atomic():
     assert '"cargo oxide build",' not in source
     assert '"--arch sm_75",' not in source
     assert "; --arch sm_75" not in " ".join(source.split())
+
+
+def test_abi():
+    source = (ROOT / "build/buck2/cuda/defs.bzl").read_text()
+    assert '"sdk": "toolchains//:sdk-linux-x86_64"' in source
+    assert "export RUSTFLAGS=" in source
+    assert "export CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS=" not in source
+    assert "--sysroot=$SYSROOT" in source
+    assert "-fuse-ld=bfd" in source
+    assert source.index("export RUSTFLAGS=") < source.index("cargo oxide build")
+
+
+def test_storage():
+    source = (ROOT / "ops/modal_build.py").read_text()
+    assert '(WORK / "buck-out").symlink_to' not in source
+    assert '(WORK / ".buck2-tools").symlink_to' in source
+    assert 'Path("ops/modal_build.py")' in source
+    assert source.index('.apt_install("patchelf")') < source.index(".add_local_dir(")
+
+
+def test_validation():
+    source = (ROOT / "ops/modal_build.py").read_text()
+    assert '"--no-deps"' not in source
+    assert '"pip", "check"' in source
+    assert '"assert row.available, row.reason"' in source
+    assert '"auditwheel"' in source
+    assert '"manylinux_2_28_x86_64"' in source

@@ -27,6 +27,7 @@ pub mod capability;
 mod code_overlap;
 pub mod coding_outcome;
 pub mod config;
+pub mod device_posterior;
 pub use blckbaux_semantics::context;
 #[cfg(all(any(target_os = "macos", target_os = "ios"), feature = "metal"))]
 mod context_metal;

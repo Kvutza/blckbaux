@@ -1,7 +1,7 @@
 [workspace]
 name = "blckbaux"
 channels = ["conda-forge"]
-platforms = ["osx-arm64", "linux-64", "linux-aarch64"]
+platforms = [{ platform = "osx-arm64", macos = "14.0" }, "linux-64", "linux-aarch64"]
 
 [feature.blckbaux.dependencies]
 click = "==8.5.0"
@@ -46,8 +46,33 @@ python = "3.14.*"
 [feature.py315.dependencies]
 python = "3.15.*"
 
+[feature.nightly.pypi-dependencies]
+# Keep the scientific stack in the same wheel ecosystem as nightly Torch.
+# Mixing conda's OpenMP-linked SciPy with the nightly Torch wheel loads two
+# OpenMP runtimes in one process.
+click = "==8.5.0"
+numpy = "*"
+scipy = "*"
+
+[feature.nightly.target.osx-arm64.pypi-dependencies]
+# PyTorch's macOS nightly is the Metal-capable CPython 3.15 lane.
+torch = { version = "==2.16.0.dev20261018", index = "https://download.pytorch.org/whl/nightly/cpu" }
+
+[feature.nightly.target.linux-64.pypi-dependencies]
+# CUDA CPython 3.15 remains experimental until a clean T4 runtime verifies it.
+torch = { version = "==2.16.0.dev20261019+cu130", index = "https://download.pytorch.org/whl/nightly/cu130" }
+triton = { version = "==3.9.0+gitfc8d31a5", index = "https://download.pytorch.org/whl/nightly/cu130" }
+# Install JAX's CUDA PJRT runtime in the CUDA lane.  This is separate from
+# Torch CUDA: either framework can hand device storage to the Rust extension
+# through the same DLPack interface.
+jax = { version = "==0.12.0", extras = ["cuda13"] }
+
+[feature.nightly.target.linux-aarch64.pypi-dependencies]
+torch = { version = "==2.16.0.dev20261019+cpu", index = "https://download.pytorch.org/whl/nightly/cpu" }
+jax = "==0.12.0"
+
 [environments]
 blckbaux = { features = ["blckbaux", "integrations", "test", "gp", "py313"], no-default-feature = true }
 blckbaux-py312 = { features = ["blckbaux", "integrations", "test", "py312"], no-default-feature = true }
 blckbaux-py314 = { features = ["blckbaux", "integrations", "test", "py314"], no-default-feature = true }
-blckbaux-py315 = { features = ["blckbaux", "test", "py315"], no-default-feature = true }
+blckbaux-py315 = { features = ["integrations", "test", "nightly", "py315"], no-default-feature = true }

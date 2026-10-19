@@ -65,6 +65,7 @@ import BlckbauxResearch.Optimization.Metric
 import BlckbauxResearch.Optimization.PretrainWorkload
 import BlckbauxResearch.Optimization.PretrainProfile
 import BlckbauxResearch.Optimization.PatchFeedback
+import BlckbauxResearch.Optimization.EvaluationSpace
 import BlckbauxResearch.Semantics.FbtProgram
 import BlckbauxResearch.Semantics.Optimizer
 import BlckbauxResearch.Forward.Encoder

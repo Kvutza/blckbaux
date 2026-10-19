@@ -105,6 +105,28 @@ theorem sublinear {ι : Type*} (s : Finset ι) (regret sigma : ι → ℝ) (beta
   have hMul := mul_le_mul_of_nonneg_left hSig h2b
   exact hSumR.trans hMul
 
+/-- Cumulative regret bound for UCB acquisition under bounded information gain.
+Discharges the round regret hypothesis using exact UCB candidate selection. -/
+theorem ucbSublinear {ι : Type*} {Candidate : Type*} (s : Finset ι)
+    (truth mean sigma : ι → Candidate → ℝ)
+    (selected optimal : ι → Candidate)
+    (beta gamma : ℝ)
+    (hBeta : 0 ≤ beta)
+    (hConf : ∀ i ∈ s, ∀ c, |truth i c - mean i c| ≤ beta * sigma i c)
+    (hSelect : ∀ i ∈ s,
+      ApproxMax (fun c => mean i c + beta * sigma i c) (selected i) 0)
+    (hSum : ∑ i ∈ s, (sigma i (selected i)) ^ 2 ≤ 2 * gamma) :
+    ∑ i ∈ s, (truth i (optimal i) - truth i (selected i)) ≤
+      2 * beta * Real.sqrt (2 * (s.card : ℝ) * gamma) := by
+  have hRound : ∀ i ∈ s,
+      truth i (optimal i) - truth i (selected i) ≤
+        2 * beta * sigma i (selected i) := by
+    intro i hi
+    exact Selection.ucbExact (truth i) (mean i) (sigma i)
+      (selected i) (optimal i) beta (hConf i hi) (hSelect i hi)
+  exact sublinear s (fun i => truth i (optimal i) - truth i (selected i))
+    (fun i => sigma i (selected i)) beta gamma hBeta hRound hSum
+
 /-- Sublinear simple regret bounded by C / √T. -/
 theorem simpleBound (cumul C : ℝ) (T : ℕ) (hT : 0 < T)
     (hCumul : cumul ≤ C * Real.sqrt (T : ℝ)) :

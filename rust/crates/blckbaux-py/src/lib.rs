@@ -38,6 +38,7 @@ mod py_metal;
 pub mod py_model;
 pub mod py_optimizer;
 pub mod py_parameter;
+pub mod py_posterior;
 #[cfg(all(target_os = "macos", feature = "metal"))]
 pub mod py_qwen;
 pub mod py_util;
@@ -54,6 +55,7 @@ pub use pymodule_wrappers::{
 #[pymodule]
 #[pyo3(name = "blckbaux_rust")]
 pub(crate) fn blckbaux_rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(py_util::capabilities, m)?)?;
     m.add_class::<py_optimizer::PyMultiTrustRegion>()?;
     #[cfg(all(target_os = "linux", target_arch = "x86_64", feature = "cuda"))]
     m.add_wrapped(wrap_pymodule!(pymodule_cuda))?;

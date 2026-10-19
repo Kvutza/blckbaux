@@ -86,6 +86,76 @@ theorem Selection.gainBound
   have selectionError := selectedWithin comparison
   linarith
 
+/-- Upper Confidence Bound (UCB) acquisition regret bound. When the true gain
+lies within a `beta * sigma` confidence corridor and the selected candidate
+maximizes the UCB score `mean + beta * sigma` up to `slack`, the regret relative
+to any comparator `comparison` is bounded by `2 * beta * sigma selected + slack`. -/
+theorem Selection.ucbBound
+    {Candidate : Type*}
+    (truth mean sigma : Candidate → ℝ)
+    (selected comparison : Candidate)
+    (beta slack : ℝ)
+    (hConf : ∀ c, |truth c - mean c| ≤ beta * sigma c)
+    (selectedWithin :
+      ApproxMax (fun c => mean c + beta * sigma c) selected slack) :
+    truth comparison - truth selected ≤
+      2 * beta * sigma selected + slack := by
+  have compConf := (abs_le.mp (hConf comparison)).2
+  have selConf := (abs_le.mp (hConf selected)).1
+  have selMax := selectedWithin comparison
+  linarith
+
+/-- Exact UCB acquisition regret bound with zero selection slack. -/
+theorem Selection.ucbExact
+    {Candidate : Type*}
+    (truth mean sigma : Candidate → ℝ)
+    (selected comparison : Candidate)
+    (beta : ℝ)
+    (hConf : ∀ c, |truth c - mean c| ≤ beta * sigma c)
+    (selectedWithin :
+      ApproxMax (fun c => mean c + beta * sigma c) selected 0) :
+    truth comparison - truth selected ≤
+      2 * beta * sigma selected := by
+  have h := Selection.ucbBound truth mean sigma selected comparison beta 0 hConf selectedWithin
+  linarith
+
+/-- Thompson sampling acquisition regret bound under bounded epistemic perturbation.
+When the epistemic sample deviates from posterior mean by at most beta * sigma and the
+true gain lies within the beta * sigma confidence corridor, the instantaneous regret
+relative to any comparator is bounded by 2 * beta * (sigma selected + sigma comparison) + slack. -/
+theorem Selection.thompsonBound
+    {Candidate : Type*}
+    (truth mean sigma : Candidate → ℝ)
+    (sample : Candidate → ℝ)
+    (selected comparison : Candidate)
+    (beta slack : ℝ)
+    (hConf : ∀ c, |truth c - mean c| ≤ beta * sigma c)
+    (hSample : ∀ c, |sample c - mean c| ≤ beta * sigma c)
+    (selectedWithin : ApproxMax sample selected slack) :
+    truth comparison - truth selected ≤
+      2 * beta * (sigma selected + sigma comparison) + slack := by
+  have compConf := (abs_le.mp (hConf comparison)).2
+  have compSample := (abs_le.mp (hSample comparison)).1
+  have selConf := (abs_le.mp (hConf selected)).1
+  have selSample := (abs_le.mp (hSample selected)).2
+  have selMax := selectedWithin comparison
+  linarith
+
+/-- Exact Thompson sampling acquisition regret bound with zero selection slack. -/
+theorem Selection.thompsonExact
+    {Candidate : Type*}
+    (truth mean sigma : Candidate → ℝ)
+    (sample : Candidate → ℝ)
+    (selected comparison : Candidate)
+    (beta : ℝ)
+    (hConf : ∀ c, |truth c - mean c| ≤ beta * sigma c)
+    (hSample : ∀ c, |sample c - mean c| ≤ beta * sigma c)
+    (selectedWithin : ApproxMax sample selected 0) :
+    truth comparison - truth selected ≤
+      2 * beta * (sigma selected + sigma comparison) := by
+  have h := Selection.thompsonBound truth mean sigma sample selected comparison beta 0 hConf hSample selectedWithin
+  linarith
+
 /-- The selector loses at most `2ε + ξ` of the opportunity in its candidate pool. -/
 theorem Progress.lowerBound
     {State : Type*}
@@ -318,7 +388,7 @@ theorem Selected.unidentified
     have nonpositive :
         estimate other - (estimate other + epsilon + 1) ≤ 0 := by
       linarith
-    simp only [truthB, if_pos rfl] at atOther
+    simp only [truthB, ite_true] at atOther
     rw [abs_of_nonpos nonpositive] at atOther
     linarith
 

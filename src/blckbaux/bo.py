@@ -6,8 +6,8 @@ import numpy as np
 from numpy.random import Generator
 
 from . import _rust
-from .turbo.config.encode import encode, enn_k, is_lhd, supports
 from .turbo.config import OptimizerConfig
+from .turbo.config.encode import encode, enn_k, is_lhd, supports
 from .turbo.config.surrogate import ENNSurrogate, GaussianProcess, NoSurrogate
 from .turbo.optimizer_types import Telemetry, _Obs, _Plan, _View
 
@@ -44,8 +44,14 @@ def _plan(cfg: OptimizerConfig) -> _Plan:
     raise ValueError(f"unsupported surrogate: {type(cfg.surrogate)!r}")
 
 
-class BayesOptimizer:
-    """NumPy facade over the optimizer core."""
+class Optimizer:
+    """Optimize a bounded search space through Rust-owned ask/tell state.
+
+    ``ask`` returns parameter rows for objective evaluation. ``tell`` records
+    objective values and optional observation variances. Objective evaluation
+    belongs to the caller; constructing this object does not select a Python
+    array framework or imply that posterior computation runs on an accelerator.
+    """
 
     def __init__(self, d: int, rng: Generator, inner: Any) -> None:
         self._d = d
@@ -114,7 +120,7 @@ class BayesOptimizer:
 
 def create_optimizer(
     *, bounds: np.ndarray, config: OptimizerConfig, rng: Generator
-) -> BayesOptimizer:
+) -> Optimizer:
     """Build an optimizer from the Python config."""
     if not supports(config):
         raise ValueError(f"unsupported optimizer config: {config!r}")
@@ -133,4 +139,10 @@ def create_optimizer(
         cfg=encode(config),
         gp=plan.gp,
     )
-    return BayesOptimizer(len(bounds), rng, inner)
+    return Optimizer(len(bounds), rng, inner)
+
+
+# Preserve existing imports and isinstance checks during the public rename.
+BayesOptimizer = Optimizer
+
+__all__ = ["Optimizer", "Telemetry", "create_optimizer"]

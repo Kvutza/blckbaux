@@ -2,6 +2,10 @@
 set -eu
 repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 cd "$repo_dir"
+if [ "$(uname -s)" = Linux ] && [ "${1:-}" = cuda ] && [ "${2:-}" = setup ]; then
+    shift 2
+    exec ./tools/cuda-setup "$@"
+fi
 if [ "$(uname -s)" = Linux ] && [ "${1:-}" = cuda ] && [ "${2:-}" = tune-t4 ]; then
     shift 2
     cargo_home=${CARGO_HOME:-"$HOME/.cargo"}

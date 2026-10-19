@@ -52,7 +52,11 @@ fn round_config(
 }
 
 #[cfg(all(target_os = "linux", target_arch = "x86_64", feature = "cuda"))]
-#[pyclass(name = "ParamBuffer", unsendable)]
+/// CUDA BF16 parameter storage with DLPack exchange for array frameworks.
+///
+/// An exported array retains the storage owner. Materialization is rejected
+/// until that array releases its lease, preventing writes through a live view.
+#[pyclass(name = "ParameterBuffer", unsendable)]
 pub struct PyParamBuffer {
     inner: ParamBuffer,
     exported: Arc<AtomicBool>,
@@ -84,7 +88,7 @@ impl PyParamBuffer {
     fn materialize(&mut self, terms: Vec<(u64, f32)>) -> PyResult<()> {
         if self.exported.load(Ordering::Acquire) {
             return Err(PyValueError::new_err(
-                "cannot materialize while a JAX candidate is alive",
+                "cannot materialize while an exported candidate is alive",
             ));
         }
         self.inner.materialize(&dense_terms(terms)?).map_err(err)
@@ -104,12 +108,12 @@ impl PyParamBuffer {
     ) -> PyResult<PyObject> {
         if copy == Some(true) {
             return Err(pyo3::exceptions::PyBufferError::new_err(
-                "ParamBuffer does not export copies",
+                "ParameterBuffer does not export copies",
             ));
         }
         if dl_device.is_some_and(|device| device != (2, 0)) {
             return Err(pyo3::exceptions::PyBufferError::new_err(
-                "ParamBuffer cannot export to another device",
+                "ParameterBuffer cannot export to another device",
             ));
         }
         if stream.is_some_and(|value| value == 0 || value < -1) {

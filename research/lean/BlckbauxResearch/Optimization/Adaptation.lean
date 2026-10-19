@@ -93,6 +93,30 @@ theorem Adaptation.contractThreshold
     linarith
   exact hFinal
 
+/-- When surrogate slack is strictly below the optimal curvature-clearance margin `γ^2 / (8 * C)`,
+evaluating at the optimal resolution `length = γ / (4 * C)` guarantees strictly positive progress. -/
+theorem Adaptation.optimalProgress
+    (opp progressVal C γ slack : ℝ)
+    (hPosC : 0 < C)
+    (hSlack : slack < γ ^ 2 / (8 * C))
+    (hOpp : γ * (γ / (4 * C)) ≤ opp)
+    (hBound : opp - (2 * (C * (γ / (4 * C)) ^ 2) + slack) ≤ progressVal) :
+    0 < progressVal := by
+  have hC : C ≠ 0 := ne_of_gt hPosC
+  have hCurv : 2 * (C * (γ / (4 * C)) ^ 2) = γ ^ 2 / (8 * C) := by
+    calc
+      2 * (C * (γ / (4 * C)) ^ 2) = 2 * C * (γ ^ 2 / (16 * C ^ 2)) := by ring
+      _ = (2 * C * γ ^ 2) / (16 * C ^ 2) := by ring
+      _ = (2 * C * γ ^ 2) / (2 * C * (8 * C)) := by ring
+      _ = γ ^ 2 / (8 * C) := by
+        rw [mul_div_mul_left (γ ^ 2) (8 * C) (by linarith : 2 * C ≠ 0)]
+  have hLinear : γ * (γ / (4 * C)) = 2 * (γ ^ 2 / (8 * C)) := by
+    ring
+  have hNet : 0 < γ ^ 2 / (8 * C) - slack := sub_pos.mpr hSlack
+  have hLower : γ ^ 2 / (8 * C) - slack ≤ progressVal := by
+    linarith
+  exact lt_of_lt_of_le hNet hLower
+
 /--
 Lattice floor theorem: In a metric space where all distinct states are separated by at least
 `delta`, any trust region of radius `length < delta` contains no distinct state from the incumbent.
@@ -146,5 +170,10 @@ theorem Lattice.zeroProgress
     Lattice.floorCollapse incumbent candidate delta length hSeparation hRadius hInBall
   unfold progress
   rw [hEq, sub_self]
+
+#print axioms Adaptation.contractThreshold
+#print axioms Adaptation.optimalProgress
+#print axioms Lattice.floorCollapse
+#print axioms Lattice.zeroProgress
 
 end BlckbauxResearch.Optimization

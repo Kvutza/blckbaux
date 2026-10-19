@@ -40,6 +40,48 @@ pub struct PyENN {
 
 #[pymethods]
 impl PyENN {
+    /// Device FP32 queries in; independent device posterior snapshot out.
+    #[pyo3(signature=(x,k_neighbors,epistemic_scale,aleatoric_scale,exclude_nearest=false,observation_noise=false))]
+    fn device_posterior(
+        &self,
+        x: &Bound<'_, PyAny>,
+        k_neighbors: i32,
+        epistemic_scale: f64,
+        aleatoric_scale: f64,
+        exclude_nearest: bool,
+        observation_noise: bool,
+    ) -> PyResult<crate::py_posterior::PyDevicePosterior> {
+        let (device, index): (i32, i32) = x.call_method0("__dlpack_device__")?.extract()?;
+        if index != 0 {
+            return Err(PyValueError::new_err(
+                "device posterior currently requires device index 0",
+            ));
+        }
+        let input = crate::dlpack::Input::posterior(x, device)?;
+        if input.shape.len() != 2 || input.shape[1] != self.inner.num_dim() {
+            return Err(PyValueError::new_err(
+                "device queries must have shape (queries, dimensions)",
+            ));
+        }
+        let params = blckbaux::ENNParams::new(k_neighbors, epistemic_scale, aleatoric_scale)
+            .map_err(|e| PyValueError::new_err(e.to_string()))?;
+        let flags = py_flags(self, exclude_nearest, observation_noise);
+        // SAFETY: validated DLPack dtype, shape and device. Input retains the
+        // producer allocation until native compute and its copies complete.
+        let posterior = unsafe {
+            self.inner.device_posterior(
+                input.pointer,
+                input.offset,
+                device,
+                input.shape[0],
+                &params,
+                &flags,
+            )
+        }
+        .map_err(PyValueError::new_err)?;
+        Ok(crate::py_posterior::PyDevicePosterior::new(posterior))
+    }
+
     #[new]
     #[pyo3(signature = (train_x, train_y, train_yvar=None, scale_x=false, index_driver="Exact", work_dir=None, enn_storage=None, y_bounds=None))]
     fn new(

@@ -10,7 +10,7 @@ import jax.numpy as jnp
 import numpy as np
 
 from blckbaux._rust import ENN
-from blckbaux.experimental import ParamBlock, ParamBuffer, turbo_enn
+from blckbaux.experimental import ParamBlock, ParameterBuffer, turbo_enn
 
 MASK64 = (1 << 64) - 1
 MAX_F32 = 3.4028234663852886e38
@@ -581,7 +581,7 @@ def main() -> None:
     expected = cpu_values(base_bits, leaves, terms)
 
     blocks = [ParamBlock(*leaf) for leaf in leaves]
-    buffer = ParamBuffer(base, blocks)
+    buffer = ParameterBuffer(base, blocks)
     buffer.materialize(terms)
     candidate = jax.dlpack.from_dlpack(buffer)
     actual = jax.device_get(
@@ -602,14 +602,14 @@ def main() -> None:
 
     invalid = jax.device_put(jnp.array([0x7F80], dtype=jnp.uint16)).view(jnp.bfloat16)
     try:
-        ParamBuffer(invalid, [ParamBlock(29, 0, 1, 1.0)])
+        ParameterBuffer(invalid, [ParamBlock(29, 0, 1, 1.0)])
     except ValueError as error:
         assert "finite" in str(error)
     else:
         raise AssertionError("non-finite BF16 base was accepted")
 
     maximum = jax.device_put(jnp.array([0x7F7F], dtype=jnp.uint16)).view(jnp.bfloat16)
-    overflow = ParamBuffer(maximum, [ParamBlock(31, 0, 1, MAX_F32)])
+    overflow = ParameterBuffer(maximum, [ParamBlock(31, 0, 1, MAX_F32)])
     try:
         overflow.materialize([(101, MAX_F32)])
     except ValueError as error:

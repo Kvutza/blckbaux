@@ -8,6 +8,18 @@ use blckbaux_semantics::neighbor::MAX_HISTORY;
 const MAX_PENDING: usize = 32;
 static NEXT_OWNER: AtomicU64 = AtomicU64::new(1);
 
+fn cuda_config(config: RoundConfig) -> blckbaux_cuda::RoundConfig {
+    blckbaux_cuda::RoundConfig {
+        neighbors: config.surrogate.neighbors,
+        acquisition: crate::weights::acquisition_code(config.acquisition.kind),
+        epistemic_scale: config.surrogate.epistemic_scale,
+        aleatoric_scale: config.surrogate.aleatoric_scale,
+        y_scale: config.surrogate.output_scale,
+        beta: config.acquisition.beta,
+        adaptive_neighbors: false,
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 enum TellMode {
     Legacy,
@@ -306,16 +318,7 @@ impl SearchState {
             candidates,
             length,
             config.acquisition.seed,
-            {
-                let mut config = RoundConfig::default();
-                config.surrogate.neighbors = config.surrogate.neighbors;
-                config.acquisition.kind = crate::weights::acquisition_code(config.acquisition.kind);
-                config.surrogate.epistemic_scale = config.surrogate.epistemic_scale;
-                config.surrogate.aleatoric_scale = config.surrogate.aleatoric_scale;
-                config.surrogate.output_scale = config.surrogate.output_scale;
-                config.acquisition.beta = config.acquisition.beta;
-                config
-            },
+            cuda_config(config),
         )?;
         let mut trials = Vec::with_capacity(arms);
         for (&slot, selection) in slots.iter().zip(selections) {
@@ -368,16 +371,7 @@ impl SearchState {
             seed_root,
             1.0,
             config.acquisition.seed,
-            {
-                let mut config = RoundConfig::default();
-                config.surrogate.neighbors = config.surrogate.neighbors;
-                config.acquisition.kind = crate::weights::acquisition_code(config.acquisition.kind);
-                config.surrogate.epistemic_scale = config.surrogate.epistemic_scale;
-                config.surrogate.aleatoric_scale = config.surrogate.aleatoric_scale;
-                config.surrogate.output_scale = config.surrogate.output_scale;
-                config.acquisition.beta = config.acquisition.beta;
-                config
-            },
+            cuda_config(config),
         )?;
         let mut trials = Vec::with_capacity(arms);
         for &slot in &slots {

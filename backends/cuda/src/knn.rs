@@ -1,7 +1,10 @@
 use std::convert::Infallible;
 use std::fmt;
 use std::mem::{size_of, size_of_val};
-use std::sync::OnceLock;
+use std::sync::{Arc, OnceLock};
+
+mod resident;
+pub use resident::{DeviceDraw, DevicePosterior};
 
 use blckbaux_cuda_device::{
     BatchParams, BatchValue, DrawParams, KNN_K, KNN_THREADS, KNN_WARPS, KnnParams, MergeParams,
@@ -395,7 +398,7 @@ impl PosteriorScratch {
 }
 
 pub struct CudaIndex {
-    runtime: Runtime,
+    runtime: Arc<Runtime>,
     rows: DeviceBuffer<f32>,
     row_capacity: usize,
     row_count: usize,
@@ -413,7 +416,7 @@ impl CudaIndex {
         if rows.iter().any(|value| !value.is_finite()) {
             return Err("CUDA index rows must be finite".to_string());
         }
-        let runtime = Runtime::new()?;
+        let runtime = Arc::new(Runtime::new()?);
         let scratch = KnnScratch::new(&runtime.stream)?;
         let posterior = PosteriorScratch::new(&runtime.stream)?;
         let row_capacity = next_capacity(rows.len())?;
@@ -767,6 +770,20 @@ impl CudaIndex {
         neighbors: usize,
     ) -> CudaResult<SearchStage> {
         let problem = self.check_search(queries, query_count, neighbors)?;
+        self.stage_input(problem, Some(queries), 0)
+    }
+
+    fn stage_input(
+        &mut self,
+        problem: ScanProblem,
+        host: Option<&[f32]>,
+        pointer: u64,
+    ) -> CudaResult<SearchStage> {
+        let query_count = problem.queries;
+        let neighbors = problem.neighbors;
+        let query_len = query_count
+            .checked_mul(self.dims)
+            .ok_or("query size overflow")?;
         let family = scan_family()?;
         let mut selector = ScanSelector;
         let mut cache = NoKernelSelectionCache;
@@ -781,8 +798,24 @@ impl CudaIndex {
             .and_then(|value| value.checked_mul(neighbors))
             .ok_or("CUDA index scratch size overflow")?;
         self.scratch
-            .ensure(&self.runtime.stream, queries.len(), partials)?;
-        copy_prefix(&self.scratch.queries, queries, &self.runtime.stream)?;
+            .ensure(&self.runtime.stream, query_len, partials)?;
+        if let Some(values) = host {
+            copy_prefix(&self.scratch.queries, values, &self.runtime.stream)?;
+        } else {
+            // SAFETY: device_posterior validates length and retains the DLPack
+            // input until this stream has completed its device-to-device copy.
+            unsafe {
+                cuda_core::simt::memory::memcpy_dtod_async(
+                    self.scratch.queries.cu_deviceptr(),
+                    pointer,
+                    query_len
+                        .checked_mul(size_of::<f32>())
+                        .ok_or("query byte size overflow")?,
+                    self.runtime.stream.cu_stream(),
+                )
+                .map_err(cuda_error)?;
+            }
+        }
 
         let params = KnnParams {
             rows: to_u32(self.row_count, "index row count")?,

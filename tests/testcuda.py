@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 from click.testing import CliRunner
 
-import blckbaux.cuda as cuda
+from blckbaux import cuda
 
 
 class Backend:
@@ -54,3 +55,36 @@ def test_cli(monkeypatch, tmp_path):
     result = runner.invoke(cuda.main, ["trace", str(output)])
     assert result.exit_code == 0, result.output
     assert output.is_file()
+
+
+def test_run(monkeypatch, tmp_path):
+    package = tmp_path / "site" / "blckbaux"
+    binaries = package / "bin"
+    recipes = package / "data" / "recipes"
+    binaries.mkdir(parents=True)
+    recipes.mkdir(parents=True)
+    for name in ("blckbaux-runner", "blckbaux-corpus", "blckbaux-cuda"):
+        (binaries / name).write_bytes(name.encode())
+    (package / "source.sha256").write_text("a" * 64, encoding="utf-8")
+    (recipes / "test.json").write_text("{}", encoding="utf-8")
+    config = tmp_path / "experiment.toml"
+    config.write_text("version = 4\n", encoding="utf-8")
+    calls = []
+    monkeypatch.setattr(cuda, "__file__", str(package / "cuda.py"))
+    monkeypatch.setattr(cuda, "version", lambda _: "0.2.3+cuda75")
+    monkeypatch.setenv("HOME", str(tmp_path / "home"))
+    monkeypatch.setattr(
+        cuda.subprocess, "run", lambda *args, **kwargs: calls.append((args, kwargs))
+    )
+
+    output = cuda.run(config, tmp_path / "result")
+
+    assert output == (tmp_path / "result").resolve()
+    command = calls[0][0][0]
+    environment = calls[0][1]["env"]
+    assert command[1:3] == ["cuda-tune-t4", str(config.resolve())]
+    assert Path(environment["BLCKBAUX_CUDA_EXECUTABLE"]).is_file()
+    assert environment["BLCKBAUX_SOURCE_DIGEST"] == "a" * 64
+    assert (
+        Path(environment["BUILD_WORKSPACE_DIRECTORY"]) / "data/recipes/test.json"
+    ).is_file()

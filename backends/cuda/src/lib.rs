@@ -176,8 +176,8 @@ mod knn;
 mod model;
 mod prefill;
 pub use knn::{
-    BatchOutput, BatchSpec, CudaIndex, DrawOutput, KnnProfile, PosteriorOutput, PosteriorSpec,
-    WeightedOutput, WeightedSpec,
+    BatchOutput, BatchSpec, CudaIndex, DeviceDraw, DevicePosterior, DrawOutput, KnnProfile,
+    PosteriorOutput, PosteriorSpec, WeightedOutput, WeightedSpec,
 };
 pub use model::run::initialized_check;
 pub use model::run::{
