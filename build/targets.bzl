@@ -6,7 +6,7 @@ BLCKBAUX_TEST_CRATES = ["anstream", "anstyle", "deser", "memmap2", "ndarray", "n
 
 BLCKBAUX_PROGRAMS = [
     {
-        "version": "0.2.0",
+        "version": "0.2.1",
         "name": "turbo-enn",
         "crate": "turbo_enn",
         "root": "src/bin/turbo-enn/main.rs",
@@ -15,7 +15,7 @@ BLCKBAUX_PROGRAMS = [
         "required_features": [],
     },
     {
-        "version": "0.2.0",
+        "version": "0.2.1",
         "name": "turbo-enn-worker",
         "crate": "turbo_enn_worker",
         "root": "src/bin/turbo-enn-worker/main.rs",
@@ -24,7 +24,7 @@ BLCKBAUX_PROGRAMS = [
         "required_features": [],
     },
     {
-        "version": "0.2.0",
+        "version": "0.2.1",
         "name": "cuda_trial",
         "crate": "cuda_trial",
         "root": "examples/cuda_trial.rs",
@@ -33,7 +33,7 @@ BLCKBAUX_PROGRAMS = [
         "required_features": ["cuda"],
     },
     {
-        "version": "0.2.0",
+        "version": "0.2.1",
         "name": "knn_frontier",
         "crate": "knn_frontier",
         "root": "examples/knn_frontier.rs",
@@ -42,7 +42,7 @@ BLCKBAUX_PROGRAMS = [
         "required_features": ["metal"],
     },
     {
-        "version": "0.2.0",
+        "version": "0.2.1",
         "name": "posterior_frontier",
         "crate": "posterior_frontier",
         "root": "examples/posterior_frontier.rs",
@@ -51,7 +51,7 @@ BLCKBAUX_PROGRAMS = [
         "required_features": [],
     },
     {
-        "version": "0.2.0",
+        "version": "0.2.1",
         "name": "stable_api",
         "crate": "stable_api",
         "root": "examples/stable_api.rs",
@@ -60,7 +60,7 @@ BLCKBAUX_PROGRAMS = [
         "required_features": [],
     },
     {
-        "version": "0.2.0",
+        "version": "0.2.1",
         "name": "trial_bench",
         "crate": "trial_bench",
         "root": "examples/trial_bench.rs",
@@ -83,7 +83,7 @@ CLI_TEST_CRATES = ["clap"]
 
 CLI_PROGRAMS = [
     {
-        "version": "0.2.0",
+        "version": "0.2.1",
         "name": "blckbaux",
         "crate": "blckbaux",
         "root": "src/bin/blckbaux/main.rs",
@@ -99,7 +99,7 @@ CORPUS_TEST_CRATES = ["arrow-array", "deser", "futures", "opendal", "parquet", "
 
 CORPUS_PROGRAMS = [
     {
-        "version": "0.2.0",
+        "version": "0.2.1",
         "name": "blckbaux-corpus",
         "crate": "blckbaux_corpus",
         "root": "src/main.rs",
@@ -115,7 +115,7 @@ MODAL_RUNNER_TEST_CRATES = ["modal-rs", "tempfile", "tokio"]
 
 MODAL_RUNNER_PROGRAMS = [
     {
-        "version": "0.2.0",
+        "version": "0.2.1",
         "name": "blckbaux-modal",
         "crate": "blckbaux_modal",
         "root": "src/main.rs",
@@ -152,7 +152,7 @@ RUNNER_TEST_CRATES = ["clap", "sha2"]
 
 RUNNER_PROGRAMS = [
     {
-        "version": "0.2.0",
+        "version": "0.2.1",
         "name": "blckbaux-runner",
         "crate": "blckbaux_runner",
         "root": "src/main.rs",
@@ -175,7 +175,7 @@ TOOLING_TEST_CRATES = ["clap", "deser"]
 
 TOOLING_PROGRAMS = [
     {
-        "version": "0.2.0",
+        "version": "0.2.1",
         "name": "build-graph",
         "crate": "build_graph",
         "root": "src/bin/build-graph.rs",

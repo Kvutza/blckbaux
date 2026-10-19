@@ -86,11 +86,12 @@ jobs:
       - name: Install Rust toolchain
         run: |
           if ! command -v rustup >/dev/null; then
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain 1.96.0
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain none
             echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
             export PATH="$HOME/.cargo/bin:$PATH"
           fi
-          rustup toolchain install 1.96.0 --profile minimal --component rustfmt
+          RUST_CHANNEL=$(python3 -c 'import tomllib; print(tomllib.load(open("rust-toolchain.toml", "rb"))["toolchain"]["channel"])')
+          rustup toolchain install "$RUST_CHANNEL" --profile minimal --component rustfmt
 
       - name: Install Pixi
         uses: prefix-dev/setup-pixi@v0.11.2

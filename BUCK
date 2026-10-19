@@ -150,7 +150,7 @@ python_wheel(
         "prelude//cpu/constraints:arm64",
         "prelude//os/constraints:linux",
     ],
-    version = read_config("blckbaux", "release_version", "0.2.0"),
+    version = read_config("blckbaux", "release_version", "0.2.1"),
 )
 
 python_wheel(
@@ -171,7 +171,7 @@ python_wheel(
         "prelude//cpu/constraints:x86_64",
         "prelude//os/constraints:linux",
     ],
-    version = read_config("blckbaux", "release_version", "0.2.0"),
+    version = read_config("blckbaux", "release_version", "0.2.1"),
 )
 
 python_wheel(
@@ -192,7 +192,7 @@ python_wheel(
         "prelude//cpu/constraints:arm64",
         "prelude//os/constraints:macos",
     ],
-    version = read_config("blckbaux", "release_version", "0.2.0"),
+    version = read_config("blckbaux", "release_version", "0.2.1"),
 )
 
 configured_alias(

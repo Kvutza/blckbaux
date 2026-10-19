@@ -46,4 +46,4 @@ default_edition = 2024
 remap_src_paths = yes
 
 [blckbaux]
-release_version = 0.2.0
+release_version = 0.2.1
