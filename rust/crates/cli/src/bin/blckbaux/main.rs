@@ -82,16 +82,7 @@ enum Action {
 }
 
 fn main() -> ExitCode {
-    match run() {
-        Ok(()) => ExitCode::SUCCESS,
-        Err(error) => {
-            blckbaux_tooling::terminal::stderr(
-                blckbaux_tooling::terminal::Tag::Error,
-                &format!("blckbaux: {error}"),
-            );
-            ExitCode::FAILURE
-        }
-    }
+    blckbaux_tooling::terminal::finish(run())
 }
 
 fn run() -> Result<(), String> {

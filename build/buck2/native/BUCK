@@ -50,12 +50,3 @@ cxx_library(
     ],
     visibility = ["PUBLIC"],
 )
-
-prebuilt_cxx_library(
-    name = "hegel-c",
-    preferred_linkage = "shared",
-    shared_lib = "libhegel_c.dylib",
-    soname = "libhegel_c.dylib",
-    target_compatible_with = ["prelude//os/constraints:macos"],
-    visibility = ["PUBLIC"],
-)

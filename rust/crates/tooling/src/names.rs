@@ -208,35 +208,8 @@ fn parse_def(mut line: &str) -> Option<(&'static str, String, bool, bool)> {
         line = rest.trim_start();
     }
 
-    loop {
-        if let Some(rest) = line.strip_prefix("async ") {
-            line = rest.trim_start();
-        } else if let Some(rest) = line.strip_prefix("unsafe ") {
-            line = rest.trim_start();
-        } else if let Some(rest) = line.strip_prefix("const ") {
-            if rest.trim_start().starts_with("fn ") {
-                line = rest.trim_start();
-            } else {
-                break;
-            }
-        } else if line.starts_with("extern ") {
-            if let Some(rest) = line.strip_prefix("extern ") {
-                let trimmed = rest.trim_start();
-                if trimmed.starts_with('"') {
-                    if let Some(end) = trimmed[1..].find('"') {
-                        line = trimmed[end + 2..].trim_start();
-                    } else {
-                        break;
-                    }
-                } else {
-                    line = trimmed;
-                }
-            } else {
-                break;
-            }
-        } else {
-            break;
-        }
+    while let Some(rest) = qualifier(line) {
+        line = rest;
     }
 
     let kinds = [
@@ -269,6 +242,27 @@ fn parse_def(mut line: &str) -> Option<(&'static str, String, bool, bool)> {
     }
 
     None
+}
+
+/// Consume one Rust declaration qualifier, preserving constants and malformed ABIs.
+fn qualifier(line: &str) -> Option<&str> {
+    if let Some(rest) = line
+        .strip_prefix("async ")
+        .or_else(|| line.strip_prefix("unsafe "))
+    {
+        return Some(rest.trim_start());
+    }
+    if let Some(rest) = line.strip_prefix("const ") {
+        return rest
+            .trim_start()
+            .starts_with("fn ")
+            .then(|| rest.trim_start());
+    }
+    let rest = line.strip_prefix("extern ")?.trim_start();
+    match rest.strip_prefix('"') {
+        Some(abi) => Some(abi[abi.find('"')? + 1..].trim_start()),
+        None => Some(rest),
+    }
 }
 
 fn check_rust(path: &Path, root: &Path, config: &Config, findings: &mut Vec<Finding>) {
@@ -536,6 +530,25 @@ mod tests {
         assert_eq!(name, "OptimizerConfig");
         assert!(is_pub);
         assert!(!is_ext);
+
+        for declaration in [
+            "pub async unsafe fn compute_loss() {",
+            "pub const fn compute_loss() {",
+            "pub unsafe extern \"C\" fn compute_loss() {",
+            "pub extern fn compute_loss() {",
+            "pub extern \"C\" unsafe fn compute_loss() {",
+        ] {
+            assert_eq!(
+                parse_def(declaration),
+                Some(("fn", "compute_loss".to_owned(), true, true)),
+                "{declaration}",
+            );
+        }
+        assert_eq!(
+            parse_def("const WIDTH: usize = 4;"),
+            Some(("const", "WIDTH".to_owned(), false, false)),
+        );
+        assert!(parse_def("extern \"unterminated fn hidden() {").is_none());
     }
 
     #[test]

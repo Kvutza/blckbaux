@@ -10,6 +10,7 @@ rust_library(
     name = "neighbor-index",
     srcs = glob(["src/**/*.rs"]),
     aliases = aliases(),
+    crate_name = "blckbaux_neighbor_index",
     crate_root = "src/lib.rs",
     edition = crate_edition(),
     deps = crate_deps(NEIGHBOR_INDEX_CRATES) + [

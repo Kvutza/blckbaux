@@ -381,17 +381,7 @@ fn select_symbols<'a>(index: &'a ScipIndex, query: &str) -> Vec<SymbolMatch<'a>>
             if !definitions.contains(info.symbol.as_str()) {
                 continue;
             }
-            let display = info.display.to_ascii_lowercase();
-            let symbol = info.symbol.to_ascii_lowercase();
-            let score = if display == query {
-                0
-            } else if symbol == query {
-                1
-            } else if display.contains(&query) {
-                2
-            } else if symbol.contains(&query) {
-                3
-            } else {
+            let Some(score) = match_score(info, &query) else {
                 continue;
             };
             let key = if local_symbol(&info.symbol) {
@@ -412,6 +402,23 @@ fn select_symbols<'a>(index: &'a ScipIndex, query: &str) -> Vec<SymbolMatch<'a>>
         .filter(|(score, _)| *score == best)
         .map(|(_, info)| info)
         .collect()
+}
+
+/// Rank case-insensitive exact names ahead of substring and canonical-symbol matches.
+fn match_score(info: &SymbolInfo, query: &str) -> Option<u8> {
+    let display = info.display.to_ascii_lowercase();
+    let symbol = info.symbol.to_ascii_lowercase();
+    if display == query {
+        Some(0)
+    } else if symbol == query {
+        Some(1)
+    } else if display.contains(query) {
+        Some(2)
+    } else if symbol.contains(query) {
+        Some(3)
+    } else {
+        None
+    }
 }
 
 fn print_symbol(index: &ScipIndex, found: &SymbolMatch<'_>, references: bool, limit: &mut usize) {
@@ -508,7 +515,7 @@ fn report(name: &str, ready: bool, detail: &str) {
 
 #[cfg(test)]
 mod tests {
-    use super::{DEFINITION, Occurrence, format_hit, parse_index};
+    use super::{DEFINITION, Occurrence, format_hit, parse_index, select_symbols};
 
     fn varint(mut value: u64) -> Vec<u8> {
         let mut bytes = Vec::new();
@@ -555,7 +562,7 @@ mod tests {
         let mut document = bytes(1, b"source.rs");
         document.extend(bytes(2, &occurrence));
         document.extend(bytes(3, &info));
-        let index = parse_index(&bytes(2, &document)).expect("valid synthetic SCIP");
+        let mut index = parse_index(&bytes(2, &document)).expect("valid synthetic SCIP");
 
         assert_eq!(index.documents[0].path, "source.rs");
         assert_eq!(index.documents[0].occurrences[0].roles, DEFINITION);
@@ -564,5 +571,13 @@ mod tests {
             index.documents[0].symbols[0].signature.as_deref(),
             Some("fn test()")
         );
+        for query in ["TEST", "rust test symbol", "tes", "rust test"] {
+            let selected = select_symbols(&index, query);
+            assert_eq!(selected.len(), 1, "{query}");
+            assert_eq!(selected[0].info.symbol, "rust test symbol");
+        }
+        assert!(select_symbols(&index, "absent").is_empty());
+        index.documents[0].occurrences[0].roles = 0;
+        assert!(select_symbols(&index, "test").is_empty());
     }
 }

@@ -1,3 +1,5 @@
+//! Prepare and verify cached corpora selected by the experiment's data recipe.
+
 use blckbaux::config::ExperimentSpec;
 use blckbaux_artifact::json::{Value, json};
 use sha2::{Digest, Sha256};
@@ -8,6 +10,8 @@ use std::process::{Command, Stdio};
 
 use blckbaux_tooling::build::BuildSystem;
 use blckbaux_tooling::terminal::{self, Tag};
+
+mod mixture;
 
 pub(super) fn prepare(
     root: &Path,
@@ -21,7 +25,7 @@ pub(super) fn prepare(
         .ok_or("pretraining requires data.recipe")?;
     let document = recipe(root, recipe_name)?;
     if string(&document, "format")? == "blckbaux.pretraining-mixture.v4" {
-        check_mix(root, &document, spec)?;
+        mixture::check(root, &document, spec)?;
     }
     prepare_named(root, recipe_name, engine)
 }
@@ -35,7 +39,7 @@ fn prepare_named(root: &Path, recipe_name: &str, engine: BuildSystem) -> Result<
         return Ok(());
     }
     if string(&recipe, "format")? == "blckbaux.pretraining-mixture.v4" {
-        return prepare_mix(root, &recipe, &id, engine);
+        return mixture::prepare(root, &recipe, &id, engine);
     }
 
     let tokenizer = tokenizer(root, &recipe)?;
@@ -82,7 +86,15 @@ fn prepare_named(root: &Path, recipe_name: &str, engine: BuildSystem) -> Result<
         }
     };
 
-    let mut child = Command::new(executable.path)
+    run_worker(&executable.path, &job, &stage, "corpus preparation")?;
+    if !stage.join("manifest.json").is_file() {
+        return Err("corpus worker did not write a manifest".into());
+    }
+    fs::rename(stage, destination).map_err(|error| error.to_string())
+}
+
+fn run_worker(executable: &Path, job: &Value, stage: &Path, label: &str) -> Result<(), String> {
+    let mut child = Command::new(executable)
         .stdin(Stdio::piped())
         .spawn()
         .map_err(|error| error.to_string())?;
@@ -91,21 +103,18 @@ fn prepare_named(root: &Path, recipe_name: &str, engine: BuildSystem) -> Result<
         .take()
         .ok_or("corpus worker stdin unavailable")?
         .write_all(
-            blckbaux_artifact::json::to_string(&job)
+            blckbaux_artifact::json::to_string(job)
                 .map_err(|error| error.to_string())?
                 .as_bytes(),
         )
         .map_err(|error| error.to_string())?;
     if !child.wait().map_err(|error| error.to_string())?.success() {
         return Err(format!(
-            "corpus preparation failed; diagnostics retained in {}",
+            "{label} failed; diagnostics retained in {}",
             stage.display()
         ));
     }
-    if !stage.join("manifest.json").is_file() {
-        return Err("corpus worker did not write a manifest".into());
-    }
-    fs::rename(stage, destination).map_err(|error| error.to_string())
+    Ok(())
 }
 
 pub(super) fn resolve(root: &Path, spec: &mut ExperimentSpec) -> Result<(), String> {
@@ -135,7 +144,7 @@ pub(super) fn resolve(root: &Path, spec: &mut ExperimentSpec) -> Result<(), Stri
         return Err(format!("cached corpus {id} does not match its recipe"));
     }
     if format == "blckbaux.pretraining-mixture.v4" {
-        return resolve_mix(spec, &recipe, &manifest, &directory);
+        return mixture::resolve(spec, &recipe, &manifest, &directory);
     }
 
     let mut paths = Vec::new();
@@ -168,6 +177,14 @@ pub(super) fn resolve(root: &Path, spec: &mut ExperimentSpec) -> Result<(), Stri
     )?;
     spec.data.train = Some(paths.remove(0));
     spec.data.validation = Some(paths.remove(0));
+    report_budget(spec, &recipe, &split_tokens)
+}
+
+fn report_budget(
+    spec: &ExperimentSpec,
+    recipe: &Value,
+    split_tokens: &[u64],
+) -> Result<(), String> {
     if let Some(window_tokens) = spec.objective.window_tokens {
         let train_tokens = split_tokens[0];
         let validation_tokens = split_tokens[1];
@@ -186,343 +203,13 @@ pub(super) fn resolve(root: &Path, spec: &mut ExperimentSpec) -> Result<(), Stri
             Tag::Orchestration,
             &format!(
                 "data · {} · train={} tokens · objective={} tokens · corpus-pass-equivalent={corpus_passes:.3}x · windows={train_windows} train/{validation_windows} validation",
-                string(&recipe, "preset")?,
+                string(recipe, "preset")?,
                 train_tokens,
                 objective_tokens,
             ),
         );
     }
     Ok(())
-}
-
-fn prepare_mix(root: &Path, document: &Value, id: &str, engine: BuildSystem) -> Result<(), String> {
-    let parent = root.join(".cache/blckbaux/corpora");
-    fs::create_dir_all(&parent).map_err(|error| error.to_string())?;
-    let stage = parent.join(format!(".{id}.{}.preparing", std::process::id()));
-    fs::create_dir(&stage).map_err(|error| error.to_string())?;
-    let mut tokenizer_hash = None;
-    let mut boundaries = None;
-    let mut split_records = blckbaux_artifact::json::Map::new();
-    for split in ["train", "validation", "test"] {
-        let mut parts = Vec::new();
-        let mut minimum = u64::MAX;
-        for part in mix_parts(document, split)? {
-            let component_name = string(part, "recipe")?;
-            let component = recipe(root, component_name)?;
-            if string(&component, "format")? != "blckbaux.pretraining.v2" {
-                return Err("pretraining mixtures may only contain corpus recipes".into());
-            }
-            prepare_named(root, component_name, engine)?;
-            let component_id = recipe_key(root, &component)?;
-            let component_dir = parent.join(&component_id);
-            let component_manifest: Value = blckbaux_artifact::json::from_reader(
-                fs::File::open(component_dir.join("manifest.json"))
-                    .map_err(|error| error.to_string())?,
-            )
-            .map_err(|error| error.to_string())?;
-            if component_manifest["format"].kind().as_str() != Some("blckbaux.pretraining.v2")
-                || component_manifest["recipe_id"].kind().as_str() != Some(component_id.as_str())
-                || canonical(
-                    component_manifest
-                        .get("recipe")
-                        .ok_or("component corpus manifest has no recipe")?,
-                )? != canonical(&component)?
-            {
-                return Err(format!(
-                    "cached component corpus {component_id} does not match recipe {component_name}"
-                ));
-            }
-            let record = &component_manifest["splits"][split];
-            let tokens = record["tokens"]
-                .kind()
-                .as_u64()
-                .ok_or("component corpus split has no token count")?;
-            verify(
-                &component_dir.join(format!("{split}.blckbauxptn")),
-                record["sha256"].kind().as_str(),
-            )?;
-            minimum = minimum.min(tokens);
-            let tokenizer = string(&component_manifest["tokenizer"], "sha256")?;
-            verify(&component_dir.join("tokenizer.json"), Some(tokenizer))?;
-            if tokenizer_hash
-                .as_deref()
-                .is_some_and(|expected| expected != tokenizer)
-            {
-                return Err("pretraining mixture components use different tokenizers".into());
-            }
-            tokenizer_hash = Some(tokenizer.to_owned());
-            let bos = component_manifest["tokenizer"]["special_tokens"]["<bos>"]
-                .kind()
-                .as_u64()
-                .ok_or("component corpus has no BOS token")?;
-            let eos = component_manifest["tokenizer"]["special_tokens"]["<eos>"]
-                .kind()
-                .as_u64()
-                .ok_or("component corpus has no EOS token")?;
-            if boundaries.is_some_and(|expected| expected != (bos, eos)) {
-                return Err("pretraining mixture components use different boundaries".into());
-            }
-            boundaries = Some((bos, eos));
-            let mut record = json!({
-                "name":string(part, "name")?,
-                "tokens":tokens,
-                "path":format!("../{component_id}/{split}.blckbauxptn"),
-                "sha256":string(record, "sha256")?,
-                "tokenizer-sha256":tokenizer,
-            });
-            if split == "train" {
-                let marker = match string(&component, "serialization")? {
-                    "repository_file_v1" => Some("<|repository|>"),
-                    "role_tool_channel_v4" => Some("<|episode|>"),
-                    "text_document_v1" => None,
-                    _ => return Err("mixture component has an unsupported serialization".into()),
-                };
-                if let Some(marker) = marker {
-                    record["marker"] = component_manifest["tokenizer"]["special_tokens"][marker]
-                        .kind()
-                        .as_u64()
-                        .ok_or("component corpus has no structural marker")?
-                        .into();
-                }
-            } else {
-                record["weight"] = Value::from(
-                    part["weight"]
-                        .kind()
-                        .as_u64()
-                        .ok_or("mixture weight missing")?,
-                );
-            }
-            parts.push(record);
-        }
-        if split == "train" {
-            let (bos, eos) = boundaries.ok_or("mixture has no token boundaries")?;
-            let artifact = stage.join("train.blckbauxptn");
-            let report = stage.join("train.json");
-            let job_parts = parts
-                .iter()
-                .map(|part| {
-                    let path = string(part, "path")?;
-                    Ok(json!({
-                        "name":string(part, "name")?,
-                        "path":stage.join(path),
-                        "marker":part.get("marker"),
-                    }))
-                })
-                .collect::<Result<Vec<_>, String>>()?;
-            let executable = engine.build_artifact(root, "//rust/crates/corpus:corpus")?;
-            let mut child = Command::new(executable.path)
-                .stdin(Stdio::piped())
-                .spawn()
-                .map_err(|error| error.to_string())?;
-            child
-                .stdin
-                .take()
-                .ok_or("corpus worker stdin unavailable")?
-                .write_all(
-                    blckbaux_artifact::json::to_string(&json!({
-                        "kind":"mix",
-                        "output":artifact,
-                        "report":report,
-                        "bos":bos,
-                        "eos":eos,
-                        "seed":mix_seed(document)?,
-                        "parts":job_parts,
-                    }))
-                    .map_err(|error| error.to_string())?
-                    .as_bytes(),
-                )
-                .map_err(|error| error.to_string())?;
-            if !child.wait().map_err(|error| error.to_string())?.success() {
-                return Err(format!(
-                    "corpus interleave failed; diagnostics retained in {}",
-                    stage.display()
-                ));
-            }
-            let report_value: Value = blckbaux_artifact::json::from_reader(
-                fs::File::open(&report).map_err(|error| error.to_string())?,
-            )
-            .map_err(|error| error.to_string())?;
-            verify(&artifact, report_value["sha256"].kind().as_str())?;
-            split_records.insert(
-                split,
-                json!({
-                    "artifact":"train.blckbauxptn",
-                    "sha256":string(&report_value, "sha256")?,
-                    "tokens":report_value["tokens"].kind().as_u64().ok_or("interleave report has no token count")?,
-                    "construction":string(&report_value, "construction")?,
-                    "sources":report_value["sources"].clone(),
-                }),
-            );
-            continue;
-        }
-        let artifact = stage.join(format!("{split}.json"));
-        fs::write(
-            &artifact,
-            blckbaux_artifact::json::pretty_string(&json!({
-                "format":"blckbaux.pretraining-evaluation.v1",
-                "aggregation":string(&document["evaluation"], "aggregation")?,
-                "parts":parts,
-            }))
-            .map_err(|error| error.to_string())?,
-        )
-        .map_err(|error| error.to_string())?;
-        split_records.insert(
-            split,
-            json!({
-                "artifact":format!("{split}.json"),
-                "sha256":file_hash(&artifact)?,
-                "minimum-tokens":minimum,
-            }),
-        );
-    }
-    let manifest = json!({
-        "format":"blckbaux.pretraining-mixture.v4",
-        "recipe_id":id,
-        "recipe":document,
-        "tokenizer":{"sha256":tokenizer_hash.ok_or("mixture has no tokenizer")?},
-        "splits":Value::from(split_records),
-    });
-    fs::write(
-        stage.join("manifest.json"),
-        blckbaux_artifact::json::pretty_string(&manifest).map_err(|error| error.to_string())?,
-    )
-    .map_err(|error| error.to_string())?;
-    fs::rename(stage, parent.join(id)).map_err(|error| error.to_string())
-}
-
-fn resolve_mix(
-    spec: &mut ExperimentSpec,
-    recipe: &Value,
-    manifest: &Value,
-    directory: &Path,
-) -> Result<(), String> {
-    let mut paths = Vec::new();
-    for split in ["train", "validation", "test"] {
-        let record = &manifest["splits"][split];
-        if let Some(window_tokens) = spec.objective.window_tokens {
-            let required = u64::from(window_tokens) + 1;
-            let available = if split == "train" {
-                record["tokens"].kind().as_u64().unwrap_or(0)
-            } else {
-                record["minimum-tokens"].kind().as_u64().unwrap_or(0)
-            };
-            if available < required {
-                return Err(format!(
-                    "mixture {split} needs at least {required} tokens for a {window_tokens}-token objective window"
-                ));
-            }
-        }
-        let artifact = string(record, "artifact")?;
-        let expected = if split == "train" {
-            "train.blckbauxptn".to_owned()
-        } else {
-            format!("{split}.json")
-        };
-        if artifact != expected {
-            return Err(format!("mixture has an invalid {split} artifact"));
-        }
-        let path = directory.join(artifact);
-        verify(&path, record["sha256"].kind().as_str())?;
-        paths.push(path);
-    }
-    spec.data.train = Some(paths.remove(0));
-    spec.data.validation = Some(paths.remove(0));
-    let train_record = &manifest["splits"]["train"];
-    let train_tokens = train_record["tokens"]
-        .kind()
-        .as_u64()
-        .ok_or("mixture train token count missing")?;
-    let train = source_summary(train_record)?;
-    let validation = mix_summary(recipe, "validation")?;
-    let window_tokens = u64::from(
-        spec.objective
-            .window_tokens
-            .ok_or("pretraining mixture requires objective.window-tokens")?,
-    );
-    let evaluations = u64::from(spec.execution.rounds)
-        .checked_add(1)
-        .ok_or("pretraining evaluation count overflow")?;
-    let objective_tokens = window_tokens
-        .checked_mul(evaluations)
-        .ok_or("pretraining token budget overflow")?;
-    let repetitions = objective_tokens as f64 / train_tokens as f64;
-    if objective_tokens
-        > train_tokens
-            .checked_mul(max_repetitions(recipe)?)
-            .ok_or("mixture repetition capacity overflow")?
-    {
-        return Err(format!(
-            "mixture exceeds training.max_repetitions={}: {repetitions:.3} corpus-pass-equivalents",
-            max_repetitions(recipe)?
-        ));
-    }
-    terminal::stderr(
-        Tag::Orchestration,
-        &format!(
-            "data · {} · train=unit-interleave{{{train}}} · validation=weighted-mean{{{validation}}} · evaluations={evaluations} · objective={objective_tokens} tokens · corpus-pass-equivalent={repetitions:.3}x",
-            string(recipe, "preset")?,
-        ),
-    );
-    Ok(())
-}
-
-fn check_mix(root: &Path, document: &Value, spec: &ExperimentSpec) -> Result<(), String> {
-    let window_tokens = u64::from(
-        spec.objective
-            .window_tokens
-            .ok_or("pretraining mixture requires objective.window-tokens")?,
-    );
-    let tokens = mix_parts(document, "train")?.into_iter().try_fold(
-        0u64,
-        |total, part| -> Result<u64, String> {
-            let component = recipe(root, string(part, "recipe")?)?;
-            let tokens = component["materialization"]["tokens"]["train"]
-                .kind()
-                .as_u64()
-                .filter(|tokens| *tokens > 0)
-                .ok_or_else(|| {
-                    "mixture component has no materialized training token count".to_owned()
-                })?;
-            total
-                .checked_add(tokens)
-                .ok_or_else(|| "mixture token count overflow".to_owned())
-        },
-    )?;
-    let evaluations = u64::from(spec.execution.rounds)
-        .checked_add(1)
-        .ok_or("pretraining evaluation count overflow")?;
-    let objective = window_tokens
-        .checked_mul(evaluations)
-        .ok_or("pretraining token budget overflow")?;
-    let capacity = tokens
-        .checked_mul(max_repetitions(document)?)
-        .ok_or("mixture repetition capacity overflow")?;
-    if objective > capacity {
-        return Err(format!(
-            "mixture exceeds training.max_repetitions={}: {objective} objective tokens over {tokens} corpus tokens",
-            max_repetitions(document)?
-        ));
-    }
-    Ok(())
-}
-
-fn source_summary(record: &Value) -> Result<String, String> {
-    record["sources"]
-        .as_seq()
-        .ok_or("mixture train sources missing")?
-        .iter()
-        .map(|source| {
-            Ok(format!(
-                "{}={} tokens",
-                string(source, "name")?,
-                source["tokens"]
-                    .kind()
-                    .as_u64()
-                    .ok_or("mixture source token count missing")?
-            ))
-        })
-        .collect::<Result<Vec<_>, String>>()
-        .map(|parts| parts.join(","))
 }
 
 fn aligned_windows(tokens: u64, window_tokens: u64, alignment: u64) -> u64 {
@@ -650,6 +337,15 @@ fn validate_recipe(name: &str, recipe: &Value) -> Result<(), String> {
     {
         return Err(format!("invalid {name} recipe contract"));
     }
+    validate_content(name, recipe, serialization)?;
+    if string(recipe, "preset")?.replace('_', "-") != name {
+        return Err(format!("invalid {name} recipe contract"));
+    }
+    Ok(())
+}
+
+fn validate_content(name: &str, recipe: &Value, serialization: &str) -> Result<(), String> {
+    let tokenizer = &recipe["tokenizer"];
     if serialization == "repository_file_v1" {
         exact_fields(
             &recipe["filter"],
@@ -704,9 +400,6 @@ fn validate_recipe(name: &str, recipe: &Value) -> Result<(), String> {
         || !valid_field(string(&recipe["source"], "id_field")?)
     {
         return Err(format!("invalid {name} text recipe contract"));
-    }
-    if string(recipe, "preset")?.replace('_', "-") != name {
-        return Err(format!("invalid {name} recipe contract"));
     }
     Ok(())
 }
@@ -795,35 +488,6 @@ fn max_repetitions(recipe: &Value) -> Result<u64, String> {
         .as_u64()
         .filter(|value| *value > 0)
         .ok_or_else(|| "mixture training max_repetitions must be positive".into())
-}
-
-fn mix_summary(recipe: &Value, split: &str) -> Result<String, String> {
-    let parts = mix_parts(recipe, split)?;
-    let total = parts.iter().try_fold(0u64, |total, part| {
-        total
-            .checked_add(
-                part["weight"]
-                    .kind()
-                    .as_u64()
-                    .ok_or("mixture weight missing")?,
-            )
-            .ok_or("pretraining mixture weight overflow")
-    })?;
-    parts
-        .into_iter()
-        .map(|part| {
-            Ok(format!(
-                "{}={}/{}",
-                string(part, "name")?,
-                part["weight"]
-                    .kind()
-                    .as_u64()
-                    .ok_or("mixture weight missing")?,
-                total,
-            ))
-        })
-        .collect::<Result<Vec<_>, String>>()
-        .map(|parts| parts.join(","))
 }
 
 fn valid_values(value: &Value, minimum: usize, maximum: usize) -> bool {
@@ -995,17 +659,7 @@ fn trace_sources(root: &Path, recipe: &Value) -> Result<Vec<PathBuf>, String> {
 
 fn verify(path: &Path, expected: Option<&str>) -> Result<(), String> {
     let expected = expected.ok_or_else(|| format!("missing digest for {}", path.display()))?;
-    let mut file = fs::File::open(path).map_err(|error| error.to_string())?;
-    let mut hash = Sha256::new();
-    let mut buffer = [0_u8; 65_536];
-    loop {
-        let size = file.read(&mut buffer).map_err(|error| error.to_string())?;
-        if size == 0 {
-            break;
-        }
-        hash.update(&buffer[..size]);
-    }
-    if format!("{:x}", hash.finalize()) == expected {
+    if file_hash(path)? == expected {
         Ok(())
     } else {
         Err(format!("checksum mismatch: {}", path.display()))
@@ -1035,7 +689,7 @@ fn string<'a>(value: &'a Value, key: &str) -> Result<&'a str, String> {
 
 #[cfg(test)]
 mod tests {
-    use super::{aligned_windows, mix_summary, validate_recipe};
+    use super::{aligned_windows, mixture, validate_recipe};
     use blckbaux_artifact::json::json;
 
     #[test]
@@ -1072,7 +726,7 @@ mod tests {
         });
         assert!(validate_recipe("code-trace-v1", &recipe).is_ok());
         assert_eq!(
-            mix_summary(&recipe, "validation").unwrap(),
+            mixture::summary(&recipe, "validation").unwrap(),
             "code=1/2,traces=1/2"
         );
         let invalid = json!({

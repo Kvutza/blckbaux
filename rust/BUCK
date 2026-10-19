@@ -12,6 +12,40 @@ git_fetch(
 )
 
 http_archive(
+    name = "adler2-2.0.1.crate",
+    sha256 = "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa",
+    strip_prefix = "adler2-2.0.1",
+    urls = ["https://static.crates.io/crates/adler2/2.0.1/download"],
+    visibility = [],
+)
+
+reindeer_rust_library(
+    name = "adler2-2",
+    srcs = [":adler2-2.0.1.crate"],
+    crate = "adler2",
+    crate_root = "adler2-2.0.1.crate/src/lib.rs",
+    edition = "2021",
+    env = {
+        "CARGO_BIN_NAME": "adler2",
+        "CARGO_CRATE_NAME": "adler2",
+        "CARGO_MANIFEST_DIR": "adler2-2.0.1.crate",
+        "CARGO_PKG_AUTHORS": "Jonas Schievink <jonasschievink@gmail.com>:oyvindln <oyvindln@users.noreply.github.com>",
+        "CARGO_PKG_DESCRIPTION": "A simple clean-room implementation of the Adler-32 checksum",
+        "CARGO_PKG_HOMEPAGE": "",
+        "CARGO_PKG_NAME": "adler2",
+        "CARGO_PKG_README": "README.md",
+        "CARGO_PKG_REPOSITORY": "https://github.com/oyvindln/adler2",
+        "CARGO_PKG_RUST_VERSION": "",
+        "CARGO_PKG_VERSION": "2.0.1",
+        "CARGO_PKG_VERSION_MAJOR": "2",
+        "CARGO_PKG_VERSION_MINOR": "0",
+        "CARGO_PKG_VERSION_PATCH": "1",
+        "CARGO_PKG_VERSION_PRE": "",
+    },
+    visibility = [],
+)
+
+http_archive(
     name = "adler32-1.2.0.crate",
     sha256 = "aae1277d39aeec15cb388266ecc24b11c80469deae6067e17a1a7aa9e5c1f234",
     strip_prefix = "adler32-1.2.0",
@@ -3051,6 +3085,128 @@ reindeer_rust_library(
 )
 
 http_archive(
+    name = "dashu-base-0.6.1.crate",
+    sha256 = "861a614e79388a4c72aa66b0bdabc91e3a4f30d53e0c8d962953e207d75884d0",
+    strip_prefix = "dashu-base-0.6.1",
+    urls = ["https://static.crates.io/crates/dashu-base/0.6.1/download"],
+    visibility = [],
+)
+
+reindeer_rust_library(
+    name = "dashu-base-0.6",
+    srcs = [":dashu-base-0.6.1.crate"],
+    crate = "dashu_base",
+    crate_root = "dashu-base-0.6.1.crate/src/lib.rs",
+    edition = "2021",
+    env = {
+        "CARGO_BIN_NAME": "dashu_base",
+        "CARGO_CRATE_NAME": "dashu_base",
+        "CARGO_MANIFEST_DIR": "dashu-base-0.6.1.crate",
+        "CARGO_PKG_AUTHORS": "Jacob Zhong <cmpute@gmail.com>",
+        "CARGO_PKG_DESCRIPTION": "Common trait definitions, error types, and utilities shared by the dashu math crates (integers, floats, rationals, and complex numbers). Defines the core abstractions the library builds on — Approximation, AbsOrd, Signed, SquareRoot, CubicRoot, EstimatedLog2, BitTest, and FloatEncoding — plus the Sign type and conversion errors.",
+        "CARGO_PKG_HOMEPAGE": "https://github.com/cmpute/dashu/tree/master/base",
+        "CARGO_PKG_NAME": "dashu-base",
+        "CARGO_PKG_README": "README.md",
+        "CARGO_PKG_REPOSITORY": "https://github.com/cmpute/dashu",
+        "CARGO_PKG_RUST_VERSION": "1.68",
+        "CARGO_PKG_VERSION": "0.6.1",
+        "CARGO_PKG_VERSION_MAJOR": "0",
+        "CARGO_PKG_VERSION_MINOR": "6",
+        "CARGO_PKG_VERSION_PATCH": "1",
+        "CARGO_PKG_VERSION_PRE": "",
+    },
+    visibility = [],
+    deps = [":num-modular-0.6"],
+)
+
+http_archive(
+    name = "dashu-int-0.6.2.crate",
+    sha256 = "64a0490b40a6a3f6427970035f17f76fd59c01d3cd9f9140809672863a0d64c8",
+    strip_prefix = "dashu-int-0.6.2",
+    urls = ["https://static.crates.io/crates/dashu-int/0.6.2/download"],
+    visibility = [],
+)
+
+reindeer_rust_library(
+    name = "dashu-int-0.6",
+    srcs = [":dashu-int-0.6.2.crate"],
+    crate = "dashu_int",
+    crate_root = "dashu-int-0.6.2.crate/src/lib.rs",
+    edition = "2021",
+    env = {
+        "CARGO_BIN_NAME": "dashu_int",
+        "CARGO_CRATE_NAME": "dashu_int",
+        "CARGO_MANIFEST_DIR": "dashu-int-0.6.2.crate",
+        "CARGO_PKG_AUTHORS": "Jacob Zhong <cmpute@gmail.com>:Tomek Czajka <tczajka@gmail.com>",
+        "CARGO_PKG_DESCRIPTION": "Arbitrary-precision integer math library for Rust, balancing ergonomics and efficiency. Provides UBig and IBig (unsigned and signed), with small values inlined on the stack. Efficient arithmetic, modular arithmetic, and number theory (pow, ilog, gcd, gcd_ext); two's-complement bit operations; parsing and formatting in base 2-36; optional serde, rand, num-traits, rkyv, and zeroize.",
+        "CARGO_PKG_HOMEPAGE": "https://github.com/cmpute/dashu/tree/master/integer",
+        "CARGO_PKG_NAME": "dashu-int",
+        "CARGO_PKG_README": "README.md",
+        "CARGO_PKG_REPOSITORY": "https://github.com/cmpute/dashu",
+        "CARGO_PKG_RUST_VERSION": "1.68",
+        "CARGO_PKG_VERSION": "0.6.2",
+        "CARGO_PKG_VERSION_MAJOR": "0",
+        "CARGO_PKG_VERSION_MINOR": "6",
+        "CARGO_PKG_VERSION_PATCH": "2",
+        "CARGO_PKG_VERSION_PRE": "",
+        "OUT_DIR": "$(location :dashu-int-0.6-build-script-run[out_dir])",
+    },
+    rustc_flags = ["@$(location :dashu-int-0.6-build-script-run[rustc_flags])"],
+    visibility = [],
+    deps = [
+        ":cfg-if-1",
+        ":dashu-base-0.6",
+        ":num-modular-0.6",
+        ":static_assertions-1",
+    ],
+)
+
+reindeer_rust_binary(
+    name = "dashu-int-0.6-build-script-build",
+    srcs = [":dashu-int-0.6.2.crate"],
+    crate = "build_script_build",
+    crate_root = "dashu-int-0.6.2.crate/build.rs",
+    edition = "2021",
+    env = {
+        "CARGO_BIN_NAME": "build-script-build",
+        "CARGO_CRATE_NAME": "build_script_build",
+        "CARGO_MANIFEST_DIR": "dashu-int-0.6.2.crate",
+        "CARGO_PKG_AUTHORS": "Jacob Zhong <cmpute@gmail.com>:Tomek Czajka <tczajka@gmail.com>",
+        "CARGO_PKG_DESCRIPTION": "Arbitrary-precision integer math library for Rust, balancing ergonomics and efficiency. Provides UBig and IBig (unsigned and signed), with small values inlined on the stack. Efficient arithmetic, modular arithmetic, and number theory (pow, ilog, gcd, gcd_ext); two's-complement bit operations; parsing and formatting in base 2-36; optional serde, rand, num-traits, rkyv, and zeroize.",
+        "CARGO_PKG_HOMEPAGE": "https://github.com/cmpute/dashu/tree/master/integer",
+        "CARGO_PKG_NAME": "dashu-int",
+        "CARGO_PKG_README": "README.md",
+        "CARGO_PKG_REPOSITORY": "https://github.com/cmpute/dashu",
+        "CARGO_PKG_RUST_VERSION": "1.68",
+        "CARGO_PKG_VERSION": "0.6.2",
+        "CARGO_PKG_VERSION_MAJOR": "0",
+        "CARGO_PKG_VERSION_MINOR": "6",
+        "CARGO_PKG_VERSION_PATCH": "2",
+        "CARGO_PKG_VERSION_PRE": "",
+    },
+    visibility = [],
+)
+
+buildscript_run(
+    name = "dashu-int-0.6-build-script-run",
+    package_name = "dashu-int",
+    buildscript_rule = ":dashu-int-0.6-build-script-build",
+    env = {
+        "CARGO_PKG_AUTHORS": "Jacob Zhong <cmpute@gmail.com>:Tomek Czajka <tczajka@gmail.com>",
+        "CARGO_PKG_DESCRIPTION": "Arbitrary-precision integer math library for Rust, balancing ergonomics and efficiency. Provides UBig and IBig (unsigned and signed), with small values inlined on the stack. Efficient arithmetic, modular arithmetic, and number theory (pow, ilog, gcd, gcd_ext); two's-complement bit operations; parsing and formatting in base 2-36; optional serde, rand, num-traits, rkyv, and zeroize.",
+        "CARGO_PKG_HOMEPAGE": "https://github.com/cmpute/dashu/tree/master/integer",
+        "CARGO_PKG_README": "README.md",
+        "CARGO_PKG_REPOSITORY": "https://github.com/cmpute/dashu",
+        "CARGO_PKG_RUST_VERSION": "1.68",
+        "CARGO_PKG_VERSION_MAJOR": "0",
+        "CARGO_PKG_VERSION_MINOR": "6",
+        "CARGO_PKG_VERSION_PATCH": "2",
+        "CARGO_PKG_VERSION_PRE": "",
+    },
+    version = "0.6.2",
+)
+
+http_archive(
     name = "derive_builder-0.20.2.crate",
     sha256 = "507dfb09ea8b7fa618fcf76e953f4f5e192547945816d5358edffe39f6f94947",
     strip_prefix = "derive_builder-0.20.2",
@@ -5144,6 +5300,7 @@ reindeer_rust_library(
         "CARGO_PKG_VERSION_PATCH": "1",
         "CARGO_PKG_VERSION_PRE": "",
     },
+    features = ["inline-more"],
     visibility = [],
 )
 
@@ -5179,6 +5336,216 @@ reindeer_rust_library(
         "CARGO_PKG_VERSION_PRE": "",
     },
     visibility = [],
+)
+
+alias(
+    name = "hegeltest",
+    actual = ":hegeltest-0.50",
+    visibility = ["PUBLIC"],
+)
+
+http_archive(
+    name = "hegeltest-0.50.2.crate",
+    sha256 = "e0957d17d80ddf0c50046e8c521cea13b31b9a0eb055bd0af8d745aaddec67a8",
+    strip_prefix = "hegeltest-0.50.2",
+    urls = ["https://static.crates.io/crates/hegeltest/0.50.2/download"],
+    visibility = [],
+)
+
+reindeer_rust_library(
+    name = "hegeltest-0.50",
+    srcs = [":hegeltest-0.50.2.crate"],
+    crate = "hegel",
+    crate_root = "hegeltest-0.50.2.crate/src/lib.rs",
+    edition = "2024",
+    env = {
+        "CARGO_BIN_NAME": "hegel",
+        "CARGO_CRATE_NAME": "hegel",
+        "CARGO_MANIFEST_DIR": "hegeltest-0.50.2.crate",
+        "CARGO_PKG_AUTHORS": "",
+        "CARGO_PKG_DESCRIPTION": "Property-based testing for Rust, built on Hypothesis",
+        "CARGO_PKG_HOMEPAGE": "http://hegel.dev",
+        "CARGO_PKG_NAME": "hegeltest",
+        "CARGO_PKG_README": "README.md",
+        "CARGO_PKG_REPOSITORY": "https://github.com/hegeldev/hegel",
+        "CARGO_PKG_RUST_VERSION": "1.86",
+        "CARGO_PKG_VERSION": "0.50.2",
+        "CARGO_PKG_VERSION_MAJOR": "0",
+        "CARGO_PKG_VERSION_MINOR": "50",
+        "CARGO_PKG_VERSION_PATCH": "2",
+        "CARGO_PKG_VERSION_PRE": "",
+        "OUT_DIR": "$(location :hegeltest-0.50-build-script-run[out_dir])",
+    },
+    features = [
+        "default",
+        "static-engine",
+    ],
+    rustc_flags = ["@$(location :hegeltest-0.50-build-script-run[rustc_flags])"],
+    visibility = [],
+    deps = [
+        ":hegeltest-c-0.47",
+        ":hegeltest-macros-0.50",
+        ":parking_lot-0.12",
+    ],
+)
+
+reindeer_rust_binary(
+    name = "hegeltest-0.50-build-script-build",
+    srcs = [":hegeltest-0.50.2.crate"],
+    crate = "build_script_build",
+    crate_root = "hegeltest-0.50.2.crate/build.rs",
+    edition = "2024",
+    env = {
+        "CARGO_BIN_NAME": "build-script-build",
+        "CARGO_CRATE_NAME": "build_script_build",
+        "CARGO_MANIFEST_DIR": "hegeltest-0.50.2.crate",
+        "CARGO_PKG_AUTHORS": "",
+        "CARGO_PKG_DESCRIPTION": "Property-based testing for Rust, built on Hypothesis",
+        "CARGO_PKG_HOMEPAGE": "http://hegel.dev",
+        "CARGO_PKG_NAME": "hegeltest",
+        "CARGO_PKG_README": "README.md",
+        "CARGO_PKG_REPOSITORY": "https://github.com/hegeldev/hegel",
+        "CARGO_PKG_RUST_VERSION": "1.86",
+        "CARGO_PKG_VERSION": "0.50.2",
+        "CARGO_PKG_VERSION_MAJOR": "0",
+        "CARGO_PKG_VERSION_MINOR": "50",
+        "CARGO_PKG_VERSION_PATCH": "2",
+        "CARGO_PKG_VERSION_PRE": "",
+    },
+    features = [
+        "default",
+        "static-engine",
+    ],
+    visibility = [],
+)
+
+buildscript_run(
+    name = "hegeltest-0.50-build-script-run",
+    package_name = "hegeltest",
+    buildscript_rule = ":hegeltest-0.50-build-script-build",
+    env = {
+        "CARGO_PKG_AUTHORS": "",
+        "CARGO_PKG_DESCRIPTION": "Property-based testing for Rust, built on Hypothesis",
+        "CARGO_PKG_HOMEPAGE": "http://hegel.dev",
+        "CARGO_PKG_README": "README.md",
+        "CARGO_PKG_REPOSITORY": "https://github.com/hegeldev/hegel",
+        "CARGO_PKG_RUST_VERSION": "1.86",
+        "CARGO_PKG_VERSION_MAJOR": "0",
+        "CARGO_PKG_VERSION_MINOR": "50",
+        "CARGO_PKG_VERSION_PATCH": "2",
+        "CARGO_PKG_VERSION_PRE": "",
+    },
+    features = [
+        "default",
+        "static-engine",
+    ],
+    version = "0.50.2",
+)
+
+http_archive(
+    name = "hegeltest-c-0.47.2.crate",
+    sha256 = "3004e05baa066cbcd39df9e75e792ebea725774981920bc72b3f64b400e19d32",
+    strip_prefix = "hegeltest-c-0.47.2",
+    urls = ["https://static.crates.io/crates/hegeltest-c/0.47.2/download"],
+    visibility = [],
+)
+
+reindeer_rust_library(
+    name = "hegeltest-c-0.47",
+    srcs = [":hegeltest-c-0.47.2.crate"],
+    crate = "hegel_c",
+    crate_root = "hegeltest-c-0.47.2.crate/src/lib.rs",
+    dlopen_enable = True,
+    edition = "2024",
+    env = {
+        "CARGO_BIN_NAME": "hegel_c",
+        "CARGO_CRATE_NAME": "hegel_c",
+        "CARGO_MANIFEST_DIR": "hegeltest-c-0.47.2.crate",
+        "CARGO_PKG_AUTHORS": "",
+        "CARGO_PKG_DESCRIPTION": "C-ABI bindings for Hegel's native engine.",
+        "CARGO_PKG_HOMEPAGE": "http://hegel.dev",
+        "CARGO_PKG_NAME": "hegeltest-c",
+        "CARGO_PKG_README": "README.md",
+        "CARGO_PKG_REPOSITORY": "https://github.com/hegeldev/hegel",
+        "CARGO_PKG_RUST_VERSION": "1.86",
+        "CARGO_PKG_VERSION": "0.47.2",
+        "CARGO_PKG_VERSION_MAJOR": "0",
+        "CARGO_PKG_VERSION_MINOR": "47",
+        "CARGO_PKG_VERSION_PATCH": "2",
+        "CARGO_PKG_VERSION_PRE": "",
+    },
+    features = ["std"],
+    platform = {
+        "linux-arm64": dict(
+            deps = [":rustix-1"],
+        ),
+        "linux-x86_64": dict(
+            deps = [":rustix-1"],
+        ),
+        "macos-arm64": dict(
+            deps = [":rustix-1"],
+        ),
+        "macos-x86_64": dict(
+            deps = [":rustix-1"],
+        ),
+        "windows-gnu": dict(
+            deps = [":windows-sys-0.61"],
+        ),
+        "windows-msvc": dict(
+            deps = [":windows-sys-0.61"],
+        ),
+    },
+    visibility = [],
+    deps = [
+        ":dashu-int-0.6",
+        ":hashbrown-0.17",
+        ":libm-0.2",
+        ":miniz_oxide-0.8",
+        ":once_cell-1",
+        ":rand-0.10",
+        ":rustc-hash-2",
+        ":toml-1",
+    ],
+)
+
+http_archive(
+    name = "hegeltest-macros-0.50.2.crate",
+    sha256 = "80c279a70cae8cf660f947d4cb2203cd63d69c174e285fe18e2aaa0c8a851f9f",
+    strip_prefix = "hegeltest-macros-0.50.2",
+    urls = ["https://static.crates.io/crates/hegeltest-macros/0.50.2/download"],
+    visibility = [],
+)
+
+reindeer_rust_library(
+    name = "hegeltest-macros-0.50",
+    srcs = [":hegeltest-macros-0.50.2.crate"],
+    crate = "hegel_macros",
+    crate_root = "hegeltest-macros-0.50.2.crate/src/lib.rs",
+    edition = "2024",
+    env = {
+        "CARGO_BIN_NAME": "hegel_macros",
+        "CARGO_CRATE_NAME": "hegel_macros",
+        "CARGO_MANIFEST_DIR": "hegeltest-macros-0.50.2.crate",
+        "CARGO_PKG_AUTHORS": "",
+        "CARGO_PKG_DESCRIPTION": "Procedural macros for Hegel.",
+        "CARGO_PKG_HOMEPAGE": "http://hegel.dev",
+        "CARGO_PKG_NAME": "hegeltest-macros",
+        "CARGO_PKG_README": "README.md",
+        "CARGO_PKG_REPOSITORY": "https://github.com/hegeldev/hegel",
+        "CARGO_PKG_RUST_VERSION": "1.86",
+        "CARGO_PKG_VERSION": "0.50.2",
+        "CARGO_PKG_VERSION_MAJOR": "0",
+        "CARGO_PKG_VERSION_MINOR": "50",
+        "CARGO_PKG_VERSION_PATCH": "2",
+        "CARGO_PKG_VERSION_PRE": "",
+    },
+    proc_macro = True,
+    visibility = [],
+    deps = [
+        ":proc-macro2-1",
+        ":quote-1",
+        ":syn-2",
+    ],
 )
 
 http_archive(
@@ -7043,6 +7410,7 @@ reindeer_rust_library(
         "general",
         "ioctl",
         "no_std",
+        "prctl",
     ],
     visibility = [],
 )
@@ -7656,6 +8024,42 @@ reindeer_rust_library(
 )
 
 http_archive(
+    name = "miniz_oxide-0.8.9.crate",
+    sha256 = "1fa76a2c86f704bdb222d66965fb3d63269ce38518b83cb0575fca855ebb6316",
+    strip_prefix = "miniz_oxide-0.8.9",
+    urls = ["https://static.crates.io/crates/miniz_oxide/0.8.9/download"],
+    visibility = [],
+)
+
+reindeer_rust_library(
+    name = "miniz_oxide-0.8",
+    srcs = [":miniz_oxide-0.8.9.crate"],
+    crate = "miniz_oxide",
+    crate_root = "miniz_oxide-0.8.9.crate/src/lib.rs",
+    edition = "2021",
+    env = {
+        "CARGO_BIN_NAME": "miniz_oxide",
+        "CARGO_CRATE_NAME": "miniz_oxide",
+        "CARGO_MANIFEST_DIR": "miniz_oxide-0.8.9.crate",
+        "CARGO_PKG_AUTHORS": "Frommi <daniil.liferenko@gmail.com>:oyvindln <oyvindln@users.noreply.github.com>:Rich Geldreich richgel99@gmail.com",
+        "CARGO_PKG_DESCRIPTION": "DEFLATE compression and decompression library rewritten in Rust based on miniz",
+        "CARGO_PKG_HOMEPAGE": "https://github.com/Frommi/miniz_oxide/tree/master/miniz_oxide",
+        "CARGO_PKG_NAME": "miniz_oxide",
+        "CARGO_PKG_README": "Readme.md",
+        "CARGO_PKG_REPOSITORY": "https://github.com/Frommi/miniz_oxide/tree/master/miniz_oxide",
+        "CARGO_PKG_RUST_VERSION": "",
+        "CARGO_PKG_VERSION": "0.8.9",
+        "CARGO_PKG_VERSION_MAJOR": "0",
+        "CARGO_PKG_VERSION_MINOR": "8",
+        "CARGO_PKG_VERSION_PATCH": "9",
+        "CARGO_PKG_VERSION_PRE": "",
+    },
+    features = ["with-alloc"],
+    visibility = [],
+    deps = [":adler2-2"],
+)
+
+http_archive(
     name = "mio-1.2.4.crate",
     sha256 = "1788edb87fdc09c7e26304471e2f5be8cdefb1b6930d6e3985fc02ff53bf86ee",
     strip_prefix = "mio-1.2.4",
@@ -8235,6 +8639,40 @@ reindeer_rust_library(
         ":num-integer-0.1",
         ":num-traits-0.2",
     ],
+)
+
+http_archive(
+    name = "num-modular-0.6.5.crate",
+    sha256 = "bd8e500409e6cd603b03e477c26a6caecdc27ac58979a53e881c75eafc079f44",
+    strip_prefix = "num-modular-0.6.5",
+    urls = ["https://static.crates.io/crates/num-modular/0.6.5/download"],
+    visibility = [],
+)
+
+reindeer_rust_library(
+    name = "num-modular-0.6",
+    srcs = [":num-modular-0.6.5.crate"],
+    crate = "num_modular",
+    crate_root = "num-modular-0.6.5.crate/src/lib.rs",
+    edition = "2018",
+    env = {
+        "CARGO_BIN_NAME": "num_modular",
+        "CARGO_CRATE_NAME": "num_modular",
+        "CARGO_MANIFEST_DIR": "num-modular-0.6.5.crate",
+        "CARGO_PKG_AUTHORS": "",
+        "CARGO_PKG_DESCRIPTION": "Implementation of efficient integer division and modular arithmetic operations with generic number types.\nSupports various backends including num-bigint, etc..\n",
+        "CARGO_PKG_HOMEPAGE": "",
+        "CARGO_PKG_NAME": "num-modular",
+        "CARGO_PKG_README": "README.md",
+        "CARGO_PKG_REPOSITORY": "https://github.com/cmpute/num-modular",
+        "CARGO_PKG_RUST_VERSION": "1.65",
+        "CARGO_PKG_VERSION": "0.6.5",
+        "CARGO_PKG_VERSION_MAJOR": "0",
+        "CARGO_PKG_VERSION_MINOR": "6",
+        "CARGO_PKG_VERSION_PATCH": "5",
+        "CARGO_PKG_VERSION_PRE": "",
+    },
+    visibility = [],
 )
 
 http_archive(
@@ -11001,6 +11439,41 @@ reindeer_rust_library(
     ],
 )
 
+http_archive(
+    name = "rand-0.10.3.crate",
+    sha256 = "65c9fb96cbc91e3478eaae79a69fcd3f1ae4ad052e471fe6732fff548984b4af",
+    strip_prefix = "rand-0.10.3",
+    urls = ["https://static.crates.io/crates/rand/0.10.3/download"],
+    visibility = [],
+)
+
+reindeer_rust_library(
+    name = "rand-0.10",
+    srcs = [":rand-0.10.3.crate"],
+    crate = "rand",
+    crate_root = "rand-0.10.3.crate/src/lib.rs",
+    edition = "2024",
+    env = {
+        "CARGO_BIN_NAME": "rand",
+        "CARGO_CRATE_NAME": "rand",
+        "CARGO_MANIFEST_DIR": "rand-0.10.3.crate",
+        "CARGO_PKG_AUTHORS": "The Rand Project Developers:The Rust Project Developers",
+        "CARGO_PKG_DESCRIPTION": "Random number generators and other randomness functionality.\n",
+        "CARGO_PKG_HOMEPAGE": "https://rust-random.github.io/book",
+        "CARGO_PKG_NAME": "rand",
+        "CARGO_PKG_README": "README.md",
+        "CARGO_PKG_REPOSITORY": "https://github.com/rust-random/rand",
+        "CARGO_PKG_RUST_VERSION": "1.85",
+        "CARGO_PKG_VERSION": "0.10.3",
+        "CARGO_PKG_VERSION_MAJOR": "0",
+        "CARGO_PKG_VERSION_MINOR": "10",
+        "CARGO_PKG_VERSION_PATCH": "3",
+        "CARGO_PKG_VERSION_PRE": "",
+    },
+    visibility = [],
+    deps = [":rand_core-0.10"],
+)
+
 alias(
     name = "rand_chacha",
     actual = ":rand_chacha-0.3",
@@ -11162,6 +11635,40 @@ reindeer_rust_library(
     ],
     visibility = [],
     deps = [":getrandom-0.3"],
+)
+
+http_archive(
+    name = "rand_core-0.10.1.crate",
+    sha256 = "63b8176103e19a2643978565ca18b50549f6101881c443590420e4dc998a3c69",
+    strip_prefix = "rand_core-0.10.1",
+    urls = ["https://static.crates.io/crates/rand_core/0.10.1/download"],
+    visibility = [],
+)
+
+reindeer_rust_library(
+    name = "rand_core-0.10",
+    srcs = [":rand_core-0.10.1.crate"],
+    crate = "rand_core",
+    crate_root = "rand_core-0.10.1.crate/src/lib.rs",
+    edition = "2024",
+    env = {
+        "CARGO_BIN_NAME": "rand_core",
+        "CARGO_CRATE_NAME": "rand_core",
+        "CARGO_MANIFEST_DIR": "rand_core-0.10.1.crate",
+        "CARGO_PKG_AUTHORS": "The Rand Project Developers",
+        "CARGO_PKG_DESCRIPTION": "Core random number generation traits and tools for implementation.",
+        "CARGO_PKG_HOMEPAGE": "https://rust-random.github.io/book",
+        "CARGO_PKG_NAME": "rand_core",
+        "CARGO_PKG_README": "README.md",
+        "CARGO_PKG_REPOSITORY": "https://github.com/rust-random/rand_core",
+        "CARGO_PKG_RUST_VERSION": "1.85",
+        "CARGO_PKG_VERSION": "0.10.1",
+        "CARGO_PKG_VERSION_MAJOR": "0",
+        "CARGO_PKG_VERSION_MINOR": "10",
+        "CARGO_PKG_VERSION_PATCH": "1",
+        "CARGO_PKG_VERSION_PRE": "",
+    },
+    visibility = [],
 )
 
 alias(
@@ -11907,7 +12414,12 @@ reindeer_rust_library(
         "alloc",
         "default",
         "fs",
+        "process",
+        "rand",
         "std",
+        "stdio",
+        "thread",
+        "time",
     ],
     platform = {
         "linux-arm64": dict(
@@ -11961,7 +12473,12 @@ reindeer_rust_binary(
         "alloc",
         "default",
         "fs",
+        "process",
+        "rand",
         "std",
+        "stdio",
+        "thread",
+        "time",
     ],
     visibility = [],
 )
@@ -11986,7 +12503,12 @@ buildscript_run(
         "alloc",
         "default",
         "fs",
+        "process",
+        "rand",
         "std",
+        "stdio",
+        "thread",
+        "time",
     ],
     version = "1.1.5",
 )
@@ -14741,6 +15263,47 @@ reindeer_rust_library(
 )
 
 http_archive(
+    name = "toml-1.1.8+spec-1.1.0.crate",
+    sha256 = "20489e00e4d8741d6be680764cc12e270655e375a20d1011e844a9c3379e678d",
+    strip_prefix = "toml-1.1.8+spec-1.1.0",
+    urls = ["https://static.crates.io/crates/toml/1.1.8+spec-1.1.0/download"],
+    visibility = [],
+)
+
+reindeer_rust_library(
+    name = "toml-1",
+    srcs = [":toml-1.1.8+spec-1.1.0.crate"],
+    crate = "toml",
+    crate_root = "toml-1.1.8+spec-1.1.0.crate/src/lib.rs",
+    edition = "2024",
+    env = {
+        "CARGO_BIN_NAME": "toml",
+        "CARGO_CRATE_NAME": "toml",
+        "CARGO_MANIFEST_DIR": "toml-1.1.8+spec-1.1.0.crate",
+        "CARGO_PKG_AUTHORS": "",
+        "CARGO_PKG_DESCRIPTION": "A native Rust encoder and decoder of TOML-formatted files and streams. Provides\nimplementations of the standard Serialize/Deserialize traits for TOML data to\nfacilitate deserializing and serializing Rust structures.\n",
+        "CARGO_PKG_HOMEPAGE": "",
+        "CARGO_PKG_NAME": "toml",
+        "CARGO_PKG_README": "README.md",
+        "CARGO_PKG_REPOSITORY": "https://github.com/toml-rs/toml",
+        "CARGO_PKG_RUST_VERSION": "1.85",
+        "CARGO_PKG_VERSION": "1.1.8+spec-1.1.0",
+        "CARGO_PKG_VERSION_MAJOR": "1",
+        "CARGO_PKG_VERSION_MINOR": "1",
+        "CARGO_PKG_VERSION_PATCH": "8",
+        "CARGO_PKG_VERSION_PRE": "",
+    },
+    features = ["parse"],
+    visibility = [],
+    deps = [
+        ":serde_spanned-1",
+        ":toml_datetime-1",
+        ":toml_parser-1",
+        ":winnow-1",
+    ],
+)
+
+http_archive(
     name = "toml_datetime-0.7.5+spec-1.1.0.crate",
     sha256 = "92e1cfed4a3038bc5a127e35a2d360f145e1f4b971b551a2ba5fd7aedf7e1347",
     strip_prefix = "toml_datetime-0.7.5+spec-1.1.0",
@@ -14781,23 +15344,58 @@ reindeer_rust_library(
 )
 
 http_archive(
-    name = "toml_parser-1.1.4+spec-1.1.0.crate",
-    sha256 = "bed810ee007d8e7f9cf20b4774e7198142fa27186e0f805871da7f3c39eaf333",
-    strip_prefix = "toml_parser-1.1.4+spec-1.1.0",
-    urls = ["https://static.crates.io/crates/toml_parser/1.1.4+spec-1.1.0/download"],
+    name = "toml_datetime-1.1.2+spec-1.1.0.crate",
+    sha256 = "2b86d767906c6c42421dcba507eb9d203e779497710a47782a224bb871653053",
+    strip_prefix = "toml_datetime-1.1.2+spec-1.1.0",
+    urls = ["https://static.crates.io/crates/toml_datetime/1.1.2+spec-1.1.0/download"],
+    visibility = [],
+)
+
+reindeer_rust_library(
+    name = "toml_datetime-1",
+    srcs = [":toml_datetime-1.1.2+spec-1.1.0.crate"],
+    crate = "toml_datetime",
+    crate_root = "toml_datetime-1.1.2+spec-1.1.0.crate/src/lib.rs",
+    edition = "2024",
+    env = {
+        "CARGO_BIN_NAME": "toml_datetime",
+        "CARGO_CRATE_NAME": "toml_datetime",
+        "CARGO_MANIFEST_DIR": "toml_datetime-1.1.2+spec-1.1.0.crate",
+        "CARGO_PKG_AUTHORS": "",
+        "CARGO_PKG_DESCRIPTION": "A TOML-compatible datetime type",
+        "CARGO_PKG_HOMEPAGE": "",
+        "CARGO_PKG_NAME": "toml_datetime",
+        "CARGO_PKG_README": "README.md",
+        "CARGO_PKG_REPOSITORY": "https://github.com/toml-rs/toml",
+        "CARGO_PKG_RUST_VERSION": "1.85",
+        "CARGO_PKG_VERSION": "1.1.2+spec-1.1.0",
+        "CARGO_PKG_VERSION_MAJOR": "1",
+        "CARGO_PKG_VERSION_MINOR": "1",
+        "CARGO_PKG_VERSION_PATCH": "2",
+        "CARGO_PKG_VERSION_PRE": "",
+    },
+    features = ["alloc"],
+    visibility = [],
+)
+
+http_archive(
+    name = "toml_parser-1.1.5+spec-1.1.0.crate",
+    sha256 = "baa693a8032d7e1cada7d0041e96126df243179ff061456783ac7f12bda4744c",
+    strip_prefix = "toml_parser-1.1.5+spec-1.1.0",
+    urls = ["https://static.crates.io/crates/toml_parser/1.1.5+spec-1.1.0/download"],
     visibility = [],
 )
 
 reindeer_rust_library(
     name = "toml_parser-1",
-    srcs = [":toml_parser-1.1.4+spec-1.1.0.crate"],
+    srcs = [":toml_parser-1.1.5+spec-1.1.0.crate"],
     crate = "toml_parser",
-    crate_root = "toml_parser-1.1.4+spec-1.1.0.crate/src/lib.rs",
+    crate_root = "toml_parser-1.1.5+spec-1.1.0.crate/src/lib.rs",
     edition = "2024",
     env = {
         "CARGO_BIN_NAME": "toml_parser",
         "CARGO_CRATE_NAME": "toml_parser",
-        "CARGO_MANIFEST_DIR": "toml_parser-1.1.4+spec-1.1.0.crate",
+        "CARGO_MANIFEST_DIR": "toml_parser-1.1.5+spec-1.1.0.crate",
         "CARGO_PKG_AUTHORS": "",
         "CARGO_PKG_DESCRIPTION": "Yet another format-preserving TOML parser.",
         "CARGO_PKG_HOMEPAGE": "",
@@ -14805,10 +15403,10 @@ reindeer_rust_library(
         "CARGO_PKG_README": "README.md",
         "CARGO_PKG_REPOSITORY": "https://github.com/toml-rs/toml",
         "CARGO_PKG_RUST_VERSION": "1.85",
-        "CARGO_PKG_VERSION": "1.1.4+spec-1.1.0",
+        "CARGO_PKG_VERSION": "1.1.5+spec-1.1.0",
         "CARGO_PKG_VERSION_MAJOR": "1",
         "CARGO_PKG_VERSION_MINOR": "1",
-        "CARGO_PKG_VERSION_PATCH": "4",
+        "CARGO_PKG_VERSION_PATCH": "5",
         "CARGO_PKG_VERSION_PRE": "",
     },
     features = [
@@ -16228,9 +16826,11 @@ reindeer_rust_library(
         "Win32_System_Console",
         "Win32_System_Diagnostics",
         "Win32_System_Diagnostics_Debug",
+        "Win32_System_Environment",
         "Win32_System_IO",
         "Win32_System_LibraryLoader",
         "Win32_System_Memory",
+        "Win32_System_Performance",
         "Win32_System_Pipes",
         "Win32_System_SystemInformation",
         "Win32_System_SystemServices",
@@ -16887,28 +17487,4 @@ buildscript_run(
         "CARGO_PKG_VERSION_PRE": "",
     },
     version = "1.0.23",
-)
-
-alias(
-    name = "proc-macro2",
-    actual = ":proc-macro2-1",
-    visibility = ["PUBLIC"],
-)
-
-alias(
-    name = "quote",
-    actual = ":quote-1",
-    visibility = ["PUBLIC"],
-)
-
-alias(
-    name = "syn",
-    actual = ":syn-2",
-    visibility = ["PUBLIC"],
-)
-
-alias(
-    name = "parking_lot",
-    actual = ":parking_lot-0.12",
-    visibility = ["PUBLIC"],
 )

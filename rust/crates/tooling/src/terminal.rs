@@ -1,6 +1,7 @@
 //! Shared terminal rendering for BLCKBAUX developer and experiment commands.
 
 use std::io::{self, IsTerminal, Write};
+use std::process::ExitCode;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 const RESET: &str = "\x1b[0m";
@@ -117,6 +118,17 @@ pub fn render(tag: Tag, text: &str, color: bool, theme: Theme) -> String {
 pub fn stderr(tag: Tag, text: &str) {
     let rendered = render(tag, text, io::stderr().is_terminal(), theme());
     let _ = io::stderr().write_all(rendered.as_bytes());
+}
+
+/// Report a command failure using the shared terminal format and exit status.
+pub fn finish(result: Result<(), String>) -> ExitCode {
+    match result {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(error) => {
+            stderr(Tag::Error, &format!("blckbaux: {error}"));
+            ExitCode::FAILURE
+        }
+    }
 }
 
 pub fn stdout(tag: Tag, text: &str) {

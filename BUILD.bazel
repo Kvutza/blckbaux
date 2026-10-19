@@ -79,6 +79,7 @@ test_suite(
     tests = [
         "//rust/crates/neighbor-index:neighbor-index_test",
         "//rust/crates/blckbaux:blckbaux_test",
+        "//rust/crates/properties:properties_test",
         "//rust/crates/blckbaux:trial_search_metal_test",
     ],
 )

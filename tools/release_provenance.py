@@ -95,6 +95,22 @@ def verify_wheels(
             raise ValueError(f"wheel metadata disagrees with release: {wheel.name}")
 
 
+def verify_release(
+    root: Path,
+    tag: str,
+    commit: str | None,
+    platform_tags: tuple[str, ...],
+    wheels: Path | None,
+) -> str:
+    """Resolve the source identity and check every requested release artifact."""
+    resolved = resolve_release(root, tag)
+    if commit:
+        verify_checkout(root, tag, commit)
+    if wheels:
+        verify_wheels(wheels, tag[1:], platform_tags or PLATFORM_TAGS)
+    return resolved
+
+
 @click.command(help=__doc__)
 @click.argument("tag")
 @click.option("--commit")
@@ -113,11 +129,7 @@ def main(
 ) -> None:
     root = Path.cwd()
     try:
-        resolved = resolve_release(root, tag)
-        if commit:
-            verify_checkout(root, tag, commit)
-        if wheels:
-            verify_wheels(wheels, tag[1:], platform_tags or PLATFORM_TAGS)
+        resolved = verify_release(root, tag, commit, platform_tags, wheels)
     except (OSError, subprocess.CalledProcessError, ValueError) as error:
         raise click.ClickException(str(error)) from error
     click.echo(f"tag={tag}\ncommit={resolved}")

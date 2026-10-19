@@ -37,10 +37,25 @@ the implementation or establish a mathematical guarantee.
 
 The default Buck2 suite includes the optimizer, runtime, CLI, development tools,
 and platform integration tests. Hegel properties live in
-`rust/crates/blckbaux/tests/hegel_prop.rs` and run as part of that suite. Use generated
+`rust/crates/properties/src/lib.rs` and run as part of that suite. Use generated
 multi-step inputs to test state transitions, configuration round trips, wrapper
 agreement, and invariants across failures. Keep concrete regression examples
 alongside these properties when they identify a specific defect.
+
+The property-test package pins the upstream `hegeltest` Rust SDK to 0.50.2 with
+its `static-engine` feature. The SDK pins engine 0.47.2 and macros 0.50.2; Cargo,
+Buck2, and Bazel build those dependencies from their published crate sources.
+The engine links into the test executable, so tests need no separately installed
+Hegel library. Production libraries and unrelated test targets do not depend on
+Hegel. The default Buck2 and Bazel verification suites include the property
+package. To run it directly:
+
+```sh
+./buck2w test //rust/crates/properties:properties-unit
+bazel test //rust/crates/properties:properties_test
+cargo test -p blckbaux-properties --lib             # CPU properties
+cargo test -p blckbaux-properties --features metal  # also check the Metal ABI on macOS
+```
 
 The default suite also builds `blckbaux-semantics` independently. Shared ABI records
 generate Metal declarations with compiler-checked sizes and field offsets;

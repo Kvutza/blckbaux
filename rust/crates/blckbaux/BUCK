@@ -194,7 +194,6 @@ blckbaux_program_targets(BLCKBAUX_PROGRAMS, RUST_EDITION, glob(["src/**/*.rs", "
             "//rust/crates/semantics:semantics",
             "//rust/crates/artifact:artifact",
             "//rust:tempfile",
-            "//rust/vendor/hegel:hegel",
         ] + select({
             "//:macos-arm64": [
                 "//build/buck2/native:openmp-macos",

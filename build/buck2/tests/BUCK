@@ -53,6 +53,7 @@ _TESTS = [
     "//rust/crates/neighbor-index:neighbor-index-unit",
     "//rust/crates/semantics:semantics-unit",
     "//rust/crates/artifact:artifact-unit",
+    "//rust/crates/properties:properties-unit",
     "//rust/crates/blckbaux:blckbaux-unit",
     "//rust/crates/blckbaux:turbo-enn-test",
     "//rust/crates/blckbaux:region-math",

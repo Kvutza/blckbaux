@@ -132,6 +132,13 @@ NEIGHBOR_INDEX_TEST_CRATES = ["deser", "memmap2", "ndarray", "rand", "rand_chach
 NEIGHBOR_INDEX_PROGRAMS = [
 ]
 
+PROPERTIES_CRATES = ["hegeltest", "ndarray"]
+
+PROPERTIES_TEST_CRATES = ["hegeltest", "ndarray"]
+
+PROPERTIES_PROGRAMS = [
+]
+
 BLCKBAUX_PY_CRATES = ["ndarray", "numpy", "pyo3", "rand"]
 
 BLCKBAUX_PY_TEST_CRATES = ["ndarray", "numpy", "pyo3", "rand"]

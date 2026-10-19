@@ -4,11 +4,13 @@ import subprocess
 import zipfile
 
 import pytest
+from click.testing import CliRunner
 
 from tools.release_provenance import (
     PLATFORM_TAGS,
     PYTHON_ABIS,
     git,
+    main,
     resolve_release,
     verify_checkout,
     verify_wheels,
@@ -110,3 +112,18 @@ def test_007(tmp_path):
     (tmp_path / "blckbaux-1.2.3-cp312-cp312-manylinux_2_28_aarch64.whl").unlink()
     with pytest.raises(ValueError, match="manylinux_2_28_aarch64"):
         verify_wheels(tmp_path, "1.2.3")
+
+
+def test_command(repository, monkeypatch):
+    monkeypatch.chdir(repository)
+    runner = CliRunner()
+    commit = resolve_release(repository, "v1.2.3")
+    result = runner.invoke(main, ["v1.2.3", "--commit", commit])
+    assert result.exit_code == 0, result.output
+    assert result.output == f"tag=v1.2.3\ncommit={commit}\n"
+    result = runner.invoke(main, ["main"])
+    assert result.exit_code == 1
+    assert "release tag" in result.output
+    result = runner.invoke(main, ["v1.2.3", "--commit", "0" * 40])
+    assert result.exit_code == 1
+    assert "tag moved" in result.output

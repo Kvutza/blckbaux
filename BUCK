@@ -124,6 +124,7 @@ cuda_oxide(
         "modal-runner": "//rust/crates/modal-runner:modal-source",
         "neighbor-index": "//rust/crates/neighbor-index:source",
         "ptx-synth": "//rust/crates/ptx-synth:ptx-source",
+        "properties": "//rust/crates/properties:source",
         "semantics": "//rust/crates/semantics:source",
     },
     cuda = "//backends/cuda:source",

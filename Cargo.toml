@@ -12,6 +12,7 @@ members = [
     "rust/crates/blckbaux-py",
     "rust/crates/modal-runner",
     "rust/crates/ptx-synth",
+    "rust/crates/properties",
     "rust/crates/artifact",
 ]
 resolver = "2"
