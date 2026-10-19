@@ -92,6 +92,7 @@ jobs:
           fi
           RUST_CHANNEL=$(python3 -c 'import tomllib; print(tomllib.load(open("rust-toolchain.toml", "rb"))["toolchain"]["channel"])')
           rustup toolchain install "$RUST_CHANNEL" --profile minimal --component rustfmt
+          cargo install kiss-ai --version 0.4.13 --locked
 
       - name: Install Pixi
         uses: prefix-dev/setup-pixi@v0.11.2

@@ -1,6 +1,6 @@
 module(
     name = "blckbaux",
-    version = "0.2.1",
+    version = "0.2.2",
 )
 
 bazel_dep(name = "platforms", version = "1.1.0")
