@@ -211,7 +211,7 @@ fn capture(program: &str, args: &[&str]) -> Result<String, String> {
 }
 
 fn parity(metadata: &Metadata) -> Result<(), String> {
-    let buck = capture("./buck2w", &["targets", "//rust/crates/..."])?;
+    let buck = capture("./tools/buck2w", &["targets", "//rust/crates/..."])?;
     let bazel = capture("bazel", &["query", "//rust/crates/...", "--output=label"])?;
     let labels = |text: &str| {
         text.lines()

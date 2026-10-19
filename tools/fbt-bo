@@ -12,6 +12,6 @@ esac
 [ "$(uname -s)" = Darwin ] && [ "$(uname -m)" = arm64 ] || {
     echo 'This BO experiment requires Apple silicon macOS' >&2; exit 1;
 }
-exec ./buck2w test //rust/crates/blckbaux:blckbaux-unit --local-only -j 1 \
+exec ./tools/buck2w test //rust/crates/blckbaux:blckbaux-unit --local-only -j 1 \
     -- --timeout 600 --test-arg=--ignored --test-arg=--nocapture \
     --test-arg=--test-threads=1 --test-arg="$filter"

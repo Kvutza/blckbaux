@@ -194,20 +194,20 @@ EOF
 done
 
 if [ -n "$target" ] && [ "$target" != "." ]; then
-    echo "blckbaux: KISS target '$target' has no Buck2 mapping; use ./buck2w test directly" >&2
+    echo "blckbaux: KISS target '$target' has no Buck2 mapping; use ./tools/buck2w test directly" >&2
     exit 2
 fi
 
 if [ "$dry_run" -eq 1 ]; then
-    exec "$repo_dir/buck2w" targets //build/buck2/tests:all
+    exec "$repo_dir/tools/buck2w" targets //build/buck2/tests:all
 fi
 
 if [ -n "$jobs" ] && [ "$has_passthrough" -eq 1 ]; then
-    exec "$repo_dir/buck2w" test //build/buck2/tests:all --local-only -j "$jobs" -- "$@"
+    exec "$repo_dir/tools/buck2w" test //build/buck2/tests:all --local-only -j "$jobs" -- "$@"
 elif [ -n "$jobs" ]; then
-    exec "$repo_dir/buck2w" test //build/buck2/tests:all --local-only -j "$jobs"
+    exec "$repo_dir/tools/buck2w" test //build/buck2/tests:all --local-only -j "$jobs"
 elif [ "$has_passthrough" -eq 1 ]; then
-    exec "$repo_dir/buck2w" test //build/buck2/tests:all --local-only -- "$@"
+    exec "$repo_dir/tools/buck2w" test //build/buck2/tests:all --local-only -- "$@"
 else
-    exec "$repo_dir/buck2w" test //build/buck2/tests:all --local-only
+    exec "$repo_dir/tools/buck2w" test //build/buck2/tests:all --local-only
 fi

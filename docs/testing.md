@@ -51,7 +51,7 @@ Hegel. The default Buck2 and Bazel verification suites include the property
 package. To run it directly:
 
 ```sh
-./buck2w test //rust/crates/properties:properties-unit
+./tools/buck2w test //rust/crates/properties:properties-unit
 bazel test //rust/crates/properties:properties_test
 cargo test -p blckbaux-properties --lib             # CPU properties
 cargo test -p blckbaux-properties --features metal  # also check the Metal ABI on macOS

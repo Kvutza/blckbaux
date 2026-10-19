@@ -82,7 +82,8 @@ class KissConfigTests(unittest.TestCase):
 
     def test_rust(self):
         target = "//build/buck2/tests:all"
-        (self.root / "buck2w").symlink_to(self.upstream)
+        (self.root / "tools").mkdir()
+        (self.root / "tools/buck2w").symlink_to(self.upstream)
         for option in ((), ("--config", str(self.config))):
             with self.subTest(option=option):
                 result = self.invoke(*option, "test", "--dry-run")

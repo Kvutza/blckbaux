@@ -121,7 +121,7 @@ for index in "${!python_versions[@]}"; do
         targets+=(//build/buck2/tests:all //rust/crates/cli:blckbaux)
     fi
     build_report=$(mktemp "${TMPDIR:-/tmp}/blckbaux-buck2-report.XXXXXX")
-    ./buck2w \
+    ./tools/buck2w \
         build "${targets[@]}" \
         --build-test-info \
         --config "blckbaux.python_version=$python_version" \

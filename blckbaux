@@ -12,7 +12,7 @@ if [ "$(uname -s)" = Linux ] && [ "${1:-}" = cuda ] && [ "${2:-}" = tune-t4 ]; t
 fi
 case "${BLCKBAUX_BUILD_SYSTEM:-buck2}" in
     buck2)
-        built=$(./buck2w build --console none -v 0 --show-full-output //rust/crates/cli:blckbaux)
+        built=$(./tools/buck2w build --console none -v 0 --show-full-output //rust/crates/cli:blckbaux)
         case "$built" in
             "root//rust/crates/cli:blckbaux "*) binary=${built#* } ;;
             *) echo "blckbaux: could not resolve the Buck2 CLI artifact" >&2; exit 1 ;;

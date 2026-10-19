@@ -243,7 +243,7 @@ fn run_modal(
     if let Some(parent) = out.parent() {
         std::fs::create_dir_all(parent).map_err(|error| error.to_string())?;
     }
-    let status = Command::new(root.join("buck2w"))
+    let status = Command::new(root.join("tools/buck2w"))
         .current_dir(root)
         .args([
             "run",
@@ -349,7 +349,7 @@ fn generate_t4(
     {
         return Err("invalid CUDA generation dimensions or sampling parameters".into());
     }
-    let status = Command::new(root.join("buck2w"))
+    let status = Command::new(root.join("tools/buck2w"))
         .current_dir(root)
         .args([
             "run",

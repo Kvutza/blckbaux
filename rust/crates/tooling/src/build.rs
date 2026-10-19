@@ -59,7 +59,7 @@ impl BuildSystem {
         let isolation = std::env::var("BUCK_ISOLATION_DIR").unwrap_or_else(|_| "dev".to_string());
         let mut command = match self {
             Self::Buck2 => {
-                let mut command = Command::new("./buck2w");
+                let mut command = Command::new("./tools/buck2w");
                 command.args([
                     "--isolation-dir",
                     &isolation,
@@ -92,7 +92,7 @@ impl BuildSystem {
 
 fn buck_artifact(root: &Path, target: &str) -> Result<BuiltArtifact, String> {
     let isolation = std::env::var("BUCK_ISOLATION_DIR").unwrap_or_else(|_| "dev".to_string());
-    let output = Command::new("./buck2w")
+    let output = Command::new("./tools/buck2w")
         .current_dir(root)
         .args([
             "--isolation-dir",

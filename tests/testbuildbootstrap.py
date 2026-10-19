@@ -50,7 +50,7 @@ mode=smoke
 echo "verify:$BLCKBAUX_PYTHON_VERSION:$mode" >> events
 """,
         )
-        # ./blckbaux always does `buck2w run //rust/crates/cli:blckbaux -- …`.
+        # ./blckbaux always runs the Buck2 wrapper before dispatching to the CLI.
         # Bootstrap isolates that behind a stub CLI that matches clap enough for
         # build/--help, then falls through to the wheel-build stub for `build`.
         self.script(
@@ -115,7 +115,7 @@ esac
 """,
         )
         self.script(
-            "buck2w",
+            "tools/buck2w",
             """
 if [ "${1:-}" = run ]; then
     while [ "$#" -gt 0 ] && [ "$1" != "--" ]; do

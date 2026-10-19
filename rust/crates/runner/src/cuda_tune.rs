@@ -34,7 +34,7 @@ struct HnetJob<'a> {
 }
 
 fn launch_modal(job: &HnetJob<'_>) -> Result<std::process::ExitStatus, String> {
-    let mut command = Command::new(job.root.join("buck2w"));
+    let mut command = Command::new(job.root.join("tools/buck2w"));
     command
         .current_dir(job.root)
         .env("BLCKBAUX_CUDA_DATASET", job.dataset)

@@ -323,11 +323,11 @@ fn wheel_cmd(mjx: bool) -> String {
          export PATH=/tmp/blckbaux-wheel-env/bin:$PATH; \
          export XLA_PYTHON_CLIENT_PREALLOCATE=false; \
          unset LD_LIBRARY_PATH; \
-         PARITY=$(./buck2w --isolation-dir cuda build //:cuda-parity \
+         PARITY=$(./tools/buck2w --isolation-dir cuda build //:cuda-parity \
          --target-platforms //:linux-x86_64-platform --local-only --num-threads 4 \
          --show-full-simple-output); \
          cat \"$PARITY\"; \
-         ./buck2w --isolation-dir cuda build //:cuda-wheel \
+         ./tools/buck2w --isolation-dir cuda build //:cuda-wheel \
          --target-platforms //:linux-x86_64-platform --local-only --num-threads 4 \
          --out {wheel}; \
          /tmp/blckbaux-wheel-env/bin/python -m pip install --quiet {wheel}; \

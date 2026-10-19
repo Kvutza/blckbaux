@@ -33,8 +33,8 @@ Cargo manifests declare Rust crates; Reindeer generates their Buck targets in `r
 ## Cache Cleanup
 
 ```sh
-./buck2w clean --stale --dry-run   # inspect stale artifacts
-./buck2w clean --stale             # reclaim them
+./tools/buck2w clean --stale --dry-run   # inspect stale artifacts
+./tools/buck2w clean --stale             # reclaim them
 ```
 
 ## Hosts

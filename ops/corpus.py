@@ -43,7 +43,7 @@ def read_native(job):
         request.seek(0)
         with subprocess.Popen(
             [
-                "./buck2w",
+                "./tools/buck2w",
                 "--isolation-dir",
                 "dev",
                 "run",
