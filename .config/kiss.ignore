@@ -1,3 +1,4 @@
+# Paths are relative to the repository root, not this file's directory.
 target/
 ops/
 # Platform-specific kernels are exercised by Bazel accelerator tests. Their

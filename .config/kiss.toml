@@ -1,4 +1,4 @@
-# Repository-wide complexity budgets, not generated codebase maxima.
+# Repository-wide complexity budgets, loaded explicitly by tools/kiss.
 # Functions should coordinate one operation; modules should own one responsibility.
 # Behavioral coverage belongs to the Rust/Python runners, not lexical name matching.
 

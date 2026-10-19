@@ -122,7 +122,7 @@ jobs:
       - name: Check source policy
         run: |
           tools/bootstrap-dotslash
-          .buck2-tools/bin/dotslash tools/prek run semantic-name kiss-check --config prek.toml --all-files
+          .buck2-tools/bin/dotslash tools/prek run semantic-name kiss-check --config .config/prek.toml --all-files
 
       - name: Build and verify wheels
         run: ./blckbaux build --distribution --tests --out release

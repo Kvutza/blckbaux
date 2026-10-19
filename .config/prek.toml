@@ -87,6 +87,6 @@ pass_filenames = false
 [[repos.hooks]]
 id = "kiss-check"
 name = "KISS architecture"
-entry = "tools/kiss --config .kissconfig check ."
+entry = "tools/kiss check ."
 language = "system"
 pass_filenames = false

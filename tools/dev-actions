@@ -22,7 +22,7 @@ hooks() {
     else
         set -- "$@" --all-files
     fi
-    dotslash tools/prek run "$@" --config prek.toml
+    dotslash tools/prek run "$@" --config .config/prek.toml
 }
 
 format() {

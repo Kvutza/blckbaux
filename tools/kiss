@@ -25,37 +25,53 @@ fi
 
 command_name=
 lang=
+config_file="$repo_dir/.config/kiss.toml"
+custom_config=0
 previous=
 for arg in "$@"; do
     case "$arg" in
-        check|stats|dry|viz|test) command_name=$arg ;;
+        check|stats|dry|viz|rules|test) command_name=$arg ;;
         --lang=*) lang=${arg#--lang=} ;;
+        --config=*) config_file=${arg#--config=}; custom_config=1 ;;
     esac
     if [ "$previous" = "--lang" ]; then
         lang=$arg
+    elif [ "$previous" = "--config" ]; then
+        config_file=$arg
+        custom_config=1
     fi
     previous=$arg
 done
 
+if [ -n "$command_name" ] && [ ! -f "$config_file" ]; then
+    echo "blckbaux: KISS configuration not found: $config_file" >&2
+    exit 2
+fi
+
 if [ "$command_name" != test ]; then
+    if [ "$custom_config" -eq 0 ]; then
+        set -- --config "$config_file" "$@"
+    fi
     ignored_files=
     case "$command_name" in
         check|stats|dry|viz)
-            ignore_file="$repo_dir/.kissignore"
-            if [ -f "$ignore_file" ]; then
-                while IFS= read -r prefix || [ -n "$prefix" ]; do
-                    case "$prefix" in
-                        ''|'#'*) continue ;;
-                    esac
-                    prefix=${prefix%/}
-                    if [ -d "$repo_dir/$prefix" ]; then
-                        set -- "$@" --ignore "$prefix"
-                    elif [ "$command_name" = check ]; then
-                        ignored_files="${ignored_files}${ignored_files:+
-}$repo_dir/$prefix"
-                    fi
-                done < "$ignore_file"
+            ignore_file="$repo_dir/.config/kiss.ignore"
+            if [ ! -f "$ignore_file" ]; then
+                echo "blckbaux: KISS ignore file not found: $ignore_file" >&2
+                exit 2
             fi
+            while IFS= read -r prefix || [ -n "$prefix" ]; do
+                case "$prefix" in
+                    ''|'#'*) continue ;;
+                esac
+                prefix=${prefix%/}
+                if [ -d "$repo_dir/$prefix" ]; then
+                    set -- "$@" --ignore "$prefix"
+                elif [ "$command_name" = check ]; then
+                    ignored_files="${ignored_files}${ignored_files:+
+}$repo_dir/$prefix"
+                fi
+            done < "$ignore_file"
             ;;
     esac
     if [ "$command_name" = check ] && [ -n "$ignored_files" ]; then
@@ -86,6 +102,9 @@ fi
 
 case "$lang" in
     python|py)
+        if [ "$custom_config" -eq 0 ]; then
+            set -- --config "$config_file" "$@"
+        fi
         exec "$upstream" "$@"
         ;;
     rust|rs|"")
@@ -107,6 +126,9 @@ has_passthrough=0
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
+        test)
+            shift
+            ;;
         --)
             has_passthrough=1
             shift
@@ -125,6 +147,9 @@ EOF
             shift 2
             ;;
         --lang=*)
+            shift
+            ;;
+        --config=*)
             shift
             ;;
         --config|--main-branch|--base-branch|--ignore)

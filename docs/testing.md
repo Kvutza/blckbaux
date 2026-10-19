@@ -72,6 +72,18 @@ pass.
 
 ## Quality & Radar Gates
 
+Repository quality configuration lives in `.config/`: `kiss.toml` defines KISS
+thresholds, `kiss.ignore` lists repository-relative exclusions, and `prek.toml`
+defines formatting and policy hooks. `tools/kiss` supplies the KISS configuration
+automatically and rejects missing configuration or exclusions. Ruff and pytest
+discover their settings in the root `pyproject.toml`.
+
+Use `tools/kiss check .` for the configured architecture check. For Prek commands
+outside `./blckbaux`, pass `--config .config/prek.toml`. This explicit config keeps
+hook paths and file filters relative to the repository root. If installing Prek
+hooks in a checkout, pass that same option to `prek install`; preserve any
+existing hooks that enforce the repository's JJ workflow.
+
 ```sh
 ./blckbaux fmt               # apply Rust and Python formatting
 ./blckbaux radar performance show   # static HNet work, coverage, and goal certificate
