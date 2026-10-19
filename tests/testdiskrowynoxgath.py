@@ -10,8 +10,8 @@ import tempfile
 import numpy as np
 import pytest
 
-from ennx.ennx.enn_class import ENN
-from ennx.turbo.config.eidxdrv import ENNIndexDriver
+from blckbaux.enn.enn_class import ENN
+from blckbaux.turbo.config.surrogate import NeighborIndex
 
 pytestmark = pytest.mark.slow
 
@@ -34,7 +34,7 @@ def test_001():
             np.empty((0, d)),
             np.empty((0, 1)),
             scale_x=False,
-            index_driver=ENNIndexDriver.BPANN_DISK,
+            index_driver=NeighborIndex.BPANN_DISK,
             work_dir=work,
             enn_storage="disk",
         )

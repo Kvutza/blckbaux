@@ -1,0 +1,65 @@
+# T4 parity run for the canonical one-million-token Gaussian experiment.
+version = 4
+
+experiment = "pretrain"
+model = "fbt-pisa1-hnet-mhc4-v1"
+[data]
+recipe = "stack-v3-rust-go-v1"
+
+[objective]
+function = "cross-entropy"
+sampling = "natural"
+window-tokens = 1048576
+
+[execution]
+rounds = 128
+round-target-ms = 200
+
+[evaluation]
+interval = 128
+
+[optimizer]
+algorithm = "operator-bo"
+
+[optimizer.candidate-generation]
+generator = "independent"
+arms = 4
+candidates = 4
+
+[optimizer.candidate-generation.perturbation]
+distribution = "gaussian"
+
+[optimizer.surrogate]
+estimator = "knn"
+scaling = "global"
+neighbors = 10
+neighbor-rule = "fixed"
+epistemic-scale = 0.05
+aleatoric-scale = 0.05
+
+fit = "leave-one-out"
+fit-candidates = 30
+fit-samples = 10
+
+[optimizer.acquisition]
+function = "upper-confidence-bound"
+
+[optimizer.acceptance]
+criterion = "positive-improvement"
+
+[optimizer.radius-control]
+policy = "reliability"
+initial = 0.1
+min = 0.1
+max = 2.0
+failure-tolerance = 4
+
+[seeds]
+model = 240105308887621659
+reference = 150813718214252701
+proposal = 91614869253048103
+acquisition = 314159265358979323
+
+
+[diagnostics]
+stage-samples = 3

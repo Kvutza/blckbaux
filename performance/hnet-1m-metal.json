@@ -1,0 +1,564 @@
+{
+  "schema": "blckbaux.performance-certificate.v1",
+  "config": "examples/tuning/hnet-1m-gaussian.toml",
+  "static-contract": {
+    "model": "fbt-pisa1-hnet-mhc4-v1",
+    "program-version": 2,
+    "backend": "metal",
+    "compiler": "native",
+    "source-digest": "ae8471d3ed5214a5b373cc4522bd32eae21eca2e9dac7b35c893663a5c979edb",
+    "source-files": [
+      "rust/crates/blckbaux/src/apple_gpu.rs",
+      "rust/crates/blckbaux/src/bf16_metal.rs",
+      "rust/crates/blckbaux/src/bf16_metric.metal",
+      "rust/crates/blckbaux/src/bf16_objectives.metal",
+      "rust/crates/blckbaux/src/bf16_search.metal",
+      "rust/crates/blckbaux/src/bf16_search.rs",
+      "rust/crates/blckbaux/src/bin/turbo-enn/main.rs",
+      "rust/crates/blckbaux/src/bin/turbo-enn-worker/main.rs",
+      "rust/crates/blckbaux/src/code_environment.rs",
+      "rust/crates/blckbaux/src/config/diffusion.rs",
+      "rust/crates/blckbaux/src/config/experiment.rs",
+      "rust/crates/blckbaux/src/config/feedback.rs",
+      "rust/crates/blckbaux/src/config/generation.rs",
+      "rust/crates/blckbaux/src/config/initialization.rs",
+      "rust/crates/blckbaux/src/config/kernel.rs",
+      "rust/crates/blckbaux/src/config/objectives.rs",
+      "rust/crates/blckbaux/src/config/objectives_tests.rs",
+      "rust/crates/blckbaux/src/config/procedural.rs",
+      "rust/crates/blckbaux/src/config/resident.rs",
+      "rust/crates/blckbaux/src/config/seeds.rs",
+      "rust/crates/blckbaux/src/config/spec/conversion.rs",
+      "rust/crates/blckbaux/src/config/spec/execution.rs",
+      "rust/crates/blckbaux/src/config/spec/optimizer.rs",
+      "rust/crates/blckbaux/src/config/spec/tests.rs",
+      "rust/crates/blckbaux/src/config/spec.rs",
+      "rust/crates/blckbaux/src/config/validation.rs",
+      "rust/crates/blckbaux/src/config.rs",
+      "rust/crates/blckbaux/src/context.rs",
+      "rust/crates/blckbaux/src/context_metal/tests.rs",
+      "rust/crates/blckbaux/src/context_metal.rs",
+      "rust/crates/blckbaux/src/context_tree.metal",
+      "rust/crates/blckbaux/src/fbt.metal",
+      "rust/crates/blckbaux/src/fbt.rs",
+      "rust/crates/blckbaux/src/fbt_ablation.rs",
+      "rust/crates/blckbaux/src/fbt_attention.metal",
+      "rust/crates/blckbaux/src/fbt_attention.rs",
+      "rust/crates/blckbaux/src/fbt_attentiontests.rs",
+      "rust/crates/blckbaux/src/fbt_block/stats.rs",
+      "rust/crates/blckbaux/src/fbt_block/target.rs",
+      "rust/crates/blckbaux/src/fbt_block/tests.rs",
+      "rust/crates/blckbaux/src/fbt_block/window.rs",
+      "rust/crates/blckbaux/src/fbt_block.rs",
+      "rust/crates/blckbaux/src/fbt_boundtests.rs",
+      "rust/crates/blckbaux/src/fbt_contrast.rs",
+      "rust/crates/blckbaux/src/fbt_decode/mhc.rs",
+      "rust/crates/blckbaux/src/fbt_decode.metal",
+      "rust/crates/blckbaux/src/fbt_decode.rs",
+      "rust/crates/blckbaux/src/fbt_decodetests.rs",
+      "rust/crates/blckbaux/src/fbt_denoise.metal",
+      "rust/crates/blckbaux/src/fbt_diffusion.rs",
+      "rust/crates/blckbaux/src/fbt_draft.metal",
+      "rust/crates/blckbaux/src/fbt_draft.rs",
+      "rust/crates/blckbaux/src/fbt_generation/checkpoint.rs",
+      "rust/crates/blckbaux/src/fbt_generation/context.rs",
+      "rust/crates/blckbaux/src/fbt_generation/finish.rs",
+      "rust/crates/blckbaux/src/fbt_generation/metrics.rs",
+      "rust/crates/blckbaux/src/fbt_generation/oracle.rs",
+      "rust/crates/blckbaux/src/fbt_generation/protocol.rs",
+      "rust/crates/blckbaux/src/fbt_generation/reward.rs",
+      "rust/crates/blckbaux/src/fbt_generation/rounds.rs",
+      "rust/crates/blckbaux/src/fbt_generation/setup.rs",
+      "rust/crates/blckbaux/src/fbt_generation.rs",
+      "rust/crates/blckbaux/src/fbt_heldout.rs",
+      "rust/crates/blckbaux/src/fbt_hnet_wave.metal",
+      "rust/crates/blckbaux/src/fbt_jitter.rs",
+      "rust/crates/blckbaux/src/fbt_journal.rs",
+      "rust/crates/blckbaux/src/fbt_loss_tensorops.metal",
+      "rust/crates/blckbaux/src/fbt_losstests.rs",
+      "rust/crates/blckbaux/src/fbt_metal.rs",
+      "rust/crates/blckbaux/src/fbt_metaltests.rs",
+      "rust/crates/blckbaux/src/fbt_micro.rs",
+      "rust/crates/blckbaux/src/fbt_model.metal",
+      "rust/crates/blckbaux/src/fbt_model.rs",
+      "rust/crates/blckbaux/src/fbt_modeltests.rs",
+      "rust/crates/blckbaux/src/fbt_moe/architecture.rs",
+      "rust/crates/blckbaux/src/fbt_moe/benchmarks.rs",
+      "rust/crates/blckbaux/src/fbt_moe/buffers.rs",
+      "rust/crates/blckbaux/src/fbt_moe/candidate.rs",
+      "rust/crates/blckbaux/src/fbt_moe/causal.rs",
+      "rust/crates/blckbaux/src/fbt_moe/dispatch.rs",
+      "rust/crates/blckbaux/src/fbt_moe/envelope.rs",
+      "rust/crates/blckbaux/src/fbt_moe/experiment.rs",
+      "rust/crates/blckbaux/src/fbt_moe/initialization.rs",
+      "rust/crates/blckbaux/src/fbt_moe/mhc_reference.rs",
+      "rust/crates/blckbaux/src/fbt_moe/objective.rs",
+      "rust/crates/blckbaux/src/fbt_moe/optimization.rs",
+      "rust/crates/blckbaux/src/fbt_moe/resources.rs",
+      "rust/crates/blckbaux/src/fbt_moe/round.rs",
+      "rust/crates/blckbaux/src/fbt_moe/validation.rs",
+      "rust/crates/blckbaux/src/fbt_moe.metal",
+      "rust/crates/blckbaux/src/fbt_moe.rs",
+      "rust/crates/blckbaux/src/fbt_moe_routing_tensorops.metal",
+      "rust/crates/blckbaux/src/fbt_moe_tensorops.metal",
+      "rust/crates/blckbaux/src/fbt_mps.rs",
+      "rust/crates/blckbaux/src/fbt_pisa1/cache.rs",
+      "rust/crates/blckbaux/src/fbt_pisa1/certify.rs",
+      "rust/crates/blckbaux/src/fbt_pisa1/dirty.rs",
+      "rust/crates/blckbaux/src/fbt_pisa1/fallback.rs",
+      "rust/crates/blckbaux/src/fbt_pisa1/hierarchical.rs",
+      "rust/crates/blckbaux/src/fbt_pisa1.metal",
+      "rust/crates/blckbaux/src/fbt_pisa1.rs",
+      "rust/crates/blckbaux/src/fbt_prefill.metal",
+      "rust/crates/blckbaux/src/fbt_prefill.rs",
+      "rust/crates/blckbaux/src/fbt_readout.rs",
+      "rust/crates/blckbaux/src/fbt_reconstruction.rs",
+      "rust/crates/blckbaux/src/fbt_reward.rs",
+      "rust/crates/blckbaux/src/fbt_round.rs",
+      "rust/crates/blckbaux/src/fbt_routing.metal",
+      "rust/crates/blckbaux/src/fbt_routing.rs",
+      "rust/crates/blckbaux/src/fbt_scorer/input.rs",
+      "rust/crates/blckbaux/src/fbt_scorer/mhc.rs",
+      "rust/crates/blckbaux/src/fbt_scorer/trace.rs",
+      "rust/crates/blckbaux/src/fbt_scorer.rs",
+      "rust/crates/blckbaux/src/fbt_updates.rs",
+      "rust/crates/blckbaux/src/flame.metal",
+      "rust/crates/blckbaux/src/forward_program/contract.rs",
+      "rust/crates/blckbaux/src/forward_program/diffusion.rs",
+      "rust/crates/blckbaux/src/forward_program/graph.rs",
+      "rust/crates/blckbaux/src/forward_program/hnet.rs",
+      "rust/crates/blckbaux/src/forward_program/model.rs",
+      "rust/crates/blckbaux/src/forward_program/recurrence.rs",
+      "rust/crates/blckbaux/src/forward_program/schedule.rs",
+      "rust/crates/blckbaux/src/forward_program/tensor.rs",
+      "rust/crates/blckbaux/src/hash.rs",
+      "rust/crates/blckbaux/src/kda_moe.metal",
+      "rust/crates/blckbaux/src/objective_observation.rs",
+      "rust/crates/blckbaux/src/pisa_index.metal",
+      "rust/crates/blckbaux/src/qwen.metal",
+      "rust/crates/blckbaux/src/qwen_attention.metal",
+      "rust/crates/blckbaux/src/qwen_linear.metal",
+      "rust/crates/blckbaux/src/search/device_tests.rs",
+      "rust/crates/blckbaux/src/search/region.rs",
+      "rust/crates/blckbaux/src/search/region_tests.rs",
+      "rust/crates/blckbaux/src/search/view_tests.rs",
+      "rust/crates/blckbaux/src/search.rs",
+      "rust/crates/blckbaux/src/trust_region.rs"
+    ],
+    "workload": {
+      "prompt-token-cap": 1048576,
+      "generated-token-cap": 1048576,
+      "retained-context-tokens": 1048576,
+      "target-input-positions": 1048575,
+      "hnet-patch-tokens": 64,
+      "core-positions": 16384,
+      "broad-pass-positions": 16384,
+      "rounds": 20000,
+      "target-round-ms": 200
+    },
+    "architecture": {
+      "parameters": 1047733016,
+      "physical-layers": 5,
+      "executed-layer-visits": 7,
+      "contraction-coefficients-per-position": 19852800,
+      "contraction-flops": 650536550400,
+      "pisa-state-bytes": 29818880,
+      "cache-capacity": 16384
+    },
+    "lowering": {
+      "kernel-count": 19,
+      "kernels": [
+        {
+          "name": "fbt_moe_embed",
+          "nodes": [
+            "embed"
+          ],
+          "tile": [
+            1,
+            512,
+            1
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "fbt_moe_rms",
+          "nodes": [
+            "attention-norm"
+          ],
+          "tile": [
+            1,
+            512,
+            1
+          ],
+          "threads": [
+            128,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "fbt_model_tensorops_qkv",
+          "nodes": [
+            "qkv"
+          ],
+          "tile": [
+            128,
+            64,
+            512
+          ],
+          "threads": [
+            128,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "fbt_pisa1_leaf_means",
+          "nodes": [
+            "pisa-summaries"
+          ],
+          "tile": [
+            64,
+            64,
+            1
+          ],
+          "threads": [
+            64,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "fbt_pisa1_select_attention",
+          "nodes": [
+            "pisa-select",
+            "pisa-attention"
+          ],
+          "tile": [
+            1,
+            512,
+            64
+          ],
+          "threads": [
+            128,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "fbt_model_tensorops_output_projection",
+          "nodes": [
+            "attention-project"
+          ],
+          "tile": [
+            128,
+            64,
+            512
+          ],
+          "threads": [
+            128,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "fbt_moe_residual_rms",
+          "nodes": [
+            "attention-residual",
+            "moe-norm"
+          ],
+          "tile": [
+            1,
+            512,
+            1
+          ],
+          "threads": [
+            128,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "fbt_moe_select_top3",
+          "nodes": [
+            "route"
+          ],
+          "tile": [
+            1,
+            128,
+            1
+          ],
+          "threads": [
+            128,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "fbt_moe_route_pack",
+          "nodes": [
+            "pack-routes"
+          ],
+          "tile": [
+            64,
+            512,
+            1
+          ],
+          "threads": [
+            128,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "fbt_moe_routed_gate",
+          "nodes": [
+            "gate-up"
+          ],
+          "tile": [
+            128,
+            64,
+            512
+          ],
+          "threads": [
+            128,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "fbt_moe_routed_down",
+          "nodes": [
+            "down"
+          ],
+          "tile": [
+            128,
+            64,
+            216
+          ],
+          "threads": [
+            128,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "fbt_moe_combine",
+          "nodes": [
+            "combine-routes"
+          ],
+          "tile": [
+            1,
+            512,
+            3
+          ],
+          "threads": [
+            128,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "fbt_moe_residual",
+          "nodes": [
+            "moe-residual"
+          ],
+          "tile": [
+            1,
+            512,
+            1
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "fbt_moe_feedback_fuse",
+          "nodes": [
+            "feedback"
+          ],
+          "tile": [
+            1,
+            512,
+            1
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "fbt_model_tensorops_readout",
+          "nodes": [
+            "readout"
+          ],
+          "tile": [
+            128,
+            64,
+            512
+          ],
+          "threads": [
+            128,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "denoise_embed+fbt_readout_proposal_tiles+denoise_reduce",
+          "nodes": [
+            "draft"
+          ],
+          "tile": [
+            128,
+            64,
+            512
+          ],
+          "threads": [
+            128,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "fbt_block_verify",
+          "nodes": [
+            "verify"
+          ],
+          "tile": [
+            128,
+            4,
+            1
+          ],
+          "threads": [
+            128,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "fbt_readout_loss_tiles+fbt_readout_loss_reduce",
+          "nodes": [
+            "score-generation"
+          ],
+          "tile": [
+            128,
+            64,
+            512
+          ],
+          "threads": [
+            128,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "fbt_hnet_objective",
+          "nodes": [
+            "objective"
+          ],
+          "tile": [
+            1,
+            1048576,
+            1
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        }
+      ],
+      "missing-count": 7,
+      "missing": [
+        "FineEncode",
+        "BoundaryRoute",
+        "SelectChunks",
+        "SmoothChunks",
+        "UpsampleChunks",
+        "FineSkip",
+        "FineDecode"
+      ]
+    },
+    "goal": {
+      "maximum-context-tokens": 1048576,
+      "context-met": true,
+      "lowering-complete": false,
+      "static-goal-met": false
+    },
+    "counting-boundary": "HNet core dense contractions and resident PISA state; excludes routing logistics, normalization, sampling, BO proposal, reward, and tell"
+  },
+  "measurement": {
+    "run": ".cache/blckbaux/runs/pretrain/146f2f655c2a54d075fd/run-1791505091634-4849-0",
+    "source-digest": "ae8471d3ed5214a5b373cc4522bd32eae21eca2e9dac7b35c893663a5c979edb",
+    "matches-current-source": true,
+    "hardware": "apple-metal",
+    "samples": 1,
+    "truth": {
+      "context-tokens": 1048576,
+      "prompt-tokens": 177280,
+      "drafted-tokens": 0,
+      "evaluated-tokens": 871296,
+      "evaluated-core-positions": 16384,
+      "scored-tokens": 871296,
+      "repaired-tokens": 0,
+      "generated-tokens": 871296,
+      "committed-tokens": 871296,
+      "repair-batches": 0,
+      "exact-per-token-generation": true,
+      "direct-token-decisions": 1046400,
+      "hash-expanded-tokens": 0
+    },
+    "latency": {
+      "wall-ms": {
+        "count": 1,
+        "mean": 1592.4747080000002,
+        "p95": 1592.4747080000002,
+        "max": 1592.4747080000002
+      },
+      "proposal-ms": {
+        "count": 1,
+        "mean": 169.378667,
+        "p95": 169.378667,
+        "max": 169.378667
+      },
+      "evaluation-ms": {
+        "count": 1,
+        "mean": 1298.614332,
+        "p95": 1298.614332,
+        "max": 1298.614332
+      },
+      "gpu-ms": {
+        "count": 1,
+        "mean": 1161.3880833465373,
+        "p95": 1161.3880833465373,
+        "max": 1161.3880833465373
+      },
+      "reward-ms": {
+        "count": 1,
+        "mean": 0.00325,
+        "p95": 0.00325,
+        "max": 0.00325
+      },
+      "tell-ms": {
+        "count": 1,
+        "mean": 0.299084,
+        "p95": 0.299084,
+        "max": 0.299084
+      }
+    },
+    "initialization-samples": 1,
+    "guided-samples": 0,
+    "target-round-ms": 200.0,
+    "p95-target-met": false,
+    "strict-target-met": false,
+    "required-p95-speedup": 7.962373540000001,
+    "matches-workload": true
+  }
+}

@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from enn_helpers import sphere_objective
 
-from ennx.turbo.config import (
+from blckbaux.turbo.config import (
     OptimizerConfig,
     turbo_enn,
     turbo_one,
@@ -26,7 +26,7 @@ def _unit(x: np.ndarray, bounds: np.ndarray) -> np.ndarray:
     ids=["TURBO_ZERO", "TURBO_ENN", "TURBO_ONE"],
 )
 def test_001(config: OptimizerConfig) -> None:
-    from ennx import create_optimizer
+    from blckbaux import create_optimizer
 
     bounds1 = np.array([[0.0, 1.0], [0.0, 1.0]], dtype=float)
     bounds2 = np.array([[2.0, 4.0], [-3.0, 1.0]], dtype=float)
@@ -51,7 +51,7 @@ def test_001(config: OptimizerConfig) -> None:
     ids=["TURBO_ZERO", "TURBO_ENN"],
 )
 def test_002(config: OptimizerConfig) -> None:
-    from ennx import create_optimizer
+    from blckbaux import create_optimizer
 
     bounds = np.array([[0.0, 1.0], [0.0, 1.0]], dtype=float)
     num_arms, num_steps = 2, 2

@@ -6,8 +6,8 @@ optuna = pytest.importorskip("optuna")
 from optuna.distributions import FloatDistribution, IntDistribution
 from optuna.trial import TrialState
 
-from ennx import create_optimizer
-from ennx.optuna import Sampler
+from blckbaux import create_optimizer
+from blckbaux.optuna import Sampler
 
 
 def space():
@@ -70,13 +70,15 @@ def test_pending(config):
 def test_restart(config, tmp_path):
     storage = f"sqlite:///{tmp_path / 'study.db'}"
     study = optuna.create_study(
-        study_name="ennx",
+        study_name="blckbaux",
         storage=storage,
         sampler=Sampler(space(), config=config, seed=3),
     )
     study.optimize(lambda trial: sum(suggest(trial).values()), n_trials=4)
     sampler = Sampler(space(), config=config, seed=3)
-    restored = optuna.load_study(study_name="ennx", storage=storage, sampler=sampler)
+    restored = optuna.load_study(
+        study_name="blckbaux", storage=storage, sampler=sampler
+    )
     suggest(restored.ask())
     assert len(sampler._loop._seen) == 4
     suggest(restored.ask())

@@ -7,13 +7,13 @@ from morbo_objectives import (
     separable_objective as _separable_unimodal_objective,
 )
 
-from ennx import create_optimizer
-from ennx.turbo.config import (
-    AcqType,
-    CandidateGenConfig,
-    ENNFitConfig,
-    ENNSurrogateConfig,
-    MorboTRConfig,
+from blckbaux import create_optimizer
+from blckbaux.turbo.config import (
+    AcquisitionKind,
+    CandidateConfig,
+    SurrogateFit,
+    ENNSurrogate,
+    MorboTrustRegion,
     MultiObjectiveConfig,
     turbo_enn,
 )
@@ -23,16 +23,16 @@ def test_001():
     bounds = np.array([[-300.0, 600.0], [0.2, 1.0]], dtype=float)
     rng = np.random.default_rng(42)
     config = turbo_enn(
-        enn=ENNSurrogateConfig(
+        enn=ENNSurrogate(
             k=4,
-            fit=ENNFitConfig(num_samples=4, num_candidates=8),
+            fit=SurrogateFit(num_samples=4, num_candidates=8),
         ),
-        trust_region=MorboTRConfig(
+        trust_region=MorboTrustRegion(
             multi_objective=MultiObjectiveConfig(num_metrics=2),
         ),
         num_init=8,
-        candidates=CandidateGenConfig(num_candidates=64),
-        acq_type=AcqType.THOMPSON,
+        candidates=CandidateConfig(num_candidates=64),
+        acquisition=AcquisitionKind.THOMPSON,
     )
     opt = create_optimizer(bounds=bounds, config=config, rng=rng)
     num_arms = 4

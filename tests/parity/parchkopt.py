@@ -13,7 +13,7 @@ def run_parity(
     from .parchksob import append_case
 
     try:
-        from ennx._rust import Optimizer  # noqa: F401
+        from blckbaux._rust import BayesOptimizer  # noqa: F401
     except ImportError:
         append_case(
             report,

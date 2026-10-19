@@ -1,0 +1,19 @@
+[package]
+name = "blckbaux-runner"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+clap.workspace = true
+blckbaux.workspace = true
+blckbaux-tooling.workspace = true
+blckbaux-artifact.workspace = true
+blckbaux-semantics.workspace = true
+sha2.workspace = true
+
+[[bin]]
+name = "blckbaux-runner"
+path = "src/main.rs"

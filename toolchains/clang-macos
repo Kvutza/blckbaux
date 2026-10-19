@@ -5,7 +5,7 @@ compiler=$1
 mode=$2
 shift 2
 if ! sdk=$(xcrun --sdk macosx --show-sdk-path); then
-    echo "ennx: install Apple's SDK with: xcode-select --install" >&2
+    echo "blckbaux: install Apple's SDK with: xcode-select --install" >&2
     exit 1
 fi
 if [ "$mode" = cxx ] || [ "$mode" = link ]; then

@@ -1,11 +1,14 @@
 [package]
-name = "ennx-modal"
+name = "blckbaux-modal"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 publish = false
 
 [dependencies]
+blckbaux-artifact.workspace = true
+blckbaux-semantics.workspace = true
+blckbaux.workspace = true
 modal-rs = "=0.1.3"
 tempfile = "3"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }

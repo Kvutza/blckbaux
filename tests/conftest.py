@@ -6,7 +6,7 @@ from pathlib import Path
 
 _ROOT = Path(__file__).parent.parent
 _SRC = _ROOT / "src"
-_PACKAGE = Path(os.environ.get("ENNX_TEST_WHEEL_ROOT", str(_SRC)))
+_PACKAGE = Path(os.environ.get("BLCKBAUX_TEST_WHEEL_ROOT", str(_SRC)))
 for path in (str(_ROOT), str(_PACKAGE)):
     if path not in sys.path:
         sys.path.insert(0, path)
@@ -20,7 +20,7 @@ _TESTMON_DB = (
 
 
 def _nativepath() -> Path | None:
-    for entry in (_ROOT / "src" / "ennx").glob("ennx_rust*.so"):
+    for entry in (_ROOT / "src" / "blckbaux").glob("blckbaux_rust*.so"):
         return entry
     return None
 

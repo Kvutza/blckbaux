@@ -104,7 +104,7 @@ class Layout:
         return torch.cat(pieces)
 
     def metal_blocks(self):
-        from ennx.experimental import MetalParamBlock
+        from blckbaux.experimental import MetalParamBlock
 
         return [
             MetalParamBlock(

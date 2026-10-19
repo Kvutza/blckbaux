@@ -3,11 +3,11 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from ennx import create_optimizer, turbo_enn, turbo_zero
-from ennx.turbo.config import CandidateGenConfig, ENNFitConfig, ENNSurrogateConfig
-from ennx.turbo.config.encode import encode
+from blckbaux import create_optimizer, turbo_enn, turbo_zero
+from blckbaux.turbo.config import CandidateConfig, SurrogateFit, ENNSurrogate
+from blckbaux.turbo.config.encode import encode
 
-pytest.importorskip("ennx._rust")
+pytest.importorskip("blckbaux._rust")
 
 
 def test_perarmpool():
@@ -31,7 +31,7 @@ def test_perarmpool():
 
 def test_perarmisencoded():
     cfg_enn = turbo_enn(
-        candidates=CandidateGenConfig(num_candidates_per_arm=25),
+        candidates=CandidateConfig(num_candidates_per_arm=25),
         num_init=4,
     )
     cfg_zero = turbo_zero(num_candidates_per_arm=25, num_init=4)
@@ -43,8 +43,8 @@ def test_perarmisencoded():
 
 def test_ennperarmpool():
     config = turbo_enn(
-        candidates=CandidateGenConfig(num_candidates_per_arm=40),
-        enn=ENNSurrogateConfig(k=3, fit=ENNFitConfig(num_samples=8)),
+        candidates=CandidateConfig(num_candidates_per_arm=40),
+        enn=ENNSurrogate(k=3, fit=SurrogateFit(num_samples=8)),
         num_init=4,
     )
     bounds = np.array([[0.0, 1.0], [0.0, 1.0]], dtype=float)

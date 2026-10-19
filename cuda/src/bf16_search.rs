@@ -42,7 +42,7 @@ struct AskInput<'a> {
     candidates_per_region: usize,
     coefficient: f32,
     draw_seed: u64,
-    config: Ask,
+    config: RoundConfig,
 }
 
 #[derive(Debug, Clone)]
@@ -178,7 +178,7 @@ pub struct Bf16SearchEngine {
     tell_variances: DeviceBuffer<f32>,
     profiling: bool,
     fused_pairs: bool,
-    last_profile: Option<AskProfile>,
+    last_profile: Option<ProposalProfile>,
 }
 
 impl Bf16SearchEngine {
@@ -920,7 +920,7 @@ impl Bf16SearchEngine {
         candidates_per_region: usize,
         coefficient: f32,
         draw_seed: u64,
-        config: Ask,
+        config: RoundConfig,
     ) -> CudaResult<Vec<Selection>> {
         self.last_profile = None;
         let input = AskInput {
@@ -955,7 +955,7 @@ impl Bf16SearchEngine {
         seed_root: u64,
         coefficient: f32,
         draw_seed: u64,
-        config: Ask,
+        config: RoundConfig,
     ) -> CudaResult<()> {
         self.last_profile = None;
         let input = AskInput {
@@ -1123,7 +1123,7 @@ impl Bf16SearchEngine {
         &mut self,
         input: &AskInput<'_>,
         shape: SearchShape,
-    ) -> CudaResult<Option<AskEvents>> {
+    ) -> CudaResult<Option<ProposalEvents>> {
         let candidates = to_u32(shape.candidates, "BF16 candidate count")?;
         let regions = to_u32(shape.regions, "BF16 region count")?;
         let score_launch = self
@@ -1154,7 +1154,7 @@ impl Bf16SearchEngine {
                 0,
             ))
             .map_err(cuda_error)?;
-        let profile = self.profiling || std::env::var_os("ENNX_CUDA_PROFILE").is_some();
+        let profile = self.profiling || std::env::var_os("BLCKBAUX_CUDA_PROFILE").is_some();
         let score_start = profile
             .then(|| timing_event(&self.runtime.stream))
             .transpose()?;
@@ -1173,6 +1173,7 @@ impl Bf16SearchEngine {
             tiles: to_u32(self.tile_count, "BF16 distance tile count")?,
             resident: u32::from(input.seed_root.is_some()),
             correlated: self.sampler,
+            adaptive_neighbors: u32::from(input.config.adaptive_neighbors),
         };
         if self.fused_pairs && shape.candidates == 4 {
             let pair_blocks = shape
@@ -1321,7 +1322,7 @@ impl Bf16SearchEngine {
         });
         Ok(match (score_start, score_end, pick_end, materialize_end) {
             (Some(score_start), Some(score_end), Some(pick_end), Some(materialize_end)) => {
-                Some(AskEvents {
+                Some(ProposalEvents {
                     score_start,
                     score_end,
                     pick_end,
@@ -1478,7 +1479,7 @@ impl Bf16SearchEngine {
         Ok((self.batch.cu_deviceptr(), rows, self.row_len))
     }
 
-    pub fn last_profile(&self) -> Option<AskProfile> {
+    pub fn last_profile(&self) -> Option<ProposalProfile> {
         self.last_profile
     }
 

@@ -68,12 +68,12 @@ def collect_sizes(
     seed_chunk: int | None = None,
 ) -> list[int]:
     """Run ``enn_stress2`` with recording fakes; return tell batch sizes."""
-    from ennx.turbo.config.eidxdrv import ENNIndexDriver
+    from blckbaux.turbo.config.surrogate import NeighborIndex
     from ops.stress import enn_stress2
 
     opt = RecordingTurboOpt()
     kwargs: dict = {
-        "index_driver": ENNIndexDriver.FLAT,
+        "index_driver": NeighborIndex.FLAT,
         "num_dim": 2,
         "num_obs": num_obs,
         "num_ask": num_ask,

@@ -3,9 +3,11 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from ennx.turbo.gp import Surrogate
-from ennx.turbo.gp.model import Noisy
-from ennx.turbo.gp.train import fit
+pytest.importorskip("gpytorch")
+
+from blckbaux.turbo.gp import Surrogate
+from blckbaux.turbo.gp.model import Noisy
+from blckbaux.turbo.gp.train import fit
 
 pytestmark = [pytest.mark.slow, pytest.mark.gp]
 

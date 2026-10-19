@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-pytest.importorskip("ennx._rust")
+pytest.importorskip("blckbaux._rust")
 pytestmark = pytest.mark.slow
 
 

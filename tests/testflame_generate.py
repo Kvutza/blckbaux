@@ -146,7 +146,7 @@ def case_fixture():
         "loss_mask": [False, False, True, True],
     }
     document = {
-        "format": "ennx.solution_tokens.v1",
+        "format": "blckbaux.solution_tokens.v1",
         "examples": [example],
         "provenance": {},
     }

@@ -13,11 +13,11 @@ SYSTEM_RESERVE_BYTES = 4 * 1024**3
 def device_info():
     if sys.platform != "darwin":
         raise RuntimeError("Metal BO requires macOS and an Apple GPU")
-    from ennx import experimental
+    from blckbaux import experimental
 
     binding = getattr(experimental, "MetalWeights", None)
     if binding is None:
-        raise RuntimeError("Rebuild the ENNX extension with --features metal")
+        raise RuntimeError("Rebuild the BLCKBAUX extension with --features metal")
     return binding.device_info()
 
 
@@ -40,7 +40,7 @@ def free_memory():
 def upload_weights(flat):
     import torch
 
-    from ennx.experimental import MetalWeights
+    from blckbaux.experimental import MetalWeights
 
     if flat.device.type != "cpu" or flat.dtype != torch.bfloat16 or flat.ndim != 1:
         raise ValueError("Metal upload requires a flat CPU BF16 tensor")

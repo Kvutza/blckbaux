@@ -3,17 +3,17 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from ennx.turbo.config import (
-    AcqType,
-    ENNFitConfig,
-    ENNSurrogateConfig,
+from blckbaux.turbo.config import (
+    AcquisitionKind,
+    SurrogateFit,
+    ENNSurrogate,
     turbo_enn,
     turbo_zero,
 )
-from ennx.turbo.config.candgencfg import CandidateGenConfig
-from ennx.turbo.config.candidate_rv import CandidateRV
+from blckbaux.turbo.config.candidates import CandidateConfig
+from blckbaux.turbo.config.candidates import CandidateSampler
 
-pytest.importorskip("ennx._rust")
+pytest.importorskip("blckbaux._rust")
 
 
 def _obj(x):
@@ -25,10 +25,10 @@ def test_001():
 
     bounds = np.array([[0.0, 1.0], [0.0, 1.0]], dtype=float)
     config = turbo_enn(
-        acq_type=AcqType.UCB,
-        enn=ENNSurrogateConfig(k=3, fit=ENNFitConfig(num_samples=10)),
+        acquisition=AcquisitionKind.UCB,
+        enn=ENNSurrogate(k=3, fit=SurrogateFit(num_samples=10)),
         num_init=4,
-        candidates=CandidateGenConfig(candidate_rv=CandidateRV.RAASP),
+        candidates=CandidateConfig(sampler=CandidateSampler.RAASP),
     )
     opt = make_optimizer(bounds, config, seed=41)
     check_opt(opt, bounds)
@@ -39,7 +39,7 @@ def test_raaspdistribution():
 
     bounds = np.array([[0.0, 1.0], [0.0, 1.0]], dtype=float)
     num_arms = 4
-    config = turbo_zero(num_init=8, candidate_rv=CandidateRV.RAASP)
+    config = turbo_zero(num_init=8, sampler=CandidateSampler.RAASP)
     opt = make_optimizer(bounds, config, seed=77)
     cands = []
     for _ in range(6):

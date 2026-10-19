@@ -1,19 +1,19 @@
 from __future__ import annotations
 
-import argparse
 import cProfile
 import pstats
 import time
 from dataclasses import dataclass
 
+import click
 import numpy as np
 
-from ennx import create_optimizer
-from ennx.turbo.config.acq_type import AcqType
-from ennx.turbo.config.candgencfg import CandidateGenConfig
-from ennx.turbo.config.esurrcfg import ENNFitConfig, ENNSurrogateConfig
-from ennx.turbo.config.factory import turbo_enn
-from ennx.turbo.config.trust_region import TurboTRConfig
+from blckbaux import create_optimizer
+from blckbaux.turbo.config.acquisition import AcquisitionKind
+from blckbaux.turbo.config.candidates import CandidateConfig
+from blckbaux.turbo.config.surrogate import SurrogateFit, ENNSurrogate
+from blckbaux.turbo.config.factory import turbo_enn
+from blckbaux.turbo.config.trust_region import TurboTrustRegion
 
 
 @dataclass(frozen=True)
@@ -40,22 +40,22 @@ def _makebounds(num_dim: int) -> np.ndarray:
 def _makeoptimizer(cfg: ProfileConfig) -> object:
     rng = np.random.default_rng(cfg.seed)
     bounds = _makebounds(cfg.num_dim)
-    enn_cfg = ENNSurrogateConfig(
+    enn_cfg = ENNSurrogate(
         k=10,
-        fit=ENNFitConfig(
+        fit=SurrogateFit(
             num_samples=cfg.num_samples,
             num_candidates=cfg.fit_candidates,
         ),
     )
     candidates = (
-        CandidateGenConfig(num_candidates=cfg.num_candidates)
+        CandidateConfig(num_candidates=cfg.num_candidates)
         if cfg.num_candidates is not None
         else None
     )
     opt_config = turbo_enn(
         enn=enn_cfg,
-        acq_type=AcqType.UCB,
-        trust_region=TurboTRConfig(),
+        acquisition=AcquisitionKind.UCB,
+        trust_region=TurboTrustRegion(),
         num_init=1,
         candidates=candidates,
     )
@@ -252,54 +252,78 @@ def run_profile(cfg: ProfileConfig, actions: ProfileActions) -> None:
         )
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Profile TuRBO-ENN ask() with ENN fitting enabled."
-    )
-    parser.add_argument("--num-dim", type=int, default=8)
-    parser.add_argument("--num-obs", type=int, default=2000)
-    parser.add_argument("--num-arms", type=int, default=4)
-    parser.add_argument("--num-candidates", type=int, default=None)
-    parser.add_argument("--num-fit-samples", dest="num_samples", type=int, default=50)
-    parser.add_argument(
-        "--num-fit-candidates", dest="fit_candidates", type=int, default=60
-    )
-    parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--profile", action="store_true")
-    parser.add_argument("--profile-center", action="store_true")
-    parser.add_argument(
-        "--sweep",
-        action="store_true",
-        help="Run sweep over num_obs values and estimate scaling.",
-    )
-    parser.add_argument(
-        "--sweep-values",
-        type=str,
-        default="100,300,1000,3000,10000",
-        help="Comma-separated num_obs values for sweep.",
-    )
-    args = parser.parse_args()
+def _sweepvalues(
+    _context: click.Context, _parameter: click.Parameter, value: str
+) -> list[int]:
+    try:
+        values = [int(item) for item in value.split(",") if item.strip()]
+    except ValueError as error:
+        raise click.BadParameter("must contain comma-separated integers") from error
+    if not values or any(item <= 0 for item in values):
+        raise click.BadParameter("must contain positive integers")
+    return values
 
+
+@click.command(help="Profile TuRBO-ENN ask() with ENN fitting enabled.")
+@click.option("--num-dim", type=click.IntRange(min=1), default=8, show_default=True)
+@click.option("--num-obs", type=click.IntRange(min=1), default=2000, show_default=True)
+@click.option("--num-arms", type=click.IntRange(min=1), default=4, show_default=True)
+@click.option("--num-candidates", type=click.IntRange(min=1))
+@click.option(
+    "--num-fit-samples",
+    "num_samples",
+    type=click.IntRange(min=1),
+    default=50,
+    show_default=True,
+)
+@click.option(
+    "--num-fit-candidates",
+    "fit_candidates",
+    type=click.IntRange(min=1),
+    default=60,
+    show_default=True,
+)
+@click.option("--seed", type=int, default=0, show_default=True)
+@click.option("--profile", "profile_ask", is_flag=True)
+@click.option("--profile-center", "time_center", is_flag=True)
+@click.option("--sweep", is_flag=True, help="Estimate scaling over observation counts.")
+@click.option(
+    "--sweep-values",
+    callback=_sweepvalues,
+    default="100,300,1000,3000,10000",
+    show_default=True,
+    help="Comma-separated observation counts.",
+)
+def main(
+    num_dim: int,
+    num_obs: int,
+    num_arms: int,
+    num_candidates: int | None,
+    num_samples: int,
+    fit_candidates: int,
+    seed: int,
+    profile_ask: bool,
+    time_center: bool,
+    sweep: bool,
+    sweep_values: list[int],
+) -> None:
     cfg = ProfileConfig(
-        num_dim=args.num_dim,
-        num_obs=args.num_obs,
-        num_arms=args.num_arms,
-        num_candidates=args.num_candidates,
-        num_samples=args.num_samples,
-        fit_candidates=args.fit_candidates,
-        seed=args.seed,
+        num_dim=num_dim,
+        num_obs=num_obs,
+        num_arms=num_arms,
+        num_candidates=num_candidates,
+        num_samples=num_samples,
+        fit_candidates=fit_candidates,
+        seed=seed,
     )
-    if args.sweep:
-        sweep_vals = [int(v) for v in args.sweep_values.split(",") if v.strip()]
-        if not sweep_vals:
-            raise ValueError("--sweep-values must be non-empty")
-        run_sweep(cfg, num_obs_values=sweep_vals)
+    if sweep:
+        run_sweep(cfg, num_obs_values=sweep_values)
     else:
         run_profile(
             cfg,
             ProfileActions(
-                profile_ask=args.profile,
-                time_center=args.profile_center,
+                profile_ask=profile_ask,
+                time_center=time_center,
             ),
         )
 

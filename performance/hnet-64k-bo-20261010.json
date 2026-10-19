@@ -1,0 +1,54 @@
+{
+  "schema": "blckbaux.performance.pretrain.v1",
+  "date": "2026-10-10",
+  "hardware": {
+    "model": "MacBook Air Mac16,12",
+    "chip": "Apple M4",
+    "cpu_cores": 10,
+    "gpu_cores": 10,
+    "memory_gb": 24,
+    "api": "Metal 4"
+  },
+  "experiment": {
+    "config": "examples/tuning/hnet-64k-gaussian.toml",
+    "parameters": 1177756440,
+    "rounds": 128,
+    "context_tokens": 65536,
+    "objective": "paired conditional cross entropy improvement",
+    "proposal": "dense Gaussian with 32 operator-family posterior amplitudes",
+    "acquisition": "ucb",
+    "trust_radius_max": 0.016,
+    "candidates_per_round": 4
+  },
+  "systems": {
+    "loop_seconds": 60.21348125400001,
+    "mean_round_ms": 470.41782229687504,
+    "median_round_ms": 458.17591699999997,
+    "max_round_ms": 663.4124999999999,
+    "mean_proposal_ms": 351.6920540937499,
+    "mean_evaluation_ms": 115.21128964062495,
+    "subsecond_rounds": true,
+    "target_200ms_met": false
+  },
+  "learning": {
+    "accepted_updates": 41,
+    "positive_proposals": 80,
+    "mean_paired_improvement_all_proposals": 0.00013347490805859372,
+    "total_paired_improvement_accepted": 0.06159751769,
+    "initial_validation_nll": 12.483882578125002,
+    "final_validation_nll": 12.468208828124999,
+    "validation_nll_reduction": 0.01567375000000304,
+    "paired_validation_standard_error": 0.001715391,
+    "paired_validation_z": 9.137,
+    "validation_tasks_improved": 30,
+    "validation_tasks": 32,
+    "semantic_generation_quality_established": false
+  },
+  "displacement": {
+    "minimum_changed_bf16_weights": 460769740,
+    "maximum_changed_bf16_weights": 1166750510,
+    "minimum_metric_radius": 0.022801558,
+    "maximum_metric_radius": 2.1382098
+  },
+  "artifact": "/Users/mehulbafna/research/blckbaux/.cache/blckbaux/runs/pretrain/76b20718fa7e936adb18/run-1791629340002-84715-0"
+}

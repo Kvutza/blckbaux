@@ -25,7 +25,7 @@ def test_provenance():
     example = result["examples"][0]
     prompt = coding.prompt_for(sample)
     assert calls == [prompt + sample["code"], prompt]
-    assert result["format"] == "ennx.solution_tokens.v1"
+    assert result["format"] == "blckbaux.solution_tokens.v1"
     assert example["id"] == "mbpp/train/601"
     assert example["tokens"] == [ord(c) for c in prompt + sample["code"]] + [0]
     assert example["loss_mask"] == [False] * len(prompt) + [True] * (

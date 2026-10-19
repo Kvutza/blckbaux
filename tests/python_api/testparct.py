@@ -6,14 +6,14 @@ import inspect
 
 import pytest
 
-from ennx.ennx.enn_params import ENNParams, PosteriorFlags
+from blckbaux.enn.enn_params import ENNParams, PosteriorFlags
 
 
 class TestENNParamsContract:
     """API contract tests for ENNParams."""
 
     def test_existsandisclass3(self):
-        from ennx.ennx.enn_params import ENNParams
+        from blckbaux.enn.enn_params import ENNParams
 
         assert inspect.isclass(ENNParams)
 
@@ -72,7 +72,7 @@ class Test_001:
     """API contract tests for PosteriorFlags."""
 
     def test_existsandisclass3(self):
-        from ennx.ennx.enn_params import PosteriorFlags
+        from blckbaux.enn.enn_params import PosteriorFlags
 
         assert inspect.isclass(PosteriorFlags)
 

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import numpy as np
 
-from ennx.turbo.config import ENNFitConfig
-from ennx.turbo.proposal import mk_enn
+from blckbaux.turbo.config import SurrogateFit
+from blckbaux.turbo.proposal import mk_enn
 
 
 def test_001():
@@ -22,7 +22,7 @@ def test_002():
         k=3,
         yvar_obs=yvar_obs,
         rng=rng,
-        fit=ENNFitConfig(num_samples=4, num_candidates=6),
+        fit=SurrogateFit(num_samples=4, num_candidates=6),
     )
     assert model is not None and params is not None
     assert params.k_neighbors == 3
@@ -39,7 +39,7 @@ def test_003():
         y_obs,
         k=3,
         rng=rng,
-        fit=ENNFitConfig(num_samples=4, num_candidates=6),
+        fit=SurrogateFit(num_samples=4, num_candidates=6),
     )
     assert params_default.epistemic_scale == 1.0
     assert params_default.aleatoric_scale == 0.0

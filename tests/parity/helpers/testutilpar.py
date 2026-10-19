@@ -9,7 +9,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from ennx.ennx.enn_util import (
+from blckbaux.enn.enn_util import (
     sobol_indices,
     pareto2d_max,
     standardize_y,
@@ -17,13 +17,13 @@ from ennx.ennx.enn_util import (
 
 # Try to import Rust implementation
 try:
-    from ennx._rust import (
+    from blckbaux._rust import (
         sobol_indices as rust_calculate_sobol_indices,
     )
-    from ennx._rust import (
+    from blckbaux._rust import (
         pareto2d_max as rust_pareto_front,
     )
-    from ennx._rust import (
+    from blckbaux._rust import (
         standardize_y as rust_standardize_y,
     )
 

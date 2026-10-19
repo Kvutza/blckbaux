@@ -8,7 +8,7 @@ import time
 import jax
 import jax.numpy as jnp
 
-from ennx.experimental import ParamBlock, turbo_enn
+from blckbaux.experimental import ParamBlock, turbo_enn
 
 
 def main() -> None:

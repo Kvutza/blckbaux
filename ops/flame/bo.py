@@ -1,4 +1,4 @@
-"""Run full-weight FLAME BO with resident ENNX search engines."""
+"""Run full-weight FLAME BO with resident BLCKBAUX search engines."""
 
 from __future__ import annotations
 
@@ -259,7 +259,7 @@ def borrowed_weights(weights, backend):
 
 
 def optimize(search, layout, evaluate, settings, base_reward, emit, *, baseline=None):
-    """Sequential objective evaluations; candidates are ranked by native ENNX."""
+    """Sequential objective evaluations; candidates are ranked by native BLCKBAUX."""
     rewards = deque([base_reward], maxlen=settings.history)
     rng = np.random.Generator(np.random.PCG64(settings.seed))
     version = 0
@@ -405,7 +405,7 @@ def optimize(search, layout, evaluate, settings, base_reward, emit, *, baseline=
             del batch
             gc.collect()
             if not math.isfinite(value):
-                raise RuntimeError("Nonfinite FLAME loss; refusing to update ENNX")
+                raise RuntimeError("Nonfinite FLAME loss; refusing to update BLCKBAUX")
             evaluations += 1
             objective_evaluations += 1
         else:
@@ -643,29 +643,29 @@ def run(checkpoint: Path, tokens, output: Path, settings: Settings, *, zero_scal
                 f"This experiment requires CUDA device 0 to be a T4, got {device}"
             )
         device_name = device.device_kind
-    import ennx.ennx_rust as extension
+    import blckbaux.blckbaux_rust as extension
 
     if is_metal:
-        from ennx.experimental import MetalParamBlock as ParamBlock
-        from ennx.experimental import MetalSearchState as SearchState
+        from blckbaux.experimental import MetalParamBlock as ParamBlock
+        from blckbaux.experimental import MetalSearchState as SearchState
     else:
-        from ennx.experimental import ParamBlock, SearchState
+        from blckbaux.experimental import ParamBlock, SearchState
 
     if SearchState is None or not hasattr(SearchState, "read_best"):
-        raise RuntimeError("Rebuild the ENNX extension for the selected backend")
+        raise RuntimeError("Rebuild the BLCKBAUX extension for the selected backend")
     if minibatch and not all(
         hasattr(SearchState, name)
         for name in ("incumbent", "enable_relative", "tell_relative")
     ):
         raise RuntimeError(
-            "Rebuild the ENNX extension with paired-relative minibatch support"
+            "Rebuild the BLCKBAUX extension with paired-relative minibatch support"
         )
     if minibatch:
         try:
             parameters = inspect.signature(SearchState.tell_relative).parameters
         except (TypeError, ValueError) as error:
             raise RuntimeError(
-                "Rebuild the ENNX extension with inspectable paired-relative "
+                "Rebuild the BLCKBAUX extension with inspectable paired-relative "
                 "reject_is_failure keyword support"
             ) from error
         rejection_flag = parameters.get("reject_is_failure")
@@ -678,7 +678,7 @@ def run(checkpoint: Path, tokens, output: Path, settings: Settings, *, zero_scal
             for parameter in parameters.values()
         ):
             raise RuntimeError(
-                "Rebuild the ENNX extension with paired-relative "
+                "Rebuild the BLCKBAUX extension with paired-relative "
                 "reject_is_failure keyword support"
             )
     size = sum(math.prod(shape) for shape in Config().shapes().values())

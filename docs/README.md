@@ -1,17 +1,13 @@
-# Documentation
+# Docs
 
-ENNX systems, API, and developer documentation.
-
-## Core Reference
-
-- [API Reference](api.md): Python and Rust Prelude APIs.
-- [Python Integrations](interop.md): BoTorch, Optuna, and Ax adapters and zero-copy DLPack support.
-- [Build System](buck2.md): Hermetic Buck2 builds, pinned toolchains, and wheel generation.
-- [Testing & Quality Gates](testing.md): Rust tests, accelerator kernels, KISS quality gate, and `./ennx test --affected`.
-
-## Repository Entrypoints
-
-- `./ennx build`: Compile Rust crates, CLI, and Python 3.12–3.14 wheels.
-- `./ennx test`: Run unit tests and GPU kernels (`--affected` for changes only, `--python` for wheel matrix).
-- `./ennx tune <config>`: Launch full-space Bayesian optimization with the live terminal UI.
-- `./ennx radar <command>`: Query codebase AST, blast radius, callers/callees, and quality gates.
+- [Direct Neural Operator Optimization Preprint](../papers/operator_bo.pdf) — core mathematical theory, Lean 4 verified boundaries, and empirical dynamics
+- [API Reference](api.md) — Python and Rust public surface
+- [Python Integrations](interop.md) — BoTorch, Optuna, Ax adapters
+- [Build System](buck2.md) — Buck2, toolchains, hermetic builds
+- [Testing & Quality](testing.md) — `./blckbaux test`, `./blckbaux fmt`, gates
+- [Operator Geometry Theory](operator-bo-theory.md) — theoretical reductions and observable objectives for manifold search
+- [Black-Box Optimization Program](black-box-optimization-program.md) — normative method map, theorem ledger, citations, and implementation contract
+- [Optimizer Research Handoff](optimizer-research-handoff.txt) — experiments, GPU measurements, Lean proofs, open obligations, and next-agent assignment
+- [Perturbation Research](perturbation-research.txt) — derivations of coordinate and structured perturbation laws
+- [Mathlib Constructions Catalogue](mathlib-constructions.txt) — formalized topic cards queried via `./blckbaux research list / show`
+- [Tuning Configuration Schema](../schemas/tune-spec.schema.json) — JSON Schema for TOML experiment recipes with Taplo autocompletion

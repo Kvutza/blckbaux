@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-import argparse
 import statistics
+import sys
 import time
 from dataclasses import dataclass
 
 import numpy as np
 
-from ennx import CandidateRV, create_optimizer, turbo_zero
+from blckbaux import CandidateSampler, create_optimizer, turbo_zero
 
 
 @dataclass(frozen=True)
@@ -15,6 +15,39 @@ class BenchResult:
     num_candidates: int
     times_s: list[float]
     error: str | None = None
+
+
+@dataclass(frozen=True)
+class Config:
+    num_dim: int = 10_000
+    candidates: str = "50,100,200,500,1000,2000"
+    repeats: int = 3
+    seed: int = 0
+
+
+def parse_args(argv: list[str]) -> Config:
+    dim = 10_000
+    cands = "50,100,200,500,1000,2000"
+    reps = 3
+    seed = 0
+    idx = 0
+    while idx < len(argv):
+        arg = argv[idx]
+        if arg == "--num-dim" and idx + 1 < len(argv):
+            dim = int(argv[idx + 1])
+            idx += 2
+        elif arg == "--candidates" and idx + 1 < len(argv):
+            cands = argv[idx + 1]
+            idx += 2
+        elif arg == "--repeats" and idx + 1 < len(argv):
+            reps = int(argv[idx + 1])
+            idx += 2
+        elif arg == "--seed" and idx + 1 < len(argv):
+            seed = int(argv[idx + 1])
+            idx += 2
+        else:
+            idx += 1
+    return Config(num_dim=dim, candidates=cands, repeats=reps, seed=seed)
 
 
 def _parselist(csv: str) -> list[int]:
@@ -40,7 +73,7 @@ def _bench(
         config=turbo_zero(
             num_init=1,
             num_candidates=num_candidates,
-            candidate_rv=CandidateRV.RAASP,
+            sampler=CandidateSampler.RAASP,
         ),
         rng=rng,
     )
@@ -115,29 +148,16 @@ def _fmtstats(times_s: list[float]) -> str:
 
 
 def main() -> None:
-    p = argparse.ArgumentParser(
-        description="Benchmark native RAASP optimizer ask time (generation plus selection)."
-    )
-    p.add_argument("--num-dim", type=int, default=10_000)
-    p.add_argument(
-        "--candidates",
-        type=str,
-        default="50,100,200,500,1000,2000",
-        help="Comma-separated list of num_candidates values.",
-    )
-    p.add_argument("--repeats", type=int, default=3)
-    p.add_argument("--seed", type=int, default=0)
-    args = p.parse_args()
-
-    num_candidates_list = _parselist(args.candidates)
+    cfg = parse_args(sys.argv[1:])
+    num_candidates_list = _parselist(cfg.candidates)
     results = bench_raasp(
-        num_dim=int(args.num_dim),
+        num_dim=cfg.num_dim,
         num_candidates_list=num_candidates_list,
-        repeats=int(args.repeats),
-        seed=int(args.seed),
+        repeats=cfg.repeats,
+        seed=cfg.seed,
     )
 
-    print(f"num_dim={args.num_dim} repeats={args.repeats} seed={args.seed}")
+    print(f"num_dim={cfg.num_dim} repeats={cfg.repeats} seed={cfg.seed}")
     print("num_candidates\tRAASP optimizer ask (s)")
     for r in results:
         if r.error is not None:

@@ -18,9 +18,9 @@ from botorch.acquisition.monte_carlo import (
 from botorch.optim import optimize_acqf_discrete
 from botorch.sampling.get_sampler import get_sampler
 
-from ennx import ENN
-from ennx.botorch import Model, Sampler
-from ennx.ennx.enn_params import ENNParams, PosteriorFlags
+from blckbaux import ENN
+from blckbaux.botorch import Model, Sampler
+from blckbaux.enn.enn_params import ENNParams, PosteriorFlags
 
 
 @pytest.fixture

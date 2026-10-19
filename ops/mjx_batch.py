@@ -10,7 +10,7 @@ import jax.numpy as jnp
 import mujoco
 from mujoco import mjx
 
-from ennx.experimental import ParamBlock, turbo_enn
+from blckbaux.experimental import ParamBlock, turbo_enn
 
 
 def main() -> None:

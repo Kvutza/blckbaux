@@ -1,0 +1,328 @@
+BLCKBAUX PERTURBATION RESEARCH
+2026-10-13. Mathematical research program and first implementation.
+
+PURPOSE AND SCOPE
+
+Discover full-parameter derivative-free algorithms together with proofs of their
+properties. The objects are the actual model, objective construction, proposal
+law, fitted estimator, selection rule, retained memory, and execution costs.
+Lean is the semantic and proof environment. Rust/Metal/CUDA remain production
+execution. No gradient oracle or latent parameter search is introduced.
+
+The declared workload has 1,177,756,440 logical model parameters. Results below
+are symbolic in the parameter count or even in an arbitrary real normed space.
+A theorem over a large space is not a proposal to allocate dense covariance or
+Hessian matrices of that size. Structured implicit operators and their costs
+must be studied separately. Full-parameter coverage is an independent property;
+an update's number of nonzero entries does not establish reachable-space rank.
+
+The 200 ms transaction target and 1000 ms ceiling remain machine/workload
+targets. This work does not establish either target or superiority to Muon.
+
+NEW MATHEMATICAL IMPLEMENTATION
+
+CURRENT PROPOSAL-POLICY SOURCES
+
+The immediate synthesis target is the history-conditioned proposal law, not a
+fixed noise distribution. These sources contribute distinct reusable ideas:
+
+  Bubeck, Munos, Stoltz, and Szepesvari, X-Armed Bandits, JMLR 2011.
+  https://www.jmlr.org/papers/v12/bubeck11a.html
+  Near-optimality geometry can control regret without identifying the ambient
+  parameter count with the relevant search dimension.
+
+  Kpotufe, k-NN Regression Adapts to Local Intrinsic Dimension, 2011.
+  https://arxiv.org/abs/1110.4300
+  Local ball-mass growth supports query-specific neighbor counts and error rates.
+
+  Malherbe and Vayatis, Global Optimization of Lipschitz Functions, ICML 2017.
+  https://proceedings.mlr.press/v70/malherbe17a.html
+  Lipschitz regularity alone retains a covering-number curse; a useful theorem
+  must state the additional local geometry exploited by the proposal law.
+
+  Rashidi, Johnstonbaugh, and Gao, Cylindrical Thompson Sampling, AISTATS 2024.
+  https://proceedings.mlr.press/v238/rashidi24a.html
+  Candidate-sampling geometry is a modular BO component with material effects
+  in high dimension. Its cylindrical construction is evidence, not yet an BLCKBAUX
+  proposal or a transferred theorem.
+
+  Park et al., Elucidating Subspace Perturbation in Zeroth-Order Optimization,
+  2025. https://arxiv.org/abs/2501.19099
+  Structured perturbation quality depends on alignment rather than sparsity or
+  rank alone. BLCKBAUX will not import its gradient-estimation interface as a premise.
+
+  Tan et al., Perturbation-efficient Zeroth-order Optimization, 2025.
+  https://arxiv.org/abs/2504.20314
+  Proposal generation cost and random-number traffic are algorithmic constraints,
+  which matches the BLCKBAUX requirement that a proposal theorem carry machine cost.
+
+  Fan and Pleiss, Adaptive Candidate Point Thompson Sampling, AISTATS 2026.
+  https://proceedings.mlr.press/v300/fan26c.html
+  Fixed candidate discretizations become sparse in high dimension. Their use of
+  surrogate gradients is not adopted; the relevant question is how an adaptive
+  executable candidate law increases mass near improving parameter transitions.
+
+  Papenmeier, Poloczek, and Nardi, Understanding High-Dimensional Bayesian
+  Optimization, ICML 2025.
+  https://proceedings.mlr.press/v267/papenmeier25a.html
+  Their empirical diagnosis favors local-search behavior and careful surrogate
+  length-scale fitting. This motivates auditing our radius and LOOCV machinery;
+  it does not transfer a GP result to the ENN estimator.
+
+  Roberts and Royer, Direct Search Based on Probabilistic Descent in Reduced
+  Spaces, SIAM Journal on Optimization 2023.
+  https://doi.org/10.1137/22M1488569
+  The reusable proof interface is a probability that the generated polling set
+  contains a useful direction. BLCKBAUX replaces their direction condition by the
+  derivative-free event that an executable candidate enters a neighborhood of
+  a better state. Their random-subspace complexity theorem is not imported.
+
+  Jin, Cen, and Tan, Steering the Noise: Turning Random Perturbations into
+  Effective Descent for Memory-Efficient LLM Fine-Tuning, 2026.
+  https://arxiv.org/abs/2601.04710
+  History- or prior-guided perturbation alignment is relevant comparative
+  evidence. Its gradient-estimation target is not an BLCKBAUX premise; the question
+  here is whether history increases objective-neighborhood capture per unit work.
+
+Optimization/ObjectiveSearch.lean now defines BallMass only on an explicit
+radius interval. This avoids pretending that a finite executable candidate law
+has continuous power-law mass at arbitrarily small scales. scaledBound proves
+that a coefficient-times-radius^exponent lower mass bound yields an explicit
+expected progress lower bound. linearBound chooses radius gain/(2*L), retaining
+half the reachable gain without using a derivative. zeroMass records the hard
+support boundary: no generated candidate in a ball means exactly zero capture.
+
+selectBound is the operational bridge for the actual score-and-select pool. If
+one executable member is within radius r of a state with gain g, the selected
+member has certified progress at least
+
+  g - modulus(r) - 2 * simultaneous_score_error - selection_slack.
+
+This statement does not sample a slot uniformly and does not assume candidate
+independence. uniformLaw, hitMass, quarterMass, and slotBound are a separate
+uniform-choice baseline: a captured member of a four-slot uniform law carries
+mass 1/4. They must not be reported as the deployed acquisition law.
+
+PoolHit and seedBound put the probability in the correct place. A random seed
+generates a complete dependent pool; the event is that at least one member hits
+the neighborhood. If rejection protects every miss round from objective
+increase, seedBound proves
+
+  expected selected progress
+    >= pool-hit probability
+       * (g - modulus(r) - 2*score_error - selection_slack).
+
+This theorem is pointwise in the current history. A history-conditioned policy
+is obtained by instantiating the seed law and generator at each history; the
+remaining research obligation is a uniform or trajectory-valid hit bound.
+
+SOURCE POOL AUDIT
+
+The active operator-BO TOMLs specify four arms with one candidate per arm.
+Metal domain-separates each arm root and applies one reliability radius to all
+four candidates. The former `CurrentPool.lean` model instead encoded the legacy
+one-arm geometry as two streams crossed with two radii. It was deleted because
+its rank and covering conclusions were not statements about the active source.
+
+The replacement obligation is layout-parametric. For a resolved arm/slot
+configuration, prove that the host and each backend implement the same seed and
+radius map, then derive the number of distinct directions after finite-precision
+materialization. Candidate count alone does not establish independence,
+coverage, useful alignment, or a regret rate.
+
+The next proof obligation is therefore precise. For a history H and incumbent
+x, define the source-generated random four-candidate set C(H,x). Prove or refute
+a lower bound on
+
+  probability(exists c in C(H,x), distance(c, y) <= r)
+
+for every declared reachable comparison state y in the objective class, with
+the generator's hash dependence, radius pairing, finite precision, and work
+account included. The selectBound theorem then converts that event into actual
+selected progress whenever the ENN score envelope is valid.
+
+Two-point gradient-estimation algorithms and Markov-chain candidate transitions
+are not the current interface. They remain comparative evidence only.
+
+Optimization/Smooth.lean
+  Uses Mathlib.Analysis.Calculus.TaylorIntegral's multidimensional Taylor formula,
+  not only the scalar-input Taylor module. The exact expansion is
+    F(theta + delta) = F(theta) + DF(theta)[delta] + R(theta, delta),
+    R = integral_0^1 (1-t) D^2 F(theta+t delta)[delta,delta] dt.
+  C2 is required locally along each segment, not globally on parameter space.
+  A directional second-derivative upper cap C implies R <= C/2. Two mirrored
+  segments then give best change <= -abs(DF(theta)[delta]) + C/2.
+  The curvature penalty does not cancel. Derivatives are analysis objects;
+  the executable optimizer does not receive or estimate them through this result.
+
+Optimization/Moments.lean
+  Uses Mathlib probability measures, MemLp, covariance, matrix trace, and its
+  multivariateGaussian construction. For square-integrable parameter entries,
+    E[delta^T B delta] = tr(B Cov(delta)) + mean(delta)^T B mean(delta).
+  B need not be positive or symmetric for the algebraic identity; using it as a
+  curvature upper bound is a separate obligation. Isotropic zero-mean proposals
+  specialize to variance * trace(B). Gaussian mean and covariance come from
+  library constructions, not user-supplied moment assertions.
+  This is not proof that the current indexed/sign/frozen-basis generator samples
+  a multivariate Gaussian, has isotropic covariance, or provides useful alignment.
+
+Optimization/Search.lean
+  An exploratory three-candidate family contains the incumbent and mirrored
+  full-parameter proposals. Executed candidate states are distinct from ideal
+  analytical states. Existing UniformError and ApproxMin compose with Taylor:
+    selected executed change <= -abs(DF(theta)[delta]) + C/2
+                                + 2*score_error + selection_slack
+                                + execution_penalty.
+  Execution fidelity is a directional objective bound on comparison candidates;
+  a norm error is not silently substituted for an objective error.
+  expected integrates a pointwise progress bound and replaces its quadratic
+  expectation by the covariance/mean trace formula. Loss, alignment, penalty,
+  and second-moment integrability are required explicitly. It may be used at a
+  fixed history with that history's conditional law; it is not a complete
+  continuous-law trajectory formalization.
+  The three-candidate research mechanism is not the deployed four-slot pool,
+  and this theorem does not claim that UCB scores satisfy UniformError.
+
+Optimization/Rate.lean
+  For existing Synthesis policies with arbitrary state and memory types and
+  finite conditional feedback branches, geometric/alignment dominance implies
+  a local simple-regret contraction. Finite expectation recursion derives
+    expected terminal regret <= rho^T * initial regret
+                                + eta * sum_(i<T) rho^i.
+  For 0 <= rho < 1, its envelope is
+    rho^T * (initial regret - eta/(1-rho)) + eta/(1-rho).
+  Mathlib proves that envelope tends to eta/(1-rho). A fixed error does not
+  vanish because a controller contracts. The theorem proves the envelope's
+  limit, not convergence of the actual policy to that floor or equality to it.
+  The local dominance property must be established from proposal geometry,
+  objective structure, observation law, estimator, and selector. No such
+  production BLCKBAUX contraction is asserted. Factor/penalty are symbolic,
+  not measured constants or desired rates inserted as established facts.
+  vanishes proves that the policy's actual expected regret tends to zero when
+  the additive penalty is zero, contraction is proved, and the comparator is
+  globally optimal. These premises are not established for the source optimizer.
+
+Forward/Sensitivity.lean
+  updateSplit expands the actual real-arithmetic Mixing.update difference into
+  input-state change, residual-coefficient change, branch change, and output-
+  coefficient change. The operator view borrows Mathlib continuous linear maps:
+    ||A(y)y+b(y)-A(x)x-b(x)||
+      <= ||A(y)|| ||y-x|| + ||A(y)-A(x)|| ||x|| + ||b(y)-b(x)||.
+  With separately justified caps, the local sensitivity bound is
+    transport_cap + predictor_Lipschitz * state_radius + branch_Lipschitz.
+  Thus a unit transport norm does not prove full learned-block contraction.
+  The predictor/branch constants, flat parameter indexing, and floating-point
+  execution correspondence are still open.
+
+RESEARCH OBJECTS TO SYNTHESIZE
+
+1. Proposal geometry and exploration
+   Study dependent signs, mirrored proposals, anisotropic full-support laws,
+   block covariance, mixtures of exploratory and learned proposals, symmetry-
+   preserving operators combined with unrestricted updates, and radius schedules.
+   Obligations: directional alignment, second moments, reachable support,
+   generator/distribution correspondence, quantized executed support, sampling
+   work, and parameter traffic. Orthogonal-only weight transformations preserve
+   singular values and cannot alone provide unrestricted parameter optimization.
+   Possible findings: useful alignment/cost tradeoffs, constructive proposal
+   families, and counterexamples to isotropy or energy as sufficient criteria.
+
+2. Forward-program sensitivity and nonsmooth boundaries
+   Study the encoder, RMS/SiLU, attention probabilities, PISA support changes,
+   expert routing, finite Sinkhorn normalization, learned mHC, recurrent layer
+   visits, and hierarchical decoder jointly. Stable routing regions permit
+   local calculus; boundary crossings need explicit jump/probability estimates.
+   Establish actual all-pairs routing margins, not just a two-score inequality.
+   Compare componentwise product bounds with structure-aware composition bounds.
+   Possible findings: tighter objective curvature, cancellation justified by
+   actual structure, and mechanisms that reduce expensive objective evaluation.
+
+3. Estimation, adaptive neighbors, and uncertainty
+   Study local metric geometry, adaptive neighbor counts, sampled distance error,
+   LOOCV fitting under adaptive data, correlated patches, shared-world paired
+   evaluation, predictor uncertainty versus mean uncertainty, and baseline drift.
+   Objects include the existing Neighbor/Response/Bayes modules. A barycenter is
+   not automatically a Bayesian posterior; coherent prior/observation laws and
+   calibrated simultaneous errors must be identified or replaced by other
+   explicitly justified uncertainty constructions.
+   Possible findings: local-dimension error rates, improved weighting, valid
+   uncertainty combinations, or impossibility under the available observations.
+
+4. Memory and information
+   Distinguish total queries, retained observations, retained sufficient
+   statistics, parameter count, local metric dimension, and curvature spectrum.
+   Investigate bounded-history forgetting, resets, moving incumbents, streaming
+   summaries, and how information loss affects candidate selection.
+   Possible findings: sufficient retained state for a specified objective class,
+   lower bounds on memory/query requirements, and bounded-memory policies whose
+   regret certificates account for discarded information. No universal D or D^2
+   observation count is known for this construction.
+
+5. Objective construction and code-generation outcomes
+   Distinguish fixed-corpus NLL, population NLL, code-execution success, held-out
+   task failure, runtime/memory constraints, and vector objectives/Pareto order.
+   Study paired objective noise, evaluation batching, drift, generalization, and
+   the circumstances under which reducing an objective controls coding outcomes.
+   The checked loss-only teacher decoder equivalence applies to target NLL in
+   the forward view, not arbitrary generation rewards. Every comparison with
+   Muon must share objective, evaluation protocol, start, and resource account.
+
+6. Algorithm/proof search and resources
+   A fixed objective/noise class and resource constraints define a search task.
+   Candidate proposal, inference, selection, and memory rules must compile
+   separately from noncomputable analysis. Proofs cannot weaken the task after
+   seeing a candidate. Local potential or progress certificates should connect
+   to terminal simple regret and declared work; finite-horizon and asymptotic
+   statements must remain distinct.
+   Account for scored versus materialized versus evaluated candidates, batch
+   width versus sequential depth, forward passes, launches, synchronization,
+   traffic, host work, sorting, and random-generator retries. Kernel fusion can
+   change these costs without establishing a statistical improvement. A complete
+   machine envelope is required to turn work into a sufficient latency bound.
+
+PRIMARY RESEARCH CONNECTIONS AND TRANSFER OBLIGATIONS
+
+Stochastic Three Points (Bergou/Gorbunov/Richtarik):
+  https://arxiv.org/html/1902.03591v3
+  Direct selection without a gradient estimator for fixed/decreasing step rules.
+  Directional-law constants and smoothness control progress. Nonconvex
+  stationarity is not global simple regret. Adaptive law changes must retain
+  the stated alignment/moment properties. Not itself a Bayesian optimizer.
+
+k-NN Regression Adapts to Local Intrinsic Dimension (Kpotufe):
+  https://arxiv.org/abs/1110.4300
+  Local geometry and adaptive neighbor count are relevant. Its sampling,
+  regularity, noise, and metric hypotheses must be restated. Adaptive optimizer
+  observations, sampled distances, and bounded-history forgetting need new work.
+
+GP-UCB (Srinivas/Krause/Kakade/Seeger):
+  https://arxiv.org/abs/0912.3995
+  Information gain and kernel spectra connect uncertainty to cumulative regret
+  under stated GP/RKHS hypotheses. Transfer to terminal recommendation regret
+  and the implemented ENN predictor is not supplied by importing the paper.
+
+Sufficient Statistics and the Burkholder Method (Foster/Rakhlin/Sridharan):
+  https://proceedings.mlr.press/v75/foster18b.html
+  Algorithm construction from regret certificates and retained statistics in
+  its online-learning setting. A black-box pretraining/simple-regret version
+  would require an appropriate game, feedback model, and certificate.
+
+Derivative-free stochastic convex lower bounds (Shamir):
+  https://proceedings.mlr.press/v30/Shamir13.html
+  Dimension/query limitations are class- and oracle-dependent. They cannot be
+  dismissed by proof search, nor applied to our model without checking scope.
+
+FORMALIZATION LIMITS AND ACCEPTANCE
+
+Mathlib supplies multivariate Taylor integral formulas, Gaussian measures,
+covariance, convexity/Birkhoff constructions, spectral foundations, martingales,
+and asymptotic filters. It does not supply a ready-made ENN regret theorem,
+complete Sinkhorn/routing sensitivity, or verified Metal/CUDA execution.
+First-order model theory is a separate mathematical view; these analytical
+probability and operator models do not become model-theory results by naming.
+
+Run ./blckbaux research check for the complete library and repository naming lint;
+./blckbaux research status reports checked findings and open source obligations.
+Audit theorem dependencies: no sorry, new axioms, or unproved numerical caps
+may establish a research result. Standard classical Mathlib axioms are distinct
+from assuming the desired theorem. No GPU experiment is launched by this work.

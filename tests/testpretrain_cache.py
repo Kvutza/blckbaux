@@ -68,8 +68,8 @@ def test_poolreuse(tmp_path, monkeypatch):
     assert len(calls) == 1
     assert (stage / "tokenizer.json").is_file()
     assert (stage / "pools" / "train-implementation.u16").is_file()
-    assert (tmp_path / "round-10" / "train.ennxptn").is_file()
-    assert (tmp_path / "round-100" / "train.ennxptn").is_file()
+    assert (tmp_path / "round-10" / "train.blckbauxptn").is_file()
+    assert (tmp_path / "round-100" / "train.blckbauxptn").is_file()
     for output in (tmp_path / "round-10", tmp_path / "round-100"):
         tokenizer = output / "tokenizer.json"
         manifest = json.loads((output / "manifest.json").read_text())
@@ -123,6 +123,6 @@ def test_poolrace(tmp_path, monkeypatch):
     pretrain.prepare(tmp_path / "output", 20, 16, 16, stage=stage)
 
     assert len(calls) == 1
-    assert (tmp_path / "output" / "train.ennxptn").is_file()
+    assert (tmp_path / "output" / "train.blckbauxptn").is_file()
     assert pretrain.file_digest(stage / "tokenizer.json")
     assert not list(stage.parent.glob(f".{stage.name}.*"))

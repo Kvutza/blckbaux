@@ -1,0 +1,21 @@
+{
+  "schema": "blckbaux.performance.run-manifest.v1",
+  "change_id": "rzqwqqkqyoqv",
+  "base_revision": "817c24722339",
+  "hardware": "Tesla T4",
+  "session": "blckbaux-hnet-1m-128",
+  "prompt_tokens": 524288,
+  "output_tokens_per_round": 524288,
+  "context_window_tokens": 1048576,
+  "rounds": 128,
+  "candidates_per_round": 4,
+  "surrogate": "enn-inverse-distance",
+  "neighbors": 32,
+  "distribution": "gaussian",
+  "model_seed": 240105308887621659,
+  "proposal_seed": 91614869253048103,
+  "temperature": 1.0,
+  "radius": 0.1,
+  "visits": 2,
+  "acquisitions": ["ucb", "thompson"]
+}

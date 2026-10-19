@@ -16,6 +16,7 @@ def _loadmodule():
     assert spec is not None and spec.loader is not None
     sys.modules.pop("benchdtsel", None)
     module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
 
@@ -88,10 +89,10 @@ def test_005(monkeypatch, capsys):
 
     created = {"n": 0}
 
-    def enn_config4(*, enn, num_init, acq_type):
+    def enn_config4(*, enn, num_init, acquisition):
         created["n"] += 1
         assert created["n"] == 1
-        return {"enn": enn, "num_init": num_init, "acq_type": acq_type}
+        return {"enn": enn, "num_init": num_init, "acquisition": acquisition}
 
     def fake_optimizer(*, bounds, config, rng):
         assert bounds.shape == (2, 2)

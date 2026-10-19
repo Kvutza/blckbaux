@@ -19,7 +19,7 @@ if [ -z "$upstream" ]; then
 fi
 
 if [ -z "$upstream" ] || [ "$upstream" = "$adapter_path" ]; then
-    echo "ennx: upstream KISS executable not found; set KISS_UPSTREAM_BIN" >&2
+    echo "blckbaux: upstream KISS executable not found; set KISS_UPSTREAM_BIN" >&2
     exit 127
 fi
 
@@ -28,7 +28,7 @@ lang=
 previous=
 for arg in "$@"; do
     case "$arg" in
-        test) command_name=test ;;
+        check|stats|dry|viz|test) command_name=$arg ;;
         --lang=*) lang=${arg#--lang=} ;;
     esac
     if [ "$previous" = "--lang" ]; then
@@ -38,6 +38,49 @@ for arg in "$@"; do
 done
 
 if [ "$command_name" != test ]; then
+    ignored_files=
+    case "$command_name" in
+        check|stats|dry|viz)
+            ignore_file="$repo_dir/.kissignore"
+            if [ -f "$ignore_file" ]; then
+                while IFS= read -r prefix || [ -n "$prefix" ]; do
+                    case "$prefix" in
+                        ''|'#'*) continue ;;
+                    esac
+                    prefix=${prefix%/}
+                    if [ -d "$repo_dir/$prefix" ]; then
+                        set -- "$@" --ignore "$prefix"
+                    elif [ "$command_name" = check ]; then
+                        ignored_files="${ignored_files}${ignored_files:+
+}$repo_dir/$prefix"
+                    fi
+                done < "$ignore_file"
+            fi
+            ;;
+    esac
+    if [ "$command_name" = check ] && [ -n "$ignored_files" ]; then
+        output=$(mktemp)
+        kiss_status=0
+        "$upstream" "$@" >"$output" 2>&1 || kiss_status=$?
+        filtered=$(mktemp)
+        trap 'rm -f "$output" "$filtered"' EXIT HUP INT TERM
+        printf '%s\n' "$ignored_files" | awk '
+            NR == FNR { ignored[NR] = $0; count = NR; next }
+            /^VIOLATION:/ {
+                for (i = 1; i <= count; i++)
+                    if (index($0, ":" ignored[i] ":")) next
+            }
+            { print }
+        ' - "$output" >"$filtered"
+        cat "$filtered"
+        if grep -q '^VIOLATION:' "$filtered"; then
+            exit 1
+        fi
+        if [ "$kiss_status" -ne 0 ] && ! grep -q '^VIOLATION:' "$output"; then
+            exit "$kiss_status"
+        fi
+        exit 0
+    fi
     exec "$upstream" "$@"
 fi
 
@@ -48,7 +91,7 @@ case "$lang" in
     rust|rs|"")
         ;;
     *)
-        echo "ennx: unsupported KISS language: $lang" >&2
+        echo "blckbaux: unsupported KISS language: $lang" >&2
         exit 2
         ;;
 esac
@@ -104,19 +147,19 @@ EOF
             shift
             ;;
         --metrics|--coverage-all|--retry-bad|--watch)
-            echo "ennx: KISS option $1 is not applicable to Buck2 Rust tests" >&2
+            echo "blckbaux: KISS option $1 is not applicable to Buck2 Rust tests" >&2
             exit 2
             ;;
         .)
             shift
             ;;
         -*)
-            echo "ennx: unsupported KISS Rust-test option: $1" >&2
+            echo "blckbaux: unsupported KISS Rust-test option: $1" >&2
             exit 2
             ;;
         *)
             if [ -n "$target" ]; then
-                echo "ennx: Buck2 adapter accepts only the repository Rust test target" >&2
+                echo "blckbaux: Buck2 adapter accepts only the repository Rust test target" >&2
                 exit 2
             fi
             target=$1
@@ -126,7 +169,7 @@ EOF
 done
 
 if [ -n "$target" ] && [ "$target" != "." ]; then
-    echo "ennx: KISS target '$target' has no Buck2 mapping; use ./buck2w test directly" >&2
+    echo "blckbaux: KISS target '$target' has no Buck2 mapping; use ./buck2w test directly" >&2
     exit 2
 fi
 

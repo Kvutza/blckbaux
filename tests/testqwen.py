@@ -197,13 +197,13 @@ def test_fimmeta():
     from ops.qwen.eval import validate_obj
 
     base = {
-        "provenance": {"prompt_template": "ennx.qwen_fim_code.v1"},
+        "provenance": {"prompt_template": "blckbaux.qwen_fim_code.v1"},
         "examples": [{"setup": "", "tests": ["assert True"]}],
     }
     validate_obj(base)
     with pytest.raises(ValueError, match="FIM objective"):
         validate_obj(
-            base | {"provenance": {"prompt_template": "ennx.qwen_chat_code.v1"}}
+            base | {"provenance": {"prompt_template": "blckbaux.qwen_chat_code.v1"}}
         )
     with pytest.raises(ValueError, match="checker setup/tests"):
         validate_obj(base | {"examples": [{"setup": None, "tests": []}]})

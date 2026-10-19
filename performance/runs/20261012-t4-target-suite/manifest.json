@@ -1,0 +1,24 @@
+{
+  "schema": "blckbaux.cuda.target-suite.v1",
+  "session": "blckbaux-metal-logic-128",
+  "hardware": "Tesla T4",
+  "target": "sm_75",
+  "compute": "7.5",
+  "change": "pqunpnxwkkurvmotuyyxxzzzklouxxqo",
+  "commit": "f15c1ec3a1806eceabd437c273920554dfcce39a",
+  "commands": [
+    "./blckbaux cuda ptx-probe 1048576 100",
+    "./blckbaux cuda bench",
+    "./blckbaux cuda prefill",
+    "./blckbaux cuda context 1048576 128 7",
+    "./blckbaux cuda model-check",
+    "./blckbaux cuda sanitize model-check"
+  ],
+  "status": "completed-after-fix",
+  "fix": {
+    "file": "cuda/kernels/src/fbt.rs",
+    "sha256": "e5079c64ffe69483d8f5ef4196c70edb2df2f7520fe445463bb3f19092062d21",
+    "cause": "compact MoE blocks indexed the route table by sub-tile block instead of routed tile"
+  },
+  "result": "result.json"
+}

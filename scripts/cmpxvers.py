@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare current ennx source to ennx==0.3.6 on TuRBO-ENN, TuRBO-ONE, and MORBO.
+"""Compare current blckbaux source to blckbaux==0.3.6 on TuRBO-ENN, TuRBO-ONE, and MORBO.
 
 Runs three difficult benchmarks (Ackley 30D, DoubleAckley 30D, separable unimodal)
 for each optimizer mode and reports answer quality plus wall-clock / ask() timing.
@@ -12,13 +12,14 @@ Example:
 
 from __future__ import annotations
 
-import argparse
 import json
 import os
 import subprocess
 import sys
 import time
 from pathlib import Path
+
+import click
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -101,16 +102,17 @@ def _runsubprocess(
     return BenchmarkResult(**payload)
 
 
-def _workermain(args: argparse.Namespace) -> int:
-    problems = apply_overrides3(PROBLEMS) if args.quick else PROBLEMS
-    problem = problems[args.problem]
+def _workermain(
+    *, optimizer: str, problem_name: str, version_label: str, quick: bool
+) -> None:
+    problems = apply_overrides3(PROBLEMS) if quick else PROBLEMS
+    problem = problems[problem_name]
     result = run_benchmark(
-        optimizer=args.optimizer,
+        optimizer=optimizer,
         problem=problem,
-        version_label=args.version,
+        version_label=version_label,
     )
-    print(json.dumps(result.to_dict()))
-    return 0
+    click.echo(json.dumps(result.to_dict()))
 
 
 def _formatrow(result: BenchmarkResult) -> str:
@@ -144,8 +146,8 @@ def _comparesummary(
     }
 
 
-def _main(args: argparse.Namespace) -> int:
-    problems = apply_overrides3(PROBLEMS) if args.quick else PROBLEMS
+def _runall(quick: bool) -> None:
+    problems = apply_overrides3(PROBLEMS) if quick else PROBLEMS
     combos = experiment_combos(problems)
 
     print("Predicted running time: up to 15 minutes (use --quick for a smoke run)")
@@ -156,7 +158,7 @@ def _main(args: argparse.Namespace) -> int:
     results: dict[tuple[str, str, str], BenchmarkResult] = {}
     t0 = time.perf_counter()
     for version_label in (CURRENT_LABEL, BASELINE_LABEL):
-        print(f"=== ennx {version_label} ===")
+        print(f"=== blckbaux {version_label} ===")
         for optimizer, problem_name in combos:
             label = f"{version_label}:{optimizer}:{problem_name}"
             print(f"  running {label}...", flush=True)
@@ -164,7 +166,7 @@ def _main(args: argparse.Namespace) -> int:
                 optimizer=optimizer,
                 problem=problem_name,
                 version_label=version_label,
-                quick=args.quick,
+                quick=quick,
             )
             results[(version_label, optimizer, problem_name)] = result
             print(f"    {_formatrow(result)}")
@@ -186,7 +188,7 @@ def _main(args: argparse.Namespace) -> int:
     out_path = ROOT / "cmpxvers_report.json"
     report = {
         "baseline_version": BASELINE_VERSION,
-        "quick": args.quick,
+        "quick": quick,
         "elapsed_seconds": time.perf_counter() - t0,
         "results": [r.to_dict() for r in results.values()],
         "comparisons": comparisons,
@@ -195,48 +197,49 @@ def _main(args: argparse.Namespace) -> int:
         json.dump(report, f, indent=2)
     print(f"\nWrote {out_path}")
     print(f"Total elapsed: {report['elapsed_seconds']:.1f}s")
-    return 0
 
 
-def _buildparser2() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description=__doc__)
-    sub = parser.add_subparsers(dest="command")
+@click.group(invoke_without_command=True, help=__doc__)
+@click.option("--quick", is_flag=True, help="Use reduced smoke-test workloads.")
+@click.pass_context
+def cli(context: click.Context, quick: bool) -> None:
+    context.ensure_object(dict)
+    context.obj["quick"] = quick
+    if context.invoked_subcommand is None:
+        _runall(quick)
 
-    run_parser = sub.add_parser("run", help="Run full comparison (default)")
-    run_parser.add_argument(
-        "--quick",
-        action="store_true",
-        help="Use reduced iteration counts for smoke testing",
-    )
 
-    worker_parser = sub.add_parser(
-        "worker", help="Run a single benchmark cell (JSON stdout)"
-    )
-    worker_parser.add_argument("--optimizer", choices=OPTIMIZER_NAMES, required=True)
-    worker_parser.add_argument(
-        "--problem", choices=tuple(PROBLEMS.keys()), required=True
-    )
-    worker_parser.add_argument(
-        "--version",
-        choices=(CURRENT_LABEL, BASELINE_LABEL),
-        required=True,
-    )
-    worker_parser.add_argument("--quick", action="store_true")
+@cli.command("run", help="Run the complete comparison.")
+@click.option("--quick", is_flag=True, help="Use reduced smoke-test workloads.")
+@click.pass_context
+def run_command(context: click.Context, quick: bool) -> None:
+    _runall(quick or bool(context.obj["quick"]))
 
-    parser.add_argument(
-        "--quick",
-        action="store_true",
-        help="Use reduced iteration counts for smoke testing",
+
+@cli.command(help="Run one benchmark cell and emit JSON.")
+@click.option("--optimizer", type=click.Choice(OPTIMIZER_NAMES), required=True)
+@click.option(
+    "--problem", "problem_name", type=click.Choice(tuple(PROBLEMS)), required=True
+)
+@click.option(
+    "--version",
+    "version_label",
+    type=click.Choice((CURRENT_LABEL, BASELINE_LABEL)),
+    required=True,
+)
+@click.option("--quick", is_flag=True)
+def worker(optimizer: str, problem_name: str, version_label: str, quick: bool) -> None:
+    _workermain(
+        optimizer=optimizer,
+        problem_name=problem_name,
+        version_label=version_label,
+        quick=quick,
     )
-    return parser
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = _buildparser2()
-    args = parser.parse_args(argv)
-    if args.command == "worker":
-        return _workermain(args)
-    return _main(args)
+    cli.main(args=argv, prog_name="cmpxvers", standalone_mode=False)
+    return 0
 
 
 if __name__ == "__main__":

@@ -3,14 +3,14 @@ use std::fmt;
 use std::mem::{size_of, size_of_val};
 use std::sync::OnceLock;
 
+use blckbaux_cuda_device::{
+    BatchParams, BatchValue, DrawParams, KNN_K, KNN_THREADS, KNN_WARPS, KnnParams, MergeParams,
+    PosteriorParams, THREADS, WeightedParams,
+};
 use cuda_core::{CudaEvent, CudaStream, DeviceBuffer, DeviceCopy, LaunchConfig1D};
 use cuda_host::kernel_family::{
     KernelFamily, KernelProblem, KernelSelector, KernelVariant, NoKernelSelectionCache,
     SelectionMode,
-};
-use ennx_cuda_kernels::{
-    BatchParams, BatchValue, DrawParams, KNN_K, KNN_THREADS, KNN_WARPS, KnnParams, MergeParams,
-    PosteriorParams, THREADS, WeightedParams,
 };
 
 use super::{CudaResult, Runtime, copy_prefix, cuda_error, read_prefix, timing_event, to_u32};
@@ -91,7 +91,7 @@ fn scan_family() -> CudaResult<&'static ScanFamily> {
     FAMILY
         .get_or_init(|| {
             KernelFamily::try_new(
-                "ennx/knn-scan",
+                "blckbaux/knn-scan",
                 1,
                 [
                     KernelVariant::new(

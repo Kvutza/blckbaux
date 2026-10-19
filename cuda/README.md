@@ -1,7 +1,12 @@
 # CUDA-Oxide
 
-ENNX CUDA kernels written in Rust with CUDA-Oxide. The current target is
-NVIDIA T4 (`sm_75`). CUDA is built separately from the CPU, Metal, and OpenCL code.
+BLCKBAUX CUDA kernels written in Rust with CUDA-Oxide. T4 (`sm_75`) and A100
+(`sm_80`) have hardware-validated stage measurements. The launcher also selects
+H100 (`sm_90a`), but H100 hardware remains unmeasured. The tensor-core model
+schedule is still the Turing-derived schedule: the A100 result establishes
+compatibility and measured behavior, not an Ampere-optimized schedule. Complete
+BO transaction evidence remains T4-only. CUDA is built separately from the CPU,
+Metal, and OpenCL code.
 
 The target is a subsecond BO pre-training round with a million-token context
 window, including generation, scoring, evaluation, and the optimizer update.
@@ -19,7 +24,7 @@ is retained alongside its invalidation notice under `results/cuda/`.
 PTX synthesis can be selected for the checkpoint executor's vocabulary readout:
 
 ```sh
-ENNX_SYNTH_GEMM=32 ./ennx cuda generate-t4 --unroll 1 --out results/cuda/fresh-synth-run
+BLCKBAUX_SYNTH_GEMM=32 ./blckbaux cuda generate-t4 --unroll 1 --out results/cuda/fresh-synth-run
 ```
 
 The run checks boundary tiles against independent CPU FP16 arithmetic and
@@ -57,7 +62,7 @@ workspace initialization. Subsequent streamed wall timings include it;
 checkpoint loading remains outside generation timing.
 
 ```sh
-./ennx cuda generate-t4 --context 65536 --prompt 64512 --chunk 512 --unroll 1 --out results/cuda/fresh-streamed-run
+./blckbaux cuda generate-t4 --context 65536 --prompt 64512 --chunk 512 --unroll 1 --out results/cuda/fresh-streamed-run
 ```
 
 The benchmark compares streamed tokens and frontiers to packed execution through
@@ -100,7 +105,7 @@ one sampled chunk, not a whole-context trace. Artifacts:
 arms; this is a single paired comparison, not a latency distribution.
 
 Prefill and repair chunk sizes can now differ. Set
-`ENNX_CUDA_REPAIR_CHUNK=512` with `--chunk 4096` to retain large first-wave
+`BLCKBAUX_CUDA_REPAIR_CHUNK=512` with `--chunk 4096` to retain large first-wave
 batches and use smaller suffix batches. The effective repair size is capped
 at the allocated chunk size. The default retains the same size for both.
 This passed exact packed-token and frontier comparisons at 4K and 64K, and
@@ -110,34 +115,34 @@ paired 512/512 reference's 61.679 s device. It evaluated 1,061,376 positions;
 the first wave took 50.369 s and subsequent verification 0.850 s. This remains
 a generation-only result. Artifact: `results/cuda/generation-t4-schedule-1m/`.
 
-Set `ENNX_CUDA_PROMPT` to a JSON token-ID array when using `generate-t4` to
+Set `BLCKBAUX_CUDA_PROMPT` to a JSON token-ID array when using `generate-t4` to
 replace the zero-ID fixture. Its length must equal `--prompt`, and IDs must use
 the checkpoint's 8,192-token vocabulary. The Rust runner uploads the array and
 records `prompt_source=token_file`; it does not repeat or pad the input.
-Set `ENNX_CUDA_PROFILE=1` to record stage timings for the first, middle and last
+Set `BLCKBAUX_CUDA_PROFILE=1` to record stage timings for the first, middle and last
 chunks of the first streamed wave. These are sampled chunk profiles, not sums
 over the whole context. Profiling is disabled by default.
 
 Inspect current coverage on any development host:
 
 ```sh
-./ennx cuda inspect
+./blckbaux cuda inspect
 ```
 
 On a machine with the CUDA-Oxide toolchain installed, use the repository CLI:
 
 ```sh
-./ennx cuda setup
-./ennx cuda build
-./ennx cuda parity
-./ennx cuda resident
-./ennx cuda bench
-./ennx cuda sanitize
+./blckbaux cuda setup
+./blckbaux cuda build
+./blckbaux cuda parity
+./blckbaux cuda resident
+./blckbaux cuda bench
+./blckbaux cuda sanitize
 ```
 
 `setup` installs the pinned Linux x86-64 CUDA-Oxide toolchain on a fresh root
 host with CUDA 13.0 and an NVIDIA runtime. Repository CUDA builds and runs use
-the remaining `./ennx cuda` commands.
+the remaining `./blckbaux cuda` commands.
 
 The CUDA-Oxide revision is pinned in `Cargo.toml`; Rust and LLVM versions are in
 `cuda/rust-toolchain.toml` and `tools/cuda-setup`.
@@ -151,9 +156,9 @@ The recurrent checkpoint executor and accepted-prefix generator use the same
 CLI on the NVIDIA host:
 
 ```sh
-./ennx cuda model-check
-./ennx cuda model checkpoint.safetensors tokens.json fresh-output
-./ennx cuda generate checkpoint.safetensors prompt.json fresh-generation
+./blckbaux cuda model-check
+./blckbaux cuda model checkpoint.safetensors tokens.json fresh-output
+./blckbaux cuda generate checkpoint.safetensors prompt.json fresh-generation
 ```
 
 JSON inputs contain vocabulary IDs in an array. `model` predicts one token per
@@ -167,7 +172,7 @@ Output directories must be new. Artifacts include token IDs and measured timing;
 chunks are powers of two from 64 through 4,096. Streamed context capacity is
 bounded at 1,048,576 positions. It includes the prompt and generated output.
 
-The checkpoint format is `ennx.fbt-pisa1-looped-mhc4-rope.v1`. The implementation
+The checkpoint format is `blckbaux.fbt-pisa1-looped-mhc4-rope.v1`. The implementation
 uses all 625 routed experts plus the shared expert. Repairs remain on-device
 between passes in one submission batch; the host reads the accepted frontier
 between batches. These commands do not yet run the Bayesian optimization loop.
@@ -182,8 +187,8 @@ Persistent PISA attention supports contexts through 1,048,576 tokens with a
 separate KV cache and bounded query scratch:
 
 ```sh
-./ennx cuda context 1048576 128 7
-./ennx cuda sanitize context 1048576 128 3
+./blckbaux cuda context 1048576 128 7
+./blckbaux cuda sanitize context 1048576 128 3
 ```
 
 Arguments are context capacity, query count, and timing repetitions. Query
@@ -200,12 +205,12 @@ supports bounded streamed activations. Packed comparisons reach 64K; complete
 ## Learned block diffusion
 
 The new source accepts the distinct checkpoint format
-`ennx.fbt-pisa1-diffusion-mhc4-rope.v1`, including learned mask and index weights:
+`blckbaux.fbt-pisa1-diffusion-mhc4-rope.v1`, including learned mask and index weights:
 
 ```sh
-./ennx cuda diffusion-check
-./ennx cuda diffusion CHECKPOINT PROMPT_JSON FRESH_OUTPUT 4096 2 0.8 17 2 128 true
-./ennx cuda sanitize diffusion-check
+./blckbaux cuda diffusion-check
+./blckbaux cuda diffusion CHECKPOINT PROMPT_JSON FRESH_OUTPUT 4096 2 0.8 17 2 128 true
+./blckbaux cuda sanitize diffusion-check
 ```
 
 Arguments after the output directory are total context positions, recurrent

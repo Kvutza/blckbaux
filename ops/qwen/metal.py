@@ -129,11 +129,11 @@ class Evaluator:
     def __init__(self, checkpoint: Path, *, max_tokens: int):
         if sys.platform != "darwin":
             raise RuntimeError("Qwen Metal evaluation requires macOS")
-        from ennx.experimental import MetalQwenEvaluator
+        from blckbaux.experimental import MetalQwenEvaluator
 
         if MetalQwenEvaluator is None:
             raise RuntimeError(
-                "Rebuild the ENNX wheel with the Metal Qwen evaluator enabled"
+                "Rebuild the BLCKBAUX wheel with the Metal Qwen evaluator enabled"
             )
         checkpoint = Path(checkpoint)
         config = Config.from_file(checkpoint / "config.json")
@@ -326,8 +326,8 @@ class Evaluator:
         radius_max: float = 0.08,
         reference_seed: int = 0,
     ):
-        from ennx.experimental import MetalSearchState
-        from ennx.experimental import MetalParamBlock
+        from blckbaux.experimental import MetalSearchState
+        from blckbaux.experimental import MetalParamBlock
 
         values = (base_value, radius, radius_min, radius_max)
         if any(not math.isfinite(float(value)) for value in values):

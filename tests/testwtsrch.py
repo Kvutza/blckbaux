@@ -2,8 +2,8 @@ import sys
 
 import numpy as np
 import pytest
-from ennx.ennx_rust import optimizer
-from ennx.search import Parameter, Search
+from blckbaux.blckbaux_rust import optimizer
+from blckbaux.search import Parameter, TrialEngine
 
 
 def test_parameter():
@@ -35,7 +35,7 @@ def test_parameter():
 
 def test_tuple():
     with pytest.raises(TypeError):
-        Search(
+        TrialEngine(
             np.asarray([0], dtype=np.uint8), 0.0, [(0, 1, 8, 1.0, 1.0, 1.0)], 2, "cpu"
         )
 
@@ -60,7 +60,7 @@ def _base():
 
 
 def _ask(backend):
-    search = Search(_base(), 0.25, _leaves(), 4, backend)
+    search = TrialEngine(_base(), 0.25, _leaves(), 4, backend)
     trial = search.ask(np.asarray([17], dtype=np.uint64), 1.0, 1)
     search.tell(trial, 0.75, True)
     trial = search.ask(
@@ -83,7 +83,7 @@ def test_001():
 
 def test_002():
     with pytest.raises(ValueError, match="unknown compute device"):
-        Search(_base(), 0.25, _leaves(), 4, "agx")
+        TrialEngine(_base(), 0.25, _leaves(), 4, "agx")
 
 
 @pytest.mark.skipif(sys.platform != "darwin", reason="Metal backend requires macOS")
@@ -124,7 +124,7 @@ def test_005():
             np.bitwise_xor(base, np.uint8(0x22)),
         ]
     )
-    search = Search(base, 0.25, _leaves(), 4, "cpu")
+    search = TrialEngine(base, 0.25, _leaves(), 4, "cpu")
     search.replace_history(rows, np.asarray([3.0, 7.0], dtype=np.float32))
     assert search.history_len == 2
     assert search.history_capacity == 4
@@ -146,10 +146,10 @@ def test_005():
 
 @pytest.mark.parametrize("acquisition", ["ucb", "thompson"])
 def test_stream(acquisition):
-    from ennx.search import Optimizer
+    from blckbaux.search import ParameterOptimizer
 
     def create():
-        return Optimizer(_base(), 0.25, _leaves(), 8, "cpu", num_pert=2)
+        return ParameterOptimizer(_base(), 0.25, _leaves(), 8, "cpu", num_pert=2)
 
     first, second = create(), create()
     with pytest.raises(ValueError):
@@ -168,9 +168,11 @@ def test_stream(acquisition):
 
 
 def test_batch():
-    from ennx.search import Optimizer
+    from blckbaux.search import ParameterOptimizer
 
-    search = Optimizer(_base(), 0.25, _leaves(), 8, "cpu", num_pert=2, max_pending=2)
+    search = ParameterOptimizer(
+        _base(), 0.25, _leaves(), 8, "cpu", num_pert=2, max_pending=2
+    )
     with pytest.raises(ValueError):
         search.batch_stream(17, 3, 8, 1)
     trials = search.batch_stream(17, 2, 8, 1)
@@ -186,10 +188,12 @@ def test_batch():
 
 
 def test_identity():
-    from ennx.search import Optimizer, Trial
+    from blckbaux.search import ParameterOptimizer, Trial
 
     def create():
-        return Optimizer(_base(), 0.25, _leaves(), 8, "cpu", num_pert=2, max_pending=2)
+        return ParameterOptimizer(
+            _base(), 0.25, _leaves(), 8, "cpu", num_pert=2, max_pending=2
+        )
 
     first, second = create(), create()
     left = first.ask_stream(17, 8, 1)
@@ -223,11 +227,11 @@ def test_identity():
 
 @pytest.mark.skipif(sys.platform != "darwin", reason="Metal backend requires macOS")
 def test_metal():
-    from ennx.search import Optimizer
+    from blckbaux.search import ParameterOptimizer
 
-    cpu = Optimizer(_base(), 0.25, _leaves(), 8, "cpu", num_pert=2)
+    cpu = ParameterOptimizer(_base(), 0.25, _leaves(), 8, "cpu", num_pert=2)
     try:
-        metal = Optimizer(_base(), 0.25, _leaves(), 8, "metal", num_pert=2)
+        metal = ParameterOptimizer(_base(), 0.25, _leaves(), 8, "metal", num_pert=2)
     except ValueError as error:
         if "Metal trial search is not available in this build" in str(
             error

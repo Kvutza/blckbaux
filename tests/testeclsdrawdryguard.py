@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import numpy as np
 
-from ennx.ennx.enn_class import ENN
-from ennx.ennx.enn_params import ENNParams, PosteriorFlags
+from blckbaux.enn.enn_class import ENN
+from blckbaux.enn.enn_params import ENNParams, PosteriorFlags
 
 
 def _tinymodel():
@@ -83,7 +83,7 @@ def test_005():
     draws, _idx = model.posterior_draw(
         x, params, function_seeds=seeds, flags=PosteriorFlags()
     )
-    # Expected from ennx ENN + Rust draw path (fixed data/seeds).
+    # Expected from blckbaux ENN + Rust draw path (fixed data/seeds).
     # Shape is (batch, metrics, num_samples) to match posterior().sample().
     expected = np.array(
         [[[-0.71338448, -0.40793862]]],

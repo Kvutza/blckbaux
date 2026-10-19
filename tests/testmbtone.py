@@ -1,9 +1,9 @@
 import numpy as np
 import pytest
 
-from ennx import create_optimizer
-from ennx.benchmarks import DoubleAckley
-from ennx.turbo.config import MorboTRConfig, MultiObjectiveConfig, turbo_one
+from blckbaux import create_optimizer
+from blckbaux.benchmarks import DoubleAckley
+from blckbaux.turbo.config import MorboTrustRegion, MultiObjectiveConfig, turbo_one
 
 
 @pytest.mark.slow
@@ -16,7 +16,7 @@ def test_001():
     objective = DoubleAckley(noise=noise, rng=rng)
     bounds = np.array([objective.bounds] * num_dim, dtype=float)
     config = turbo_one(
-        trust_region=MorboTRConfig(
+        trust_region=MorboTrustRegion(
             multi_objective=MultiObjectiveConfig(num_metrics=num_metrics)
         )
     )

@@ -1,0 +1,17 @@
+{
+  "schema": "blckbaux.performance.run-manifest.v1",
+  "revision": "fc69a0ae",
+  "hardware": "Tesla T4",
+  "session": "blckbaux-hnet-1m-128",
+  "prompt_tokens": 524288,
+  "generated_tokens": 524288,
+  "context_window_tokens": 1048576,
+  "rounds": 128,
+  "model_seed": 240105308887621659,
+  "sampling_seed": 91614869253048103,
+  "temperature": 1.0,
+  "radius": 0.1,
+  "visits": 2,
+  "split_command": "./target/release/blckbaux-cuda hnet-bo-bench 240105308887621659 prompt.json targets.json /content/out1m-bo-128 524288 2 1.0 91614869253048103 0.1 128",
+  "fused_command": "BLCKBAUX_CUDA_FUSED_READOUT=1 ./target/release/blckbaux-cuda hnet-bo-bench 240105308887621659 prompt.json targets.json /content/out1m-bo-128-fused 524288 2 1.0 91614869253048103 0.1 128"
+}

@@ -1,7 +1,7 @@
 //! Device FP16 conversion checked against the independent `half` implementation.
 use crate::{CudaResult, cuda_error, read_prefix};
+use blckbaux_cuda_device::fbt_model;
 use cuda_core::{CudaContext, DeviceBuffer, LaunchConfig1D};
-use ennx_cuda_kernels::fbt_model;
 use half::f16;
 
 pub fn check() -> CudaResult<usize> {

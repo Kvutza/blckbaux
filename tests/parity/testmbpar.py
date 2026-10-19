@@ -4,33 +4,33 @@ import numpy as np
 import pytest
 from morbo_objectives import separable_objective
 
-from ennx import create_optimizer, turbo_enn
-from ennx.turbo.config import (
-    AcqType,
-    CandidateGenConfig,
-    ENNFitConfig,
-    ENNSurrogateConfig,
-    MorboTRConfig,
+from blckbaux import create_optimizer, turbo_enn
+from blckbaux.turbo.config import (
+    AcquisitionKind,
+    CandidateConfig,
+    SurrogateFit,
+    ENNSurrogate,
+    MorboTrustRegion,
     MultiObjectiveConfig,
 )
 
-pytest.importorskip("ennx._rust")
+pytest.importorskip("blckbaux._rust")
 
 
 def test_morbopostinit():
     bounds = np.array([[-300.0, 600.0], [0.2, 1.0]], dtype=float)
     config = turbo_enn(
-        acq_type=AcqType.PARETO,
-        enn=ENNSurrogateConfig(
+        acquisition=AcquisitionKind.PARETO,
+        enn=ENNSurrogate(
             k=4,
-            fit=ENNFitConfig(num_samples=4, num_candidates=8),
+            fit=SurrogateFit(num_samples=4, num_candidates=8),
         ),
-        trust_region=MorboTRConfig(
+        trust_region=MorboTrustRegion(
             multi_objective=MultiObjectiveConfig(num_metrics=2),
             noise_aware=True,
         ),
         num_init=8,
-        candidates=CandidateGenConfig(num_candidates=64),
+        candidates=CandidateConfig(num_candidates=64),
     )
     rng = np.random.default_rng(43)
     opt = create_optimizer(bounds=bounds, config=config, rng=rng)
@@ -51,17 +51,17 @@ def test_morbopostinit():
 def test_morboimproves():
     bounds = np.array([[-300.0, 600.0], [0.2, 1.0]], dtype=float)
     config = turbo_enn(
-        acq_type=AcqType.PARETO,
-        enn=ENNSurrogateConfig(
+        acquisition=AcquisitionKind.PARETO,
+        enn=ENNSurrogate(
             k=4,
-            fit=ENNFitConfig(num_samples=4, num_candidates=8),
+            fit=SurrogateFit(num_samples=4, num_candidates=8),
         ),
-        trust_region=MorboTRConfig(
+        trust_region=MorboTrustRegion(
             multi_objective=MultiObjectiveConfig(num_metrics=2),
             noise_aware=True,
         ),
         num_init=8,
-        candidates=CandidateGenConfig(num_candidates=64),
+        candidates=CandidateConfig(num_candidates=64),
     )
     rng = np.random.default_rng(42)
     opt = create_optimizer(bounds=bounds, config=config, rng=rng)

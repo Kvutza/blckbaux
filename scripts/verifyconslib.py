@@ -1,4 +1,4 @@
-"""End-to-end consumer verification script for ENNX library.
+"""End-to-end consumer verification script for BLCKBAUX library.
 
 Exercises real FP4/FP8 quantized PackedSearch, BPANN indexing, and high-level
 TuRBO optimization to guarantee runtime library functionality beyond unit tests.
@@ -9,11 +9,13 @@ import sys
 import numpy as np
 
 try:
-    from ennx.ennx_rust import optimizer
+    from blckbaux.blckbaux_rust import optimizer
 
-    from ennx.experimental import quantize_e2m1
+    from blckbaux.experimental import quantize_e2m1
 
-    print("[✓] Successfully imported native ENNX components and quantization helpers.")
+    print(
+        "[✓] Successfully imported native BLCKBAUX components and quantization helpers."
+    )
 except ImportError as e:
     print(f"[X] Import failed: {e}")
     sys.exit(1)

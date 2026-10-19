@@ -1,4 +1,4 @@
-"""Contract tests for ENNStatefulFitter."""
+"""Contract tests for ENNFitter."""
 
 from __future__ import annotations
 
@@ -6,21 +6,21 @@ import inspect
 
 import numpy as np
 
-from ennx import ENNStatefulFitter, ENN
-from ennx.ennx.enn_params import ENNParams
+from blckbaux import ENNFitter, ENN
+from blckbaux.enn.enn_params import ENNParams
 
 
 class Test_001:
     def test_initsignature(self):
-        sig = inspect.signature(ENNStatefulFitter.__init__)
+        sig = inspect.signature(ENNFitter.__init__)
         params = list(sig.parameters.keys())
         assert "k" in params
         assert "rng" in params
         assert "infer_aleatoric_variance_scale" in params
 
     def test_001(self):
-        assert "tell" in dir(ENNStatefulFitter)
-        sig = inspect.signature(ENNStatefulFitter.ask)
+        assert "tell" in dir(ENNFitter)
+        sig = inspect.signature(ENNFitter.ask)
         params = list(sig.parameters.keys())
         assert "model" in params
         assert "num_candidates" in params
@@ -36,7 +36,7 @@ class Test_001:
         model = ENN(train_x, train_y, scale_x=False)
         rng = np.random.default_rng(42)
 
-        fitter = ENNStatefulFitter(k=2, rng=rng)
+        fitter = ENNFitter(k=2, rng=rng)
         fitter.tell(train_x, train_y)
         result = fitter.ask(
             model,

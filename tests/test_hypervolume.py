@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from ennx.turbo.hypervolume import hypervolume2d_max
+from blckbaux.turbo.hypervolume import hypervolume2d_max
 
 
 @pytest.mark.parametrize(

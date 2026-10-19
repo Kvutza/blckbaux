@@ -1,10 +1,11 @@
+use super::VOCAB;
 use crate::{CudaResult, cuda_error, read_prefix};
+use blckbaux_cuda_device::{MoeShape, RouteShape, RoutedTile, fbt_model};
 use cuda_core::{CudaContext, CudaStream, DeviceBuffer, LaunchConfig1D, simt::LaunchConfig2D};
-use ennx_cuda_kernels::{MoeShape, RouteShape, RoutedTile, fbt_model};
 
 pub(super) fn check() -> CudaResult<()> {
     const ROWS: usize = 400;
-    const EXPERTS: usize = 625;
+    const EXPERTS: usize = super::EXPERTS;
     const ASSIGNMENTS: usize = ROWS * 3;
     let context = CudaContext::new(0).map_err(cuda_error)?;
     let stream = context.default_stream();
@@ -106,6 +107,7 @@ pub(super) fn check() -> CudaResult<()> {
         )
         .map_err(cuda_error)?;
     let counts = read_prefix(&counts, &stream, EXPERTS)?;
+    let tile_layout = read_prefix(&tiles, &stream, capacity)?;
     let mapping = read_prefix(&mapping, &stream, ASSIGNMENTS)?;
     let packed_host = read_prefix(&packed, &stream, ASSIGNMENTS * 512)?;
     let mut offsets = vec![0_usize; EXPERTS];
@@ -219,59 +221,6 @@ fn moe(
             shape,
         )
         .map_err(cuda_error)?;
-    let launch = module
-        .prepare_routed_project(LaunchConfig2D::new((27, capacity as u32), (256, 1), 0))
-        .map_err(cuda_error)?;
-    module
-        .routed_project(
-            stream,
-            &launch,
-            input,
-            &gate,
-            tiles,
-            cuda_host::RowWidth::new(&mut projection, 432),
-            0,
-        )
-        .map_err(cuda_error)?;
-    let launch = module
-        .prepare_routed_activate(LaunchConfig1D::new(
-            (rows as u32 * 216).div_ceil(256),
-            256,
-            0,
-        ))
-        .map_err(cuda_error)?;
-    module
-        .routed_activate(stream, &launch, &projection, &mut activation, rows as u32)
-        .map_err(cuda_error)?;
-    let launch = module
-        .prepare_routed_project(LaunchConfig2D::new((32, capacity as u32), (256, 1), 0))
-        .map_err(cuda_error)?;
-    module
-        .routed_project(
-            stream,
-            &launch,
-            &activation,
-            &down,
-            tiles,
-            cuda_host::RowWidth::new(&mut output, 512),
-            1,
-        )
-        .map_err(cuda_error)?;
-    let reference = read_prefix(&reference_output, stream, rows * 512)?;
-    let actual = read_prefix(&output, stream, rows * 512)?;
-    let mut maximum = 0.0_f32;
-    for (&expected, &value) in reference.iter().zip(&actual) {
-        let expected = widen(expected);
-        let value = widen(value);
-        let error = (expected - value).abs();
-        if !value.is_finite() || error > 0.0001 + expected.abs() * 0.001 {
-            return Err(format!("tensor-core MoE mismatch: {expected} vs {value}"));
-        }
-        maximum = maximum.max(error);
-    }
-    if reference.iter().all(|&value| value == 0) {
-        return Err("MoE parity fixture did not exercise a nonzero branch".into());
-    }
     super::expert_project(
         module,
         stream,
@@ -304,11 +253,24 @@ fn moe(
         1,
         true,
     )?;
-    if actual != read_prefix(&output, stream, rows * 512)? {
-        return Err("16-row MoE projection differs from 64-row reference".into());
+    let reference = read_prefix(&reference_output, stream, rows * 512)?;
+    let actual = read_prefix(&output, stream, rows * 512)?;
+    let mut maximum = 0.0_f32;
+    for (&expected, &value) in reference.iter().zip(&actual) {
+        let expected = widen(expected);
+        let value = widen(value);
+        let error = (expected - value).abs();
+        if !value.is_finite() || error > 0.0001 + expected.abs() * 0.001 {
+            return Err(format!("tensor-core MoE mismatch: {expected} vs {value}"));
+        }
+        maximum = maximum.max(error);
     }
+    if reference.iter().all(|&value| value == 0) {
+        return Err("MoE parity fixture did not exercise a nonzero branch".into());
+    }
+    let target = crate::target_name(stream.context())?;
     println!(
-        "MOE_PARITY ok=true rows={rows} width=512 expert-width=216 tiles=16,64 tensor-cores=sm75 max-abs-error={maximum}"
+        "MOE_PARITY ok=true rows={rows} width=512 expert-width=216 target={target} max-abs-error={maximum}"
     );
     Ok(())
 }
@@ -328,7 +290,7 @@ fn widen(value: u16) -> f32 {
 
 fn sampling(module: &fbt_model::LoadedModule, stream: &CudaStream) -> CudaResult<()> {
     let logits =
-        DeviceBuffer::from_host(stream, &vec![0x6000_u16; 32 * 8192]).map_err(cuda_error)?;
+        DeviceBuffer::from_host(stream, &vec![0x6000_u16; 32 * VOCAB]).map_err(cuda_error)?;
     let mut sampled = DeviceBuffer::zeroed(stream, 32).map_err(cuda_error)?;
     let launch = module
         .prepare_sample(LaunchConfig1D::new(32, 256, 0))

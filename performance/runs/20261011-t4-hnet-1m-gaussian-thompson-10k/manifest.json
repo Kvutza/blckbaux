@@ -1,0 +1,19 @@
+{
+  "started_at": "2026-10-11T21:13:22Z",
+  "session": "blckbaux-hnet-1m-128",
+  "tmux": "blckbaux-thompson-10k",
+  "hardware": "NVIDIA Tesla T4",
+  "context_tokens": 1048576,
+  "prompt_tokens": 524288,
+  "generated_tokens_per_round": 524288,
+  "rounds": 10000,
+  "acquisition": "thompson",
+  "command": "./target/release/blckbaux-cuda hnet-bo-bench 240105308887621659 prompt.json targets.json /content/out1m-gaussian-thompson-10000 524288 2 1.0 91614869253048103 0.1 10000 thompson",
+  "progress_file": "/content/out1m-gaussian-thompson-10000/rounds.jsonl",
+  "status": "aborted",
+  "supersedes": "opaque run stopped because it did not stream learning metrics",
+  "completed_rounds": 1576,
+  "best_nll": 11.629095,
+  "accepted_rounds": 111,
+  "reason": "replaced hidden coordinate innovation with identifiable per-tensor dense bases"
+}

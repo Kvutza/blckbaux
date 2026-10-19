@@ -46,7 +46,7 @@ def expect_error(action):
 def toy_parity():
     import torch
 
-    from ennx.experimental import FlameEvaluator, ParamBlock, SearchState
+    from blckbaux.experimental import FlameEvaluator, ParamBlock, SearchState
 
     rng = np.random.default_rng(73)
     maximum_error = 0.0
@@ -261,7 +261,7 @@ def checkpoint_parity(checkpoint, document):
     import torch
     from safetensors.torch import load_file
 
-    from ennx.experimental import FlameEvaluator
+    from blckbaux.experimental import FlameEvaluator
 
     from . import model
     from .checkpoint import digest

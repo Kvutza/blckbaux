@@ -19,7 +19,7 @@ def sphere_objective(x):
 def enn_model(n=20, d=3, seed=0, yvar_scale=0.1):
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
+    from blckbaux.enn.enn_class import ENN
 
     rng = np.random.default_rng(seed)
     train_x = rng.standard_normal((n, d))

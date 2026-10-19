@@ -3,21 +3,21 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from ennx.turbo.config import (
-    AcqType,
-    ENNFitConfig,
-    ENNSurrogateConfig,
+from blckbaux.turbo.config import (
+    AcquisitionKind,
+    SurrogateFit,
+    ENNSurrogate,
     turbo_enn,
 )
 
-pytest.importorskip("ennx._rust")
+pytest.importorskip("blckbaux._rust")
 
 
 def _ennconfig(enn=None, num_init=6, **kwargs):
     if enn is None:
-        enn = ENNSurrogateConfig(k=4, fit=ENNFitConfig(num_samples=10))
+        enn = ENNSurrogate(k=4, fit=SurrogateFit(num_samples=10))
     return turbo_enn(
-        acq_type=AcqType.UCB,
+        acquisition=AcquisitionKind.UCB,
         enn=enn,
         num_init=num_init,
         **kwargs,
@@ -33,7 +33,7 @@ def test_001():
 
     bounds = np.array([[0.0, 1.0], [0.0, 1.0]], dtype=float)
     config = _ennconfig(
-        enn=ENNSurrogateConfig(k=3, fit=ENNFitConfig(num_samples=10)), num_init=4
+        enn=ENNSurrogate(k=3, fit=SurrogateFit(num_samples=10)), num_init=4
     )
     opt = make_optimizer(bounds, config, seed=7)
     check_opt(opt, bounds)
@@ -52,7 +52,7 @@ def test_003():
 
     bounds = np.array([[0.0, 1.0], [0.0, 1.0]], dtype=float)
     config = _ennconfig(
-        enn=ENNSurrogateConfig(k=5, fit=ENNFitConfig(num_samples=10)), num_init=6
+        enn=ENNSurrogate(k=5, fit=SurrogateFit(num_samples=10)), num_init=6
     )
     opt = make_optimizer(bounds, config, seed=19)
     rng = np.random.default_rng(19)

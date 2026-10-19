@@ -1,9 +1,9 @@
 alias(
     name = "rust_core",
-    actual = "@ennx//:cpu",
+    actual = "@blckbaux//:cpu",
 )
 
 alias(
     name = "python_wheel",
-    actual = "@ennx//:wheel",
+    actual = "@blckbaux//:wheel",
 )

@@ -23,10 +23,10 @@ from .parity_types import ParityReport
 
 
 def run_harness() -> ParityReport:
-    from ennx.turbo.config import (
-        AcqType,
-        ENNFitConfig,
-        ENNSurrogateConfig,
+    from blckbaux.turbo.config import (
+        AcquisitionKind,
+        SurrogateFit,
+        ENNSurrogate,
         lhd_only,
         turbo_enn,
         turbo_zero,
@@ -34,7 +34,7 @@ def run_harness() -> ParityReport:
 
     report = ParityReport()
     try:
-        from ennx._rust import ENN as _  # noqa: F401
+        from blckbaux._rust import ENN as _  # noqa: F401
 
         report.rust_available = True
     except ImportError:
@@ -47,8 +47,8 @@ def run_harness() -> ParityReport:
         report,
         "optimizer_enn_parity",
         turbo_enn(
-            acq_type=AcqType.UCB,
-            enn=ENNSurrogateConfig(k=3, fit=ENNFitConfig(num_samples=10)),
+            acquisition=AcquisitionKind.UCB,
+            enn=ENNSurrogate(k=3, fit=SurrogateFit(num_samples=10)),
             num_init=4,
         ),
     )

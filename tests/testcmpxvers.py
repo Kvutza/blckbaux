@@ -5,11 +5,12 @@ from dataclasses import asdict
 
 import numpy as np
 import pytest
+from click.testing import CliRunner
 
 from scripts.cmpxvers import (
     BASELINE_LABEL,
     CURRENT_LABEL,
-    _buildparser2,
+    cli,
     _comparesummary,
     _envversion,
     _formatrow,
@@ -66,6 +67,7 @@ def test_006():
 
 
 def test_007():
+    pytest.importorskip("torch")
     problem = apply_overrides3(PROBLEMS)["ackley_30d"]
     result = run_benchmark(
         optimizer="turbo_enn",
@@ -78,6 +80,7 @@ def test_007():
 
 
 def test_008():
+    pytest.importorskip("torch")
     problem = apply_overrides3(PROBLEMS)["separable_unimodal"]
     result = run_benchmark(
         optimizer="morbo",
@@ -233,8 +236,15 @@ def test_workermainandparser(monkeypatch, capsys):
             seed=18,
         ),
     )
-    parser = _buildparser2()
-    args = parser.parse_args(
+    _workermain(
+        optimizer="turbo_enn",
+        problem_name="ackley_30d",
+        version_label="current",
+        quick=True,
+    )
+    assert json.loads(capsys.readouterr().out)["optimizer"] == "turbo_enn"
+    result = CliRunner().invoke(
+        cli,
         [
             "worker",
             "--optimizer",
@@ -244,10 +254,10 @@ def test_workermainandparser(monkeypatch, capsys):
             "--version",
             "current",
             "--quick",
-        ]
+        ],
     )
-    assert _workermain(args) == 0
-    assert json.loads(capsys.readouterr().out)["optimizer"] == "turbo_enn"
+    assert result.exit_code == 0, result.output
+    assert json.loads(result.output)["optimizer"] == "turbo_enn"
 
 
 def test_015():

@@ -12,31 +12,31 @@ exports_files([
 
 alias(
     name = "cpu",
-    actual = "//rust/crates/ennx:ennx_cpu",
+    actual = "//rust/crates/blckbaux:blckbaux_cpu",
 )
 
 alias(
     name = "gpu",
     actual = select({
-        "@platforms//os:macos": "//rust/crates/ennx:ennx_metal",
-        "//conditions:default": "//rust/crates/ennx:ennx_opencl",
+        "@platforms//os:macos": "//rust/crates/blckbaux:blckbaux_metal",
+        "//conditions:default": "//rust/crates/blckbaux:blckbaux_opencl",
     }),
 )
 
 alias(
     name = "ext",
-    actual = "//rust/crates/ennx-py:python_extension",
+    actual = "//rust/crates/blckbaux-py:python_extension",
 )
 
 filegroup(
     name = "python_sources",
-    srcs = glob(["src/ennx/**/*.py"]),
+    srcs = glob(["src/blckbaux/**/*.py"]),
 )
 
 copy_extension(
     name = "wheel_extension",
-    src = "//rust/crates/ennx-py:python_extension",
-    output = "ennx/ennx_rust.so",
+    src = "//rust/crates/blckbaux-py:python_extension",
+    output = "blckbaux/blckbaux_rust.so",
 )
 
 py_wheel(
@@ -44,19 +44,19 @@ py_wheel(
     abi = "cp313",
     description_content_type = "text/markdown",
     description_file = "README.md",
-    distribution = "ennx",
+    distribution = "blckbaux",
     extra_distinfo_files = {
         ":LICENSE": "licenses/LICENSE",
         ":NOTICE": "licenses/NOTICE",
     },
-    homepage = "https://github.com/Kvutza/ennx",
+    homepage = "https://github.com/Kvutza/blckbaux",
     license = "MIT",
     platform = select({
         "@platforms//os:linux": "manylinux_2_28_x86_64",
         "@platforms//os:macos": "macosx_11_0_arm64",
         "//conditions:default": "any",
     }),
-    python_requires = ">=3.12,<3.15",
+    python_requires = ">=3.12,<3.16",
     python_tag = "cp313",
     requires = [
         "ax-platform>=1.3.1,<1.4",
@@ -77,9 +77,9 @@ py_wheel(
 test_suite(
     name = "check",
     tests = [
-        "//rust/crates/bpann:bpann_test",
-        "//rust/crates/ennx:ennx_test",
-        "//rust/crates/ennx:trial_search_metal_test",
+        "//rust/crates/neighbor-index:neighbor-index_test",
+        "//rust/crates/blckbaux:blckbaux_test",
+        "//rust/crates/blckbaux:trial_search_metal_test",
     ],
 )
 

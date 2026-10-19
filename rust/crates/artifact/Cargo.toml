@@ -1,0 +1,18 @@
+[package]
+name = "blckbaux-artifact"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Typed experiment artifacts and serialization adapters for BLCKBAUX"
+
+[dependencies]
+deser.workspace = true
+deser-json = { version = "=0.9.1", features = ["speedups"] }
+deser-toml = "=0.9.1"
+deser-value = "=0.9.1"
+sha2.workspace = true
+blckbaux-semantics.workspace = true
+
+[dev-dependencies]
+tempfile = "3"

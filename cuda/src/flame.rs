@@ -96,20 +96,20 @@ mod native {
     use std::rc::Rc;
 
     unsafe extern "C" {
-        #[link_name = "ennx_flame_create"]
+        #[link_name = "blckbaux_flame_create"]
         fn flame_create(
             config: *const FlameConfig,
             max_tokens: u32,
             error: *mut c_char,
             capacity: usize,
         ) -> *mut c_void;
-        #[link_name = "ennx_flame_destroy"]
+        #[link_name = "blckbaux_flame_destroy"]
         fn flame_destroy(handle: *mut c_void);
-        #[link_name = "ennx_flame_workspace"]
+        #[link_name = "blckbaux_flame_workspace"]
         fn flame_workspace(handle: *const c_void) -> u64;
-        #[link_name = "ennx_flame_weights_len"]
+        #[link_name = "blckbaux_flame_weights_len"]
         fn flame_weightslen(handle: *const c_void) -> u64;
-        #[link_name = "ennx_flame_losses"]
+        #[link_name = "blckbaux_flame_losses"]
         fn flame_losses(
             handle: *mut c_void,
             weights: *const u16,
@@ -122,7 +122,7 @@ mod native {
             error: *mut c_char,
             capacity: usize,
         ) -> i32;
-        #[link_name = "ennx_flame_logits"]
+        #[link_name = "blckbaux_flame_logits"]
         fn flame_logits(
             handle: *mut c_void,
             weights: *const u16,

@@ -1,0 +1,26 @@
+{
+  "started_at": "2026-10-11T21:49:02Z",
+  "session": "blckbaux-hnet-1m-128",
+  "tmux": "blckbaux-identifiable-10k",
+  "hardware": "NVIDIA Tesla T4",
+  "schema": "blckbaux.cuda.hnet-bo-round.v4",
+  "context_tokens": 1048576,
+  "prompt_tokens": 524288,
+  "generated_tokens_per_round": 524288,
+  "rounds": 10000,
+  "acquisition": "thompson",
+  "proposal": "identifiable-dense-basis",
+  "descriptor_dimensions": 70,
+  "command": "./target/release/blckbaux-cuda hnet-bo-bench 240105308887621659 prompt.json targets.json /content/out1m-identifiable-thompson-10000 524288 2 1.0 91614869253048103 0.1 10000 thompson",
+  "progress_file": "/content/out1m-identifiable-thompson-10000/rounds.jsonl",
+  "status": "completed",
+  "completed_rounds": 10000,
+  "accepted_rounds": 76,
+  "best_nll": 11.846597,
+  "results": [
+    "result.json",
+    "rounds.jsonl",
+    "tokens.json",
+    "review.json"
+  ]
+}

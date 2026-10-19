@@ -4,10 +4,10 @@ from __future__ import annotations
 def test_001():
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
-    from ennx.ennx.enn_fit import ENNIncrementalDelta, enn_fit
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
-    from ennx.ennx.enn_params import ENNParams
+    from blckbaux.enn.enn_class import ENN
+    from blckbaux.enn.enn_fit import ENNIncrementalDelta, enn_fit
+    from blckbaux.enn.enn_fitter import ENNFitter
+    from blckbaux.enn.enn_params import ENNParams
 
     rng = np.random.default_rng(7)
     x_all = rng.standard_normal((12, 2))
@@ -15,7 +15,7 @@ def test_001():
     yvar_all = 0.01 * np.ones_like(y_all)
 
     model = ENN(np.empty((0, 2)), np.empty((0, 1)), np.empty((0, 1)))
-    fitter = ENNStatefulFitter(k=3, rng=np.random.default_rng(7))
+    fitter = ENNFitter(k=3, rng=np.random.default_rng(7))
     params: ENNParams | None = None
     for row_x, row_y, row_yvar in zip(x_all, y_all, yvar_all):
         row_x = row_x.reshape(1, -1)
@@ -39,20 +39,20 @@ def test_001():
 def test_002():
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
-    from ennx.ennx.enn_fit import ENNIncrementalDelta, enn_fit
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
+    from blckbaux.enn.enn_class import ENN
+    from blckbaux.enn.enn_fit import ENNIncrementalDelta, enn_fit
+    from blckbaux.enn.enn_fitter import ENNFitter
 
     rng = np.random.default_rng(99)
     x_all = rng.standard_normal((8, 2))
     y_all = rng.standard_normal((8, 1))
 
     via_enn_fit = ENN(np.empty((0, 2)), np.empty((0, 1)))
-    fitter_a = ENNStatefulFitter(k=2, rng=np.random.default_rng(99))
+    fitter_a = ENNFitter(k=2, rng=np.random.default_rng(99))
     params_a = None
 
     via_manual = ENN(np.empty((0, 2)), np.empty((0, 1)))
-    fitter_b = ENNStatefulFitter(k=2, rng=np.random.default_rng(99))
+    fitter_b = ENNFitter(k=2, rng=np.random.default_rng(99))
     params_b = None
 
     for row_x, row_y in zip(x_all, y_all):

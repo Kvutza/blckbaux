@@ -7,6 +7,13 @@ load(
 load("//buck2/cuda:defs.bzl", "cuda_oxide")
 load("//buck2/wheel:wheel.bzl", "python_wheel")
 
+http_file(
+    name = "click-wheel",
+    urls = ["https://files.pythonhosted.org/packages/58/50/6c0d534c5f134586a8e1ba4e330569e32f057e33372ae556463212fb4cd3/click-8.5.0-py3-none-any.whl"],
+    sha256 = "255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360",
+    out = "click-8.5.0-py3-none-any.whl",
+)
+
 constraint_setting(name = "profile")
 
 constraint_value(
@@ -92,7 +99,7 @@ filegroup(
 
 filegroup(
     name = "cuda-package",
-    srcs = glob(["src/ennx/**/*.py"]) + [
+    srcs = glob(["src/blckbaux/**/*.py"]) + [
         "LICENSE",
         "NOTICE",
         "README.md",
@@ -106,76 +113,85 @@ cuda_oxide(
     name = "cuda",
     package = ":cuda-package",
     workspace = ":cargo-workspace",
-    bpann = "//rust/crates/bpann:bpann-source",
-    ennx = "//rust/crates/ennx:ennx-source",
-    python = "//rust/crates/ennx-py:python-source",
-    modal = "//rust/crates/modal-runner:modal-source",
-    ptx = "//rust/crates/ptx-synth:ptx-source",
+    crates = {
+        "artifact": "//rust/crates/artifact:source",
+        "corpus": "//rust/crates/corpus:source",
+        "cli": "//rust/crates/cli:source",
+        "runner": "//rust/crates/runner:source",
+        "tooling": "//rust/crates/tooling:source",
+        "blckbaux": "//rust/crates/blckbaux:blckbaux-source",
+        "blckbaux-py": "//rust/crates/blckbaux-py:python-source",
+        "modal-runner": "//rust/crates/modal-runner:modal-source",
+        "neighbor-index": "//rust/crates/neighbor-index:source",
+        "ptx-synth": "//rust/crates/ptx-synth:ptx-source",
+        "semantics": "//rust/crates/semantics:source",
+    },
     cuda = "//cuda:source",
     parity = "ops/bf16_parity.py",
+    click = ":click-wheel",
 )
 
 python_wheel(
     name = "wheel-linux-arm64",
-    extension = "//rust/crates/ennx-py:ennx-py[shared]",
+    extension = "//rust/crates/blckbaux-py:blckbaux-py[shared]",
     extension_suffix = python_extension_suffix("linux-aarch64"),
     fixture_srcs = glob(["tests/fixtures/optimizer/*.json", "tests/fixtures/morbo/*.json"]),
     license = "LICENSE",
     notice = "NOTICE",
-    package = "ennx",
+    package = "blckbaux",
     platform_tag = "manylinux_2_28_aarch64",
     python_abi = PYTHON_ABI,
     python_requires = PYTHON_REQUIRES,
-    python_srcs = glob(["src/ennx/**/*.py"]),
+    python_srcs = glob(["src/blckbaux/**/*.py"]),
     readme = "README.md",
     runtime_libraries = [],
     target_compatible_with = [
         "prelude//cpu/constraints:arm64",
         "prelude//os/constraints:linux",
     ],
-    version = read_config("ennx", "release_version", "0.2.0"),
+    version = read_config("blckbaux", "release_version", "0.2.0"),
 )
 
 python_wheel(
     name = "wheel-linux-x86_64",
-    extension = "//rust/crates/ennx-py:ennx-py[shared]",
+    extension = "//rust/crates/blckbaux-py:blckbaux-py[shared]",
     extension_suffix = python_extension_suffix("linux-x86_64"),
     fixture_srcs = glob(["tests/fixtures/optimizer/*.json", "tests/fixtures/morbo/*.json"]),
     license = "LICENSE",
     notice = "NOTICE",
-    package = "ennx",
+    package = "blckbaux",
     platform_tag = "manylinux_2_28_x86_64",
     python_abi = PYTHON_ABI,
     python_requires = PYTHON_REQUIRES,
-    python_srcs = glob(["src/ennx/**/*.py"]),
+    python_srcs = glob(["src/blckbaux/**/*.py"]),
     readme = "README.md",
     runtime_libraries = [],
     target_compatible_with = [
         "prelude//cpu/constraints:x86_64",
         "prelude//os/constraints:linux",
     ],
-    version = read_config("ennx", "release_version", "0.2.0"),
+    version = read_config("blckbaux", "release_version", "0.2.0"),
 )
 
 python_wheel(
     name = "wheel-macos-arm64",
-    extension = "//rust/crates/ennx-py:ennx-py[shared]",
+    extension = "//rust/crates/blckbaux-py:blckbaux-py[shared]",
     extension_suffix = python_extension_suffix("macos-arm64"),
     fixture_srcs = glob(["tests/fixtures/optimizer/*.json", "tests/fixtures/morbo/*.json"]),
     license = "LICENSE",
     notice = "NOTICE",
-    package = "ennx",
+    package = "blckbaux",
     platform_tag = "macosx_11_0_arm64",
     python_abi = PYTHON_ABI,
     python_requires = PYTHON_REQUIRES,
-    python_srcs = glob(["src/ennx/**/*.py"]),
+    python_srcs = glob(["src/blckbaux/**/*.py"]),
     readme = "README.md",
     runtime_libraries = ["//buck2/native:openmp-build[lib]"],
     target_compatible_with = [
         "prelude//cpu/constraints:arm64",
         "prelude//os/constraints:macos",
     ],
-    version = read_config("ennx", "release_version", "0.2.0"),
+    version = read_config("blckbaux", "release_version", "0.2.0"),
 )
 
 configured_alias(

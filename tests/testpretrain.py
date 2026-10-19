@@ -117,7 +117,7 @@ def test_packmix():
 
 
 def test_streamhead(tmp_path):
-    path = tmp_path / "stream.ennxptn"
+    path = tmp_path / "stream.blckbauxptn"
     sequences = 2
     digest = pretrain.write_stream(
         path, list(range(pretrain.VOCAB)) * (sequences // 2), sequences
@@ -137,7 +137,7 @@ def test_diskpack(tmp_path):
         for index, (bucket, quota) in enumerate(pretrain.QUOTAS.items())
     }
     tokens, mixture = pretrain.pack(pools, sequences, 19)
-    expected = tmp_path / "expected.ennxptn"
+    expected = tmp_path / "expected.blckbauxptn"
     expected_hash = pretrain.write_stream(expected, tokens, sequences)
     paths = {}
     counts = {}
@@ -147,7 +147,7 @@ def test_diskpack(tmp_path):
             counts[bucket] = pretrain.write_values(stream, values)
         paths[bucket] = path
 
-    actual = tmp_path / "actual.ennxptn"
+    actual = tmp_path / "actual.blckbauxptn"
     actual_hash, actual_mixture = pretrain.pack_stream(
         actual, paths, counts, sequences, 19
     )
@@ -196,11 +196,11 @@ def test_cachepaths(tmp_path):
     assert first["corpus"] == second["corpus"] == changed["corpus"]
     assert first["output"] == second["output"]
     assert first["output"] != changed["output"]
-    assert first["corpus"].parent == tmp_path / ".cache" / "ennx" / "corpora"
-    assert first["output"].parent.parent == tmp_path / ".cache" / "ennx" / "runs"
+    assert first["corpus"].parent == tmp_path / ".cache" / "blckbaux" / "corpora"
+    assert first["output"].parent.parent == tmp_path / ".cache" / "blckbaux" / "runs"
     extended = pretrain.plan_study({**document, "rounds": 100}, tmp_path, "source-a")
     repeated = pretrain.plan_study({**document, "rounds": 100}, tmp_path, "source-b")
-    assert first["corpus_id"] == "5fc12ffb3c1b75386012"
+    assert first["corpus_id"] == "f3cda70272623702a38a"
     assert extended["corpus"] == repeated["corpus"] == first["corpus"]
     assert extended["corpus_id"] == repeated["corpus_id"] == first["corpus_id"]
     assert extended["stage"] == first["stage"] == repeated["stage"]
@@ -235,7 +235,7 @@ def test_resolved(tmp_path):
     plan = pretrain.plan_study(document, tmp_path, "source-a")
     resolved = tomllib.loads(pretrain.resolved_toml(document, plan))
     assert resolved["output"] == str(plan["output"].resolve())
-    assert resolved["dataset"] == str((plan["corpus"] / "train.ennxptn").resolve())
+    assert resolved["dataset"] == str((plan["corpus"] / "train.blckbauxptn").resolve())
 
 
 def test_generated(tmp_path):
@@ -267,7 +267,7 @@ def test_generated(tmp_path):
     assert resolved["rounds"] == 1
     assert resolved["target_round_ms"] == 200
     assert resolved["generation"] == raw["generation"]
-    assert resolved["dataset"] == str((plan["corpus"] / "train.ennxptn").resolve())
+    assert resolved["dataset"] == str((plan["corpus"] / "train.blckbauxptn").resolve())
 
 
 @pytest.mark.parametrize(
@@ -275,7 +275,7 @@ def test_generated(tmp_path):
     [(10, False), (10, True), (100, False), (100, True)],
 )
 def test_resolve(tmp_path, monkeypatch, caplog, rounds, cached):
-    caplog.set_level("INFO", logger="ennx.pretrain")
+    caplog.set_level("INFO", logger="blckbaux.pretrain")
     document = {
         "version": 1,
         "study": "pretrain",
@@ -318,7 +318,7 @@ def test_resolve(tmp_path, monkeypatch, caplog, rounds, cached):
     resolved = tomllib.loads(resolved_path.read_text())
 
     assert resolved_path == plan["resolved"]
-    assert resolved["dataset"] == str((plan["corpus"] / "train.ennxptn").resolve())
+    assert resolved["dataset"] == str((plan["corpus"] / "train.blckbauxptn").resolve())
     assert resolved["output"] == str(plan["output"].resolve())
     assert resolved["rounds"] == rounds
     log = plan["resolved"].with_suffix(".prepare.log").read_text()
@@ -346,7 +346,7 @@ def test_resolve(tmp_path, monkeypatch, caplog, rounds, cached):
 
 
 def test_phases(caplog):
-    caplog.set_level("INFO", logger="ennx.pretrain")
+    caplog.set_level("INFO", logger="blckbaux.pretrain")
     with pretrain.phase("test success"):
         pass
     with pytest.raises(ValueError, match="failure"):

@@ -92,12 +92,12 @@ def upload_weights(flat):
 def release_inputcache():
     import torch
 
-    # The input's allocation must be reusable by ENNX's CUDA allocator at ask.
+    # The input's allocation must be reusable by BLCKBAUX's CUDA allocator at ask.
     torch.cuda.empty_cache()
 
 
 class NativeEvaluator:
-    """Borrow ENNX/Torch DLPack weights directly for per-problem mean losses.
+    """Borrow BLCKBAUX/Torch DLPack weights directly for per-problem mean losses.
 
     FlameEvaluator consumes and releases each DLPack borrow synchronously.
     Python never wraps resident weights in another tensor library.
@@ -109,12 +109,12 @@ class NativeEvaluator:
     def __init__(self, objective: SolutionObjective, config: Config):
         if not isinstance(objective, SolutionObjective):
             raise TypeError("Native BO supports prepared solution-token corpora only")
-        from ennx import experimental
+        from blckbaux import experimental
 
         engine_type = getattr(experimental, self.binding_name, None)
         if engine_type is None:
             raise RuntimeError(
-                f"Rebuild the ENNX extension with --features {self.build_feature} for {self.binding_name} support"
+                f"Rebuild the BLCKBAUX extension with --features {self.build_feature} for {self.binding_name} support"
             )
         lengths = objective.metadata["sequence_lengths"]
         self.tokens = [

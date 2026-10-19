@@ -4,8 +4,8 @@ import numpy as np
 import pytest
 from enn_helpers import enn_rows
 
-from ennx.ennx.enn_class import ENN
-from ennx.ennx.enn_params import ENNParams
+from blckbaux.enn.enn_class import ENN
+from blckbaux.enn.enn_params import ENNParams
 
 
 @pytest.mark.parametrize("scale_x", [False, True])

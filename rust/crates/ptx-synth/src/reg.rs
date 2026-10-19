@@ -3,25 +3,43 @@
 /// Physical target architecture.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TargetArch {
-    Sm75, // Turing (T4, RTX 2080)
-    Sm80, // Ampere (A100)
-    Sm90, // Hopper (H100)
+    Sm75,  // Turing (T4)
+    Sm80,  // Ampere (A100)
+    Sm90a, // Hopper (H100), architecture-specific feature set
 }
 
 impl TargetArch {
-    pub fn ptx_target_str(&self) -> &'static str {
-        match self {
-            Self::Sm75 => "sm_75",
-            Self::Sm80 => "sm_80",
-            Self::Sm90 => "sm_90a",
+    /// Select the exact targets supported by the synthesized-kernel bank.
+    pub fn from_compute(major: impl TryInto<u32>, minor: impl TryInto<u32>) -> Option<Self> {
+        match (major.try_into().ok()?, minor.try_into().ok()?) {
+            (7, 5) => Some(Self::Sm75),
+            (8, 0) => Some(Self::Sm80),
+            (9, 0) => Some(Self::Sm90a),
+            _ => None,
         }
     }
 
-    pub fn ptx_version_str(&self) -> &'static str {
+    pub fn ptx_target(&self) -> &'static str {
+        match self {
+            Self::Sm75 => "sm_75",
+            Self::Sm80 => "sm_80",
+            Self::Sm90a => "sm_90a",
+        }
+    }
+
+    pub fn ptx_version(&self) -> &'static str {
         match self {
             Self::Sm75 => "6.5",
             Self::Sm80 => "7.0",
-            Self::Sm90 => "8.5",
+            Self::Sm90a => "8.5",
+        }
+    }
+
+    pub fn shared_bytes(&self) -> usize {
+        match self {
+            Self::Sm75 => 65_536,
+            Self::Sm80 => 167_936,
+            Self::Sm90a => 232_448,
         }
     }
 }
@@ -41,15 +59,3 @@ pub struct RegF32(pub u32);
 /// Strongly-typed 1-bit predicate register (`%p<idx>`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct RegPred(pub u32);
-
-/// A pair of 32-bit registers (for 64-bit vector or 2x 32-bit values).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct RegPair(pub Reg32, pub Reg32);
-
-/// A quad of 32-bit registers for 128-bit vector load/store (`ld.global.v4`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct RegQuad(pub Reg32, pub Reg32, pub Reg32, pub Reg32);
-
-/// Four 32-bit FP registers for Tensor Core accumulators (`{%f0, %f1, %f2, %f3}`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct MmaAccumulator(pub RegF32, pub RegF32, pub RegF32, pub RegF32);

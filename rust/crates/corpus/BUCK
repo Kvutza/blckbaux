@@ -1,5 +1,11 @@
 load("//buck2:reindeer_rules.bzl", "app_rust_binary")
 
+filegroup(
+    name = "source",
+    srcs = glob(["src/**"]) + ["Cargo.toml"],
+    visibility = ["PUBLIC"],
+)
+
 _DEPS = [
     "//rust:arrow-array",
     "//rust:futures",
@@ -7,15 +13,16 @@ _DEPS = [
     "//rust:parquet",
     "//rust:parquet_opendal",
     "//rust:deser",
-    "//rust/crates/wire:wire",
+    "//rust/crates/artifact:artifact",
     "//rust:sha2",
     "//rust:tokio",
+    "//rust:tokenizers",
 ]
 
 app_rust_binary(
     name = "corpus",
     srcs = glob(["src/**/*.rs"]),
-    crate = "ennx_corpus",
+    crate = "blckbaux_corpus",
     crate_root = "src/main.rs",
     edition = "2024",
     deps = _DEPS,
@@ -25,7 +32,7 @@ app_rust_binary(
 rust_test(
     name = "corpus-test",
     srcs = glob(["src/**/*.rs"]),
-    crate = "ennx_corpus_test",
+    crate = "blckbaux_corpus_test",
     crate_root = "src/main.rs",
     edition = "2024",
     deps = _DEPS,

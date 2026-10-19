@@ -1,18 +1,19 @@
 from __future__ import annotations
 
-import argparse
 import json
 import statistics
 import sys
 import time
 from collections.abc import Sequence
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+import click
 import numpy as np
 
-from ennx import AcqType, create_optimizer, turbo_enn
-from ennx.turbo.config import ENNFitConfig, ENNSurrogateConfig
+from blckbaux import AcquisitionKind, create_optimizer, turbo_enn
+from blckbaux.turbo.config import SurrogateFit, ENNSurrogate
 
 
 def make_bounds(num_dim: int) -> np.ndarray:
@@ -57,38 +58,20 @@ def summarize(values: list[float], name: str) -> None:
     )
 
 
-def _buildparser2() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        description="Stress-test ENN selection timing (dt_sel) at large N, D."
-    )
-    parser.add_argument(
-        "--num-obs", type=int, default=50_000, help="Total observations N"
-    )
-    parser.add_argument("--num-dim", type=int, default=64, help="Dimension D")
-    parser.add_argument("--k", type=int, default=64, help="ENN neighbor count")
-    parser.add_argument(
-        "--num-arms", type=int, default=4, help="Arms requested per ask()"
-    )
-    parser.add_argument("--num-fit-samples", dest="num_samples", type=int, default=64)
-    parser.add_argument(
-        "--num-fit-candidates", dest="num_candidates", type=int, default=128
-    )
-    parser.add_argument("--seed-batch-size", type=int, default=2_000)
-    parser.add_argument("--warmup-asks", type=int, default=3)
-    parser.add_argument("--timed-asks", type=int, default=20)
-    parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument(
-        "--compare-baseline",
-        type=str,
-        default=None,
-        help="JSON baseline with p95 ratio limits",
-    )
-    parser.add_argument(
-        "--fail-on-regression",
-        action="store_true",
-        help="Exit non-zero when measured p95 exceeds baseline limits",
-    )
-    return parser
+@dataclass(frozen=True)
+class BenchmarkConfig:
+    num_obs: int
+    num_dim: int
+    k: int
+    num_arms: int
+    num_samples: int
+    num_candidates: int
+    seed_batch_size: int
+    warmup_asks: int
+    timed_asks: int
+    seed: int
+    compare_baseline: Path | None
+    fail_on_regression: bool
 
 
 def _p95ms(values: list[float]) -> float:
@@ -134,15 +117,15 @@ def _buildoptimizer(
     rng = np.random.default_rng(seed)
     bounds = make_bounds(num_dim)
     config = turbo_enn(
-        enn=ENNSurrogateConfig(
+        enn=ENNSurrogate(
             k=k,
-            fit=ENNFitConfig(
+            fit=SurrogateFit(
                 num_samples=num_samples,
                 num_candidates=num_candidates,
             ),
         ),
         num_init=num_arms,
-        acq_type=AcqType.UCB,
+        acquisition=AcquisitionKind.UCB,
     )
     return bounds, rng, create_optimizer(bounds=bounds, config=config, rng=rng)
 
@@ -179,9 +162,7 @@ def _printsetup(num_obs: int, num_dim: int, k: int, num_arms: int):
     )
 
 
-def run_benchmark(argv: Sequence[str] | None = None) -> None:
-    args = _buildparser2().parse_args(argv)
-
+def _execute(args: BenchmarkConfig) -> None:
     if args.num_obs <= 0 or args.num_dim <= 0 or args.k <= 0:
         raise ValueError("num_obs, num_dim, and k must all be positive")
 
@@ -228,10 +209,75 @@ def run_benchmark(argv: Sequence[str] | None = None) -> None:
     ask_p95_ms = _p95ms(ask_wall_values)
     if args.compare_baseline:
         _checkbaseline(
-            Path(args.compare_baseline),
+            args.compare_baseline,
             ask_p95_ms=ask_p95_ms,
             fail_on_regression=args.fail_on_regression,
         )
+
+
+@click.command(help="Stress-test ENN selection timing (dt_sel) at large N and D.")
+@click.option("--num-obs", type=int, default=50_000, show_default=True)
+@click.option("--num-dim", type=int, default=64, show_default=True)
+@click.option("--k", type=int, default=64, show_default=True)
+@click.option("--num-arms", type=int, default=4, show_default=True)
+@click.option(
+    "--num-fit-samples", "num_samples", type=int, default=64, show_default=True
+)
+@click.option(
+    "--num-fit-candidates", "num_candidates", type=int, default=128, show_default=True
+)
+@click.option("--seed-batch-size", type=int, default=2_000, show_default=True)
+@click.option("--warmup-asks", type=int, default=3, show_default=True)
+@click.option("--timed-asks", type=int, default=20, show_default=True)
+@click.option("--seed", type=int, default=0, show_default=True)
+@click.option(
+    "--compare-baseline",
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    help="JSON baseline with p95 ratio limits.",
+)
+@click.option(
+    "--fail-on-regression",
+    is_flag=True,
+    help="Fail when measured p95 exceeds the baseline limit.",
+)
+def cli(
+    num_obs: int,
+    num_dim: int,
+    k: int,
+    num_arms: int,
+    num_samples: int,
+    num_candidates: int,
+    seed_batch_size: int,
+    warmup_asks: int,
+    timed_asks: int,
+    seed: int,
+    compare_baseline: Path | None,
+    fail_on_regression: bool,
+) -> None:
+    _execute(
+        BenchmarkConfig(
+            num_obs=num_obs,
+            num_dim=num_dim,
+            k=k,
+            num_arms=num_arms,
+            num_samples=num_samples,
+            num_candidates=num_candidates,
+            seed_batch_size=seed_batch_size,
+            warmup_asks=warmup_asks,
+            timed_asks=timed_asks,
+            seed=seed,
+            compare_baseline=compare_baseline,
+            fail_on_regression=fail_on_regression,
+        )
+    )
+
+
+def run_benchmark(argv: Sequence[str] | None = None) -> None:
+    cli.main(
+        args=None if argv is None else list(argv),
+        prog_name="benchdtsel",
+        standalone_mode=False,
+    )
 
 
 if __name__ == "__main__":

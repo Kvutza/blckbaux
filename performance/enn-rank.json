@@ -1,0 +1,33 @@
+{
+  "schema": "blckbaux.pool-rank-summary.v1",
+  "measured_at": "2026-10-09",
+  "run": ".cache/blckbaux/runs/pretrain/60fea303507e1cb6970e/run-1791603473893-41578-0",
+  "configuration": "examples/tuning/hnet-4k-gaussian.toml",
+  "context_tokens": 4096,
+  "pool_candidates": 4,
+  "frozen_points": 16,
+  "common_random_numbers": true,
+  "updates_between_candidates": 0,
+  "selected_top1": 4,
+  "random_top1_expectation": 4.0,
+  "selected_mean_rank": 2.25,
+  "random_mean_rank_expectation": 2.5,
+  "selected_mean_improvement": -0.000137176465125,
+  "pool_mean_improvement": -0.0001812348127375,
+  "oracle_mean_improvement": 0.0002312273659375,
+  "mean_selection_regret": 0.000368403838875,
+  "maximum_selection_regret": 0.00190947,
+  "predicted_actual_pairwise_concordant": 39,
+  "predicted_actual_pairwise_discordant": 33,
+  "predicted_actual_pairwise_ties": 24,
+  "predicted_actual_kendall_tau": 0.0625,
+  "mean_predicted_pool_spread": 0.000015593750000153506,
+  "mean_actual_pool_spread": 0.0007519223978125002,
+  "predicted_to_actual_spread_ratio": 0.020738509779092886,
+  "prediction": "The present radial ENN posterior does not resolve candidate ordering reliably. UCB is not the primary failure: its selected arm was also a predicted-mean maximizer in 15 of 16 pools. The posterior compresses within-pool response differences by about 48x and its pairwise ordering is nearly random.",
+  "latency": {
+    "ordinary_guided_round_ms": 108.0,
+    "four_candidate_audit_round_ms_range": [373.0, 409.0],
+    "audit_overhead_excluded_from_training_target": true
+  }
+}

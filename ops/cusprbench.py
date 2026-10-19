@@ -7,7 +7,7 @@ import time
 
 import numpy as np
 
-from ennx.search import Optimizer, Parameter
+from blckbaux.search import Optimizer, Parameter
 
 
 def main() -> None:

@@ -1,9 +1,9 @@
 import numpy as np
 import pytest
 
-from ennx.ennx.enn_class import ENN
-from ennx.ennx.enn_fit import row_loglik, subsample_loglik
-from ennx.ennx.enn_params import ENNParams
+from blckbaux.enn.enn_class import ENN
+from blckbaux.enn.enn_fit import row_loglik, subsample_loglik
+from blckbaux.enn.enn_params import ENNParams
 
 
 def test_duplicates():

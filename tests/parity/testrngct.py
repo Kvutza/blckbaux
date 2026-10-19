@@ -3,14 +3,14 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from ennx.turbo.config import (
-    AcqType,
-    ENNFitConfig,
-    ENNSurrogateConfig,
+from blckbaux.turbo.config import (
+    AcquisitionKind,
+    SurrogateFit,
+    ENNSurrogate,
     turbo_enn,
 )
 
-pytest.importorskip("ennx._rust")
+pytest.importorskip("blckbaux._rust")
 
 EXACT_RTOL = 1e-14
 EXACT_ATOL = 1e-14
@@ -21,8 +21,8 @@ def test_001():
 
     bounds = np.array([[0.0, 1.0], [0.0, 1.0]], dtype=float)
     config = turbo_enn(
-        acq_type=AcqType.UCB,
-        enn=ENNSurrogateConfig(k=4, fit=ENNFitConfig(num_samples=10)),
+        acquisition=AcquisitionKind.UCB,
+        enn=ENNSurrogate(k=4, fit=SurrogateFit(num_samples=10)),
         num_init=6,
     )
     opt_a = make_optimizer(bounds, config, seed=99)

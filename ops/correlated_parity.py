@@ -222,7 +222,7 @@ def fixture(sampler):
     import jax
     import jax.numpy as jnp
 
-    from ennx.experimental import ParamBlock, turbo_enn
+    from blckbaux.experimental import ParamBlock, turbo_enn
 
     # Odd leaf lengths test Box-Muller pairing reset; 513 crosses thread chunks.
     leaves = [
@@ -369,7 +369,7 @@ def check_gaussian():
 def check_copyorder():
     import jax.numpy as jnp
 
-    from ennx.experimental import ParamBlock, turbo_enn
+    from blckbaux.experimental import ParamBlock, turbo_enn
 
     size = 262_147
     base = jnp.ones(size, dtype=jnp.bfloat16)
@@ -459,7 +459,7 @@ def null_case():
 def check_nulls():
     import jax.numpy as jnp
 
-    from ennx.experimental import ParamBlock, turbo_enn
+    from blckbaux.experimental import ParamBlock, turbo_enn
 
     leaves, bits, radius, root = null_case()
     base = jnp.asarray(bits).view(jnp.bfloat16)
@@ -500,7 +500,7 @@ def check_nulls():
 def check_tiles():
     import jax.numpy as jnp
 
-    from ennx.experimental import ParamBlock, turbo_enn
+    from blckbaux.experimental import ParamBlock, turbo_enn
 
     leaves = [(17, 0, 65_539, 1.0)]
     base = encode(np.full(65_539, 1.5))

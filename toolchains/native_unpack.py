@@ -1,9 +1,10 @@
 """Unpack pinned LLVM archives or merge the data files of Linux SDK packages."""
 
-import argparse
 from pathlib import Path
 import tarfile
 import zipfile
+
+import click
 
 
 def extract(stream, output, package=None):
@@ -48,19 +49,23 @@ def extract_file(path, output, package):
         extract(stream, output, package)
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--sdk", action="store_true")
-    parser.add_argument("output", type=Path)
-    parser.add_argument("archives", nargs="+", type=Path)
-    args = parser.parse_args()
-    args.output.mkdir(parents=True, exist_ok=True)
-    for path in args.archives:
-        package = path.name if args.sdk else None
+@click.command(help=__doc__)
+@click.option("--sdk", is_flag=True, help="Merge SDK packages by package name.")
+@click.argument("output", type=click.Path(file_okay=False, path_type=Path))
+@click.argument(
+    "archives",
+    nargs=-1,
+    required=True,
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+)
+def main(sdk: bool, output: Path, archives: tuple[Path, ...]) -> None:
+    output.mkdir(parents=True, exist_ok=True)
+    for path in archives:
+        package = path.name if sdk else None
         if path.suffix == ".conda":
-            extract_conda(path, args.output, package)
+            extract_conda(path, output, package)
         else:
-            extract_file(path, args.output, package)
+            extract_file(path, output, package)
 
 
 if __name__ == "__main__":

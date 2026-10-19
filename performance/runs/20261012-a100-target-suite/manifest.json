@@ -1,0 +1,18 @@
+{
+  "schema": "blckbaux.cuda.target-suite.v1",
+  "session": "blckbaux-a100-target",
+  "hardware": "NVIDIA A100-SXM4-40GB",
+  "target": "sm_80",
+  "compute": "8.0",
+  "change": "pqunpnxwkkurvmotuyyxxzzzklouxxqo",
+  "commit": "f15c1ec3a1806eceabd437c273920554dfcce39a",
+  "commands": [
+    "./blckbaux cuda ptx-probe 1048576 100",
+    "./blckbaux cuda bench",
+    "./blckbaux cuda prefill",
+    "./blckbaux cuda context 1048576 128 7",
+    "./blckbaux cuda model-check"
+  ],
+  "status": "completed",
+  "result": "result.json"
+}

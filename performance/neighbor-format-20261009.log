@@ -1,0 +1,42 @@
+[2026-10-09T00:25:35.435-04:00] Build ID: 8d37ea5d-3ed4-4eb5-9036-eb53034b1cb3
+[2026-10-09T00:25:35.462-04:00] File changed: root//.git/lfs/tmp/559685191
+[2026-10-09T00:25:35.462-04:00] File changed: root//.git/lfs/tmp/4141905890
+[2026-10-09T00:25:35.462-04:00] File changed: root//.git/lfs/tmp/4041618469
+[2026-10-09T00:25:35.462-04:00] 369 additional file change events
+[2026-10-09T00:25:35.462-04:00] File changed: root//.jj/repo/op_store/operations/.tmp4jTsn0
+[2026-10-09T00:25:35.462-04:00] Directory changed: root//.jj/repo/op_store/operations/.tmp4jTsn0
+[2026-10-09T00:25:35.462-04:00] File changed: root//.jj/repo/op_store/operations/6cffda83d9701e2f25cb60bc2f4078453bd7a6e69668b1bf74df8c9e4659ff3786061606038afe8911a3adf7672a9507affc9a00f9769bf8e4db42564f3f92af
+[2026-10-09T00:25:35.462-04:00] 12 additional file change events
+[2026-10-09T00:25:35.597-04:00] Network: up 0B  down 0B
+BUILD SUCCEEDED - starting your binary
+282 files already formatted
+Analyzed: 596 files, 7020 code_units, 32283 statements, 593 graph_nodes, 432 graph_edges
+NO VIOLATIONS
+kiss: 173ms
+Analyzed: 4 files, 34 code_units, 124 statements, 4 graph_nodes, 1 graph_edges
+NO VIOLATIONS
+kiss: 6ms
+Analyzed: 0 files, 0 code_units, 0 statements, 0 graph_nodes, 0 graph_edges
+NO VIOLATIONS
+kiss: 7ms
+Analyzed: 27 files, 379 code_units, 2086 statements, 27 graph_nodes, 26 graph_edges
+NO VIOLATIONS
+kiss: 8ms
+Analyzed: 9 files, 95 code_units, 573 statements, 9 graph_nodes, 7 graph_edges
+NO VIOLATIONS
+kiss: 6ms
+Analyzed: 249 files, 3655 code_units, 16684 statements, 251 graph_nodes, 354 graph_edges
+NO VIOLATIONS
+kiss: 22ms
+Analyzed: 5 files, 53 code_units, 434 statements, 5 graph_nodes, 4 graph_edges
+NO VIOLATIONS
+kiss: 6ms
+Analyzed: 22 files, 347 code_units, 1321 statements, 23 graph_nodes, 22 graph_edges
+NO VIOLATIONS
+kiss: 6ms
+Analyzed: 2 files, 33 code_units, 312 statements, 2 graph_nodes, 1 graph_edges
+NO VIOLATIONS
+kiss: 4ms
+Analyzed: 3 files, 14 code_units, 20 statements, 3 graph_nodes, 2 graph_edges
+NO VIOLATIONS
+kiss: 4ms

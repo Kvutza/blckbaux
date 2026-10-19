@@ -13,7 +13,7 @@ from correlated_parity import candidate, check_rounding, decode, read_proposals
 def fixture(sampler="correlated", capacity=2, value=10.0, variance=0.125):
     import jax.numpy as jnp
 
-    from ennx.experimental import ParamBlock, SearchState
+    from blckbaux.experimental import ParamBlock, SearchState
 
     bits = np.resize(np.array([0x3FC0, 0xBFC0], dtype=np.uint16), 513)
     leaves = [(17, 0, bits.size, 1.0)]

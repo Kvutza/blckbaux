@@ -1,0 +1,64 @@
+#:schema ../../schemas/tune-spec.schema.json
+# Gaussian Bayesian optimization with ENN across the complete H-Net parameter space at 1M context.
+# Proposals are drawn from independent Gaussian innovations via a 256-strip Ziggurat sampler.
+version = 4
+
+experiment = "pretrain"
+model = "fbt-pisa1-hnet-mhc4-v1"
+[data]
+recipe = "stack-v3-rust-go-v1"
+
+[objective]
+function = "cross-entropy"
+sampling = "natural"
+window-tokens = 1048576
+
+[execution]
+rounds = 1000
+round-target-ms = 1000
+
+[evaluation]
+interval = 25
+
+[optimizer]
+algorithm = "turbo-enn"
+
+[optimizer.candidate-generation]
+generator = "independent"
+arms = 1
+candidates = 1
+
+[optimizer.candidate-generation.perturbation]
+distribution = "gaussian"
+
+[optimizer.surrogate]
+estimator = "enn"
+scaling = "global"
+neighbors = 10
+neighbor-rule = "fixed"
+epistemic-scale = 0.05
+aleatoric-scale = 0.05
+
+fit = "leave-one-out"
+fit-candidates = 30
+fit-samples = 10
+
+[optimizer.acquisition]
+function = "thompson"
+
+[optimizer.trust-region]
+policy = "reliability"
+initial = 0.02
+min = 0.01
+max = 0.2
+failure-tolerance = 4
+
+[seeds]
+model = 240105308887621659
+reference = 150813718214252701
+proposal = 91614869253048103
+acquisition = 314159265358979323
+
+
+[diagnostics]
+stage-samples = 3

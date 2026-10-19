@@ -1,12 +1,11 @@
 //! Persistent single-sequence KV cache with bounded PISA query scratch.
 use crate::{CudaResult, copy_prefix, cuda_error, read_prefix, timing_event};
+use blckbaux_cuda_device::{PisaShape, fbt_model};
+pub use blckbaux_semantics::context as layout;
 use cuda_core::{CudaContext, CudaStream, DeviceBuffer, LaunchConfig1D};
-use ennx_cuda_kernels::{PisaShape, fbt_model};
+use layout::{BLOCK, HEADS, Layout, Output, SELECTED, WIDTH};
 use std::sync::Arc;
 use std::time::Instant;
-#[path = "../../rust/crates/ennx/src/context.rs"]
-pub mod layout;
-use layout::{BLOCK, HEADS, Layout, Output, SELECTED, WIDTH};
 
 pub struct ContextCache {
     context: Arc<CudaContext>,
@@ -184,7 +183,9 @@ impl layout::probe::Cache for ContextCache {
 
 pub fn run(args: &[String]) -> CudaResult<()> {
     if args.len() > 3 {
-        return Err("usage: ./ennx cuda context [TOKENS=1048576] [QUERIES=128] [REPEATS=5]".into());
+        return Err(
+            "usage: ./blckbaux cuda context [TOKENS=1048576] [QUERIES=128] [REPEATS=5]".into(),
+        );
     }
     let arg = |index: usize, default: u32| {
         args.get(index).map_or(Ok(default), |value| {
@@ -194,7 +195,7 @@ pub fn run(args: &[String]) -> CudaResult<()> {
     let layout = Layout::new(arg(0, 1_048_576)?, arg(1, 128)?)?;
     let mut cache = ContextCache::new(layout)?;
     let report = layout::probe::run(&mut cache, layout, arg(2, 5)?)?;
-    println!("{}", ennx_wire::json::pretty_string(&ennx_wire::json::json!({
+    println!("{}", blckbaux_artifact::json::pretty_string(&blckbaux_artifact::json::json!({
         "stage": "cuda-cached-pisa-attention", "context": layout.tokens, "queries": layout.queries,
         "kv-bytes-per-visit": layout.kv_bytes(), "tree-bytes-per-visit": layout.tree_bytes(),
         "query-work-bytes": layout.work_bytes(), "selected-token-budget": 512,

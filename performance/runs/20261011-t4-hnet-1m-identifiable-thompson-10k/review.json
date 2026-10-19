@@ -1,0 +1,64 @@
+{
+  "schema": "blckbaux.completed-run-review.v1",
+  "rounds": 10000,
+  "initial_nll": 12.474103,
+  "final_best_nll": 11.846597,
+  "accepted": 76,
+  "last_accepted_round": 9097,
+  "mean_round_ms": 1202.4379396260003,
+  "timed_round_seconds": 12024.379396260005,
+  "evaluated_token_positions": 5242880000,
+  "scope": "Fixed prompt and target, no held-out evaluation in this runner",
+  "windows": [
+    {
+      "through_round": 1000,
+      "accepted": 48,
+      "best_nll": 12.261423
+    },
+    {
+      "through_round": 2000,
+      "accepted": 12,
+      "best_nll": 12.039025
+    },
+    {
+      "through_round": 3000,
+      "accepted": 10,
+      "best_nll": 11.895389
+    },
+    {
+      "through_round": 4000,
+      "accepted": 0,
+      "best_nll": 11.895389
+    },
+    {
+      "through_round": 5000,
+      "accepted": 0,
+      "best_nll": 11.895389
+    },
+    {
+      "through_round": 6000,
+      "accepted": 2,
+      "best_nll": 11.893087
+    },
+    {
+      "through_round": 7000,
+      "accepted": 2,
+      "best_nll": 11.877365
+    },
+    {
+      "through_round": 8000,
+      "accepted": 1,
+      "best_nll": 11.864074
+    },
+    {
+      "through_round": 9000,
+      "accepted": 0,
+      "best_nll": 11.864074
+    },
+    {
+      "through_round": 10000,
+      "accepted": 1,
+      "best_nll": 11.846597
+    }
+  ]
+}

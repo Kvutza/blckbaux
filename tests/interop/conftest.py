@@ -8,20 +8,24 @@ import pytest
 
 @pytest.fixture
 def config():
-    from ennx import turbo_enn
-    from ennx.turbo.config import CandidateGenConfig, ENNFitConfig, ENNSurrogateConfig
+    from blckbaux import turbo_enn
+    from blckbaux.turbo.config import (
+        CandidateConfig,
+        SurrogateFit,
+        ENNSurrogate,
+    )
 
     return turbo_enn(
         num_init=2,
-        candidates=CandidateGenConfig(num_candidates=16),
-        enn=ENNSurrogateConfig(k=4, fit=ENNFitConfig(num_samples=8, num_candidates=8)),
+        candidates=CandidateConfig(num_candidates=16),
+        enn=ENNSurrogate(k=4, fit=SurrogateFit(num_samples=8, num_candidates=8)),
     )
 
 
 @pytest.fixture(autouse=True)
 def wheel_origin():
-    import ennx
+    import blckbaux
 
-    root = os.environ.get("ENNX_TEST_WHEEL_ROOT")
+    root = os.environ.get("BLCKBAUX_TEST_WHEEL_ROOT")
     if root:
-        assert Path(ennx.__file__).is_relative_to(Path(root))
+        assert Path(blckbaux.__file__).is_relative_to(Path(root))

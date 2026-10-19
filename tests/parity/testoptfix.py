@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from ennx.turbo.optimizer_fixtures import (
+from blckbaux.turbo.optimizer_fixtures import (
     EXPECTED_OPTIMIZER_FIXTURE_NAMES,
     assert_invariants,
     load_fixture,

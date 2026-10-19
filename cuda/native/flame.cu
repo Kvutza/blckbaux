@@ -302,7 +302,7 @@ struct Layer {
 };
 
 struct Engine {
-    EnnxFlameConfig c{};
+    BlckbauxFlameConfig c{};
     int capacity = 0, logit_rows = 0;
     size_t weight_count = 0, matrix_count = 0;
     uint64_t workspace_bytes = 0;
@@ -342,7 +342,7 @@ struct Engine {
         return static_cast<T*>(allocations.back());
     }
 
-    void initialize(const EnnxFlameConfig& config, uint32_t max_tokens);
+    void initialize(const BlckbauxFlameConfig& config, uint32_t max_tokens);
     void linear(const float* input, const uint16_t* weight, float* output,
                 int rows, int in, int out);
     void normalized(const uint16_t* weights, size_t offset, int rows);
@@ -356,7 +356,7 @@ struct Engine {
                            uint32_t rows, bool loss) const;
 };
 
-void Engine::initialize(const EnnxFlameConfig& config, uint32_t max_tokens) {
+void Engine::initialize(const BlckbauxFlameConfig& config, uint32_t max_tokens) {
     c = config;
     const uint32_t dimensions[] = {c.layers, c.width, c.heads, c.vocab, c.dense_width,
         c.expert_width, c.shared_width, c.experts, c.top_k, c.context};
@@ -679,7 +679,7 @@ int boundary(char* error, size_t error_capacity, Function&& function) noexcept {
 
 }  // namespace
 
-extern "C" void* ennx_flame_create(const EnnxFlameConfig* config, uint32_t max_tokens,
+extern "C" void* blckbaux_flame_create(const BlckbauxFlameConfig* config, uint32_t max_tokens,
                                     char* error, size_t error_capacity) {
     std::unique_ptr<Engine> engine;
     const int status = boundary(error, error_capacity, [&] {
@@ -690,22 +690,22 @@ extern "C" void* ennx_flame_create(const EnnxFlameConfig* config, uint32_t max_t
     return status == 0 ? engine.release() : nullptr;
 }
 
-extern "C" void ennx_flame_destroy(void* engine) {
+extern "C" void blckbaux_flame_destroy(void* engine) {
     try { delete static_cast<Engine*>(engine); }
     catch (...) { synchronize_failure(); }
 }
 
-extern "C" uint64_t ennx_flame_workspace(const void* engine) {
+extern "C" uint64_t blckbaux_flame_workspace(const void* engine) {
     try { return engine ? static_cast<const Engine*>(engine)->workspace_bytes : 0; }
     catch (...) { return 0; }
 }
 
-extern "C" uint64_t ennx_flame_weights_len(const void* engine) {
+extern "C" uint64_t blckbaux_flame_weights_len(const void* engine) {
     try { return engine ? static_cast<const Engine*>(engine)->weight_count : 0; }
     catch (...) { return 0; }
 }
 
-extern "C" int ennx_flame_logits(void* opaque, const uint16_t* weights, size_t weights_len,
+extern "C" int blckbaux_flame_logits(void* opaque, const uint16_t* weights, size_t weights_len,
                                   const int32_t* host_tokens, uint32_t length,
                                   float* host_logits, char* error, size_t error_capacity) {
     return boundary(error, error_capacity, [&] {
@@ -722,7 +722,7 @@ extern "C" int ennx_flame_logits(void* opaque, const uint16_t* weights, size_t w
     });
 }
 
-extern "C" int ennx_flame_losses(void* opaque, const uint16_t* weights, size_t weights_len,
+extern "C" int blckbaux_flame_losses(void* opaque, const uint16_t* weights, size_t weights_len,
                                   const int32_t* host_tokens, const uint8_t* host_masks,
                                   const uint32_t* host_lengths, size_t batch,
                                   float* host_losses, char* error, size_t error_capacity) {

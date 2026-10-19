@@ -1,0 +1,63 @@
+{
+  "schema": "blckbaux.cuda.target-suite.v1",
+  "hardware": "Tesla T4",
+  "target": "sm_75",
+  "probe": {
+    "elements": 1048576,
+    "iterations": 100,
+    "vector_ms": 0.037540,
+    "vector_gbs": 223.458812,
+    "rademacher_ms": 0.037594,
+    "rademacher_gbs": 223.135458,
+    "max_error": 0,
+    "spills": 0,
+    "parity": true
+  },
+  "perturb": {
+    "elements": 16777216,
+    "bits": 4,
+    "iterations": 100,
+    "kernel_ms": 0.375511,
+    "gib_s": 41.610,
+    "parity": true
+  },
+  "prefill": {
+    "rows": 4096,
+    "width": 512,
+    "samples": 5,
+    "device_ms": 43.387,
+    "wall_ms": 44.398,
+    "attention_ms": 38.381,
+    "projection_ms": 1.801,
+    "parity": true
+  },
+  "context": {
+    "tokens": 1048576,
+    "queries": 128,
+    "samples": 7,
+    "tree_ms": 1.2835200428962708,
+    "repair_ms": 0.10092800110578537,
+    "query_ms": 0.9470400214195251,
+    "wall_ms": 1.053859,
+    "max_error": 0.00010019541,
+    "full_model": false
+  },
+  "model": {
+    "rows": 4096,
+    "executions": [5, 7, 11],
+    "device_ms": [724.392, 653.492, 723.730],
+    "wall_ms": [726.561, 655.485, 725.681],
+    "precision": true,
+    "moe": true,
+    "routing": true,
+    "scoring": true,
+    "generation": true,
+    "sanitizer_errors": 0
+  },
+  "scope": {
+    "complete_bo": false,
+    "target_met": null,
+    "ceiling_met": null,
+    "note": "Stage measurements do not replace the recorded complete-round evidence."
+  }
+}

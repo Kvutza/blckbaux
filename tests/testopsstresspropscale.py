@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from click.testing import CliRunner
 
-from ennx.turbo.config.eidxdrv import ENNIndexDriver
+from blckbaux.turbo.config.surrogate import NeighborIndex
 from ops.stress import (
     PROPOSAL_SCALE_SEED_CHUNK,
     PROPOSAL_SCALE_WARMUP,
@@ -233,7 +233,7 @@ def test_008(tmp_path):
 
     rows = list(
         run_stress3(
-            ENNIndexDriver.FLAT,
+            NeighborIndex.FLAT,
             2,
             30,
             work_dir=str(work_root),

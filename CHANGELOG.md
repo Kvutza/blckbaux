@@ -64,7 +64,7 @@ to CPU otherwise. Index choices are `FLAT`, `AUTO`,
 
 ### Candidate search API
 
-Added `ennx.search` for low-bit parameter optimization:
+Added `blckbaux.search` for low-bit parameter optimization:
 
 - `Parameter`: a parameter range stored as
   `int4`, `int8`, `fp4_e2m1`, `fp8_e4m3`, and `fp8_e5m2`.
@@ -76,10 +76,10 @@ The old experimental search types map as follows:
 
 | `0.1.x` | `0.2.0` |
 | --- | --- |
-| `ennx.experimental.PackedSearch` | `ennx.search.Search` |
-| `ennx.experimental.PackedTurbo` | `ennx.search.Optimizer` |
-| `ennx.experimental.TurboTrial` | `ennx.search.Trial` |
-| tuple-based packed leaves | `ennx.search.Parameter` |
+| `blckbaux.experimental.PackedSearch` | `blckbaux.search.Search` |
+| `blckbaux.experimental.PackedTurbo` | `blckbaux.search.Optimizer` |
+| `blckbaux.experimental.TurboTrial` | `blckbaux.search.Trial` |
+| tuple-based packed leaves | `blckbaux.search.Parameter` |
 
 `row`, `tell`, and GPU buffer access now take a `Trial`. Added `ask_batch`,
 `tell_batch`, `ask_stream`, and `batch_stream`. Stream methods generate
@@ -87,7 +87,7 @@ candidates from one seed, avoiding an upload of candidate seeds.
 
 ### Experimental Python API
 
-Quantization is now imported from `ennx.experimental`.
+Quantization is now imported from `blckbaux.experimental`.
 
 | `0.1.x` | `0.2.0` |
 | --- | --- |
@@ -100,7 +100,7 @@ Quantization is now imported from `ennx.experimental`.
 
 ### Rust API
 
-Use `ennx::prelude` for the main Rust types and functions. Renamed exports:
+Use `blckbaux::prelude` for the main Rust types and functions. Renamed exports:
 
 | `0.1.x` | `0.2.0` |
 | --- | --- |
@@ -132,13 +132,13 @@ Renamed methods:
 | `Optimizer` | `tell_with_yvar` | `tell_variance` |
 | `Optimizer` | `trust_region_mut` | `trust_mut` |
 
-Added `ennx::search` with `Parameter`, `Search`, `Trial`, `Optimizer`,
+Added `blckbaux::search` with `Parameter`, `Search`, `Trial`, `Optimizer`,
 `TrustRegion`, and `DeviceView`. Evaluators can read GPU buffers through
 `DeviceView` and record results with `observe` or `tell`.
 
-Added `ennx::capability` to report whether each backend implements an operation,
+Added `blckbaux::capability` to report whether each backend implements an operation,
 uses a fallback, or lacks support. Query it with `support()` or `matrix()`.
 
 Removed `IndexDriver::Agx`; use `IndexDriver::Metal`. The `apple_gpu` and
 `forward_metal` modules are private. Public GPU helpers are in
-`ennx::experimental`.
+`blckbaux::experimental`.

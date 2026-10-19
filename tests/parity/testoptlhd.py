@@ -3,9 +3,9 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from ennx.turbo.config import lhd_only
+from blckbaux.turbo.config import lhd_only
 
-pytest.importorskip("ennx._rust")
+pytest.importorskip("blckbaux._rust")
 
 
 def _obj(x):

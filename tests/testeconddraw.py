@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import numpy as np
 
-from ennx.ennx.enn_class import ENN
-from ennx.ennx.enn_params import ENNParams, PosteriorFlags
+from blckbaux.enn.enn_class import ENN
+from blckbaux.enn.enn_params import ENNParams, PosteriorFlags
 
 
 def test_001():

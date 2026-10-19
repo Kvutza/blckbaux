@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from ennx.turbo.optimizer_fixtures import (
+from blckbaux.turbo.optimizer_fixtures import (
     EXPECTED_OPTIMIZER_FIXTURE_NAMES,
     FIXTURE_GENERATOR_ENTRIES,
     PREFIX_CONFIG,
@@ -15,7 +15,7 @@ from ennx.turbo.optimizer_fixtures import (
     subdir_entry,
     load_fixture,
 )
-from ennx.turbo.optimizer_fixtures.replay import FIXTURES_ROOT, _config
+from blckbaux.turbo.optimizer_fixtures.replay import FIXTURES_ROOT, _config
 
 
 def test_catalogfixturenames():

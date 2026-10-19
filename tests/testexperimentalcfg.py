@@ -1,12 +1,10 @@
-from dataclasses import asdict
-
 import pytest
 
-from ennx import experimental
+from blckbaux import experimental
 
 
-@pytest.mark.parametrize("overrides", [{}, {"sampler": "gaussian", "length_init": 0.1}])
-def test_settings(monkeypatch, overrides):
+@pytest.mark.parametrize("settings", [{}, {"sampler": "gaussian", "length_init": 0.1}])
+def test_settings(monkeypatch, settings):
     calls = []
 
     def constructor(*args, **kwargs):
@@ -14,13 +12,22 @@ def test_settings(monkeypatch, overrides):
         return "search"
 
     monkeypatch.setattr(experimental, "__getattr__", lambda _: constructor)
-    config = experimental.TurboEnnConfig(reference_seed=23)
     assert (
-        experimental.turbo_enn("base", -1.0, [], 4, config=config, **overrides)
+        experimental.turbo_enn("base", -1.0, [], 4, reference_seed=23, **settings)
         == "search"
     )
-    assert calls == [(("base", -1.0, [], 4), asdict(config) | overrides)]
-    assert config.reference_seed == 23 and config.length_init == 0.8
+    expected = {
+        "max_pending": 1,
+        "base_variance": 0.0,
+        "length_init": 0.8,
+        "length_min": 0.0078125,
+        "length_max": 1.6,
+        "failure_tolerance": None,
+        "sampler": "independent",
+        "reference_seed": 23,
+    }
+    expected.update(settings)
+    assert calls == [(("base", -1.0, [], 4), expected)]
 
 
 def test_unknown():

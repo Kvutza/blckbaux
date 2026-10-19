@@ -1,22 +1,23 @@
 //! Runtime-assembled PTX recipes, checked against independent FP16 arithmetic.
 use crate::{CudaResult, cuda_error, timing_event};
 use cuda_core::{
-    CudaContext, CudaFunction, CudaStream, DeviceBuffer, simt::launch_kernel_on_stream,
+    CudaContext, CudaFunction, CudaStream, DeviceBuffer, DeviceCopy, simt::launch_kernel_on_stream,
 };
-use ptx_synth::{TuringGemmConfig, synthesize_turing_fp16_gemm};
+use ptx_synth::{GemmConfig, TargetArch, emit_gemm16, emit_gemm32};
 use std::{ffi::c_void, sync::Arc};
 
 pub(crate) struct Gemm {
     function: CudaFunction,
+    output_bytes: usize,
 }
 
 impl Gemm {
     pub(crate) fn from_env(context: &Arc<CudaContext>) -> CudaResult<Option<Self>> {
-        match std::env::var("ENNX_SYNTH_GEMM") {
+        match std::env::var("BLCKBAUX_SYNTH_GEMM") {
             Ok(value) => {
                 let k = value
                     .parse()
-                    .map_err(|_| "ENNX_SYNTH_GEMM must be 8, 16, 32, or 64")?;
+                    .map_err(|_| "BLCKBAUX_SYNTH_GEMM must be 8, 16, 32, or 64")?;
                 let kernel = Self::new(context, k)?;
                 kernel.check(&context.default_stream())?;
                 Ok(Some(kernel))
@@ -27,26 +28,38 @@ impl Gemm {
     }
 
     fn new(context: &Arc<CudaContext>, k: u32) -> CudaResult<Self> {
+        Self::compile(context, k, false)
+    }
+
+    pub(crate) fn for_train(context: &Arc<CudaContext>) -> CudaResult<Self> {
+        Self::compile(context, 32, true)
+    }
+
+    fn compile(context: &Arc<CudaContext>, k: u32, fp32: bool) -> CudaResult<Self> {
         if ![8, 16, 32, 64].contains(&k) {
             return Err("PTX GEMM staging depth must be 8, 16, 32, or 64".into());
         }
-        let name = format!("ennx_gemm_k{k}");
-        let ptx = synthesize_turing_fp16_gemm(&TuringGemmConfig {
+        let name = format!("blckbaux_gemm_k{k}{}", if fp32 { "_f32" } else { "" });
+        let (major, minor) = context.compute_capability().map_err(cuda_error)?;
+        let target = TargetArch::from_compute(major, minor).ok_or_else(|| {
+            format!("PTX GEMM does not support compute capability {major}.{minor}")
+        })?;
+        let config = GemmConfig {
             name: name.clone(),
+            target,
             tile_k: k,
-        });
+        };
+        let ptx = if fp32 {
+            emit_gemm32(&config)
+        } else {
+            emit_gemm16(&config)
+        };
         let source = format!("/tmp/{name}-{}.ptx", std::process::id());
         let binary = format!("/tmp/{name}-{}.cubin", std::process::id());
         std::fs::write(&source, &ptx).map_err(cuda_error)?;
+        let arch = format!("-arch={}", target.ptx_target());
         let assembled = std::process::Command::new("ptxas")
-            .args([
-                "-arch=sm_75",
-                "-O3",
-                "--warn-on-spills",
-                &source,
-                "-o",
-                &binary,
-            ])
+            .args([&arch, "-O3", "--warn-on-spills", &source, "-o", &binary])
             .output()
             .map_err(cuda_error)?;
         if !assembled.status.success() {
@@ -57,7 +70,10 @@ impl Gemm {
         }
         let module = context.load_module_from_file(&binary).map_err(cuda_error)?;
         let function = module.load_function(&name).map_err(cuda_error)?;
-        Ok(Self { function })
+        Ok(Self {
+            function,
+            output_bytes: if fp32 { 4 } else { 2 },
+        })
     }
 
     pub(crate) fn launch(
@@ -84,21 +100,77 @@ impl Gemm {
         k: usize,
         first: usize,
     ) -> CudaResult<()> {
-        if m == 0
+        let offset = first.checked_mul(k).ok_or("PTX GEMM offset overflow")?;
+        self.product(stream, a, b, c, [m, n, k], [offset, 0, 0])
+    }
+
+    pub(crate) fn product<T: DeviceCopy>(
+        &self,
+        stream: &CudaStream,
+        a: &DeviceBuffer<u16>,
+        b: &DeviceBuffer<u16>,
+        c: &DeviceBuffer<T>,
+        shape: [usize; 3],
+        offsets: [usize; 3],
+    ) -> CudaResult<()> {
+        self.batched(stream, a, b, c, shape, offsets, 1)
+    }
+
+    pub(crate) fn batch<T: DeviceCopy>(
+        &self,
+        stream: &CudaStream,
+        a: &DeviceBuffer<u16>,
+        b: &DeviceBuffer<u16>,
+        c: &DeviceBuffer<T>,
+        shape: [usize; 3],
+        batch: u32,
+    ) -> CudaResult<()> {
+        if self.output_bytes != 4 {
+            return Err("batched GEMM requires the FP32 recipe".into());
+        }
+        self.batched(stream, a, b, c, shape, [0; 3], batch)
+    }
+
+    fn batched<T: DeviceCopy>(
+        &self,
+        stream: &CudaStream,
+        a: &DeviceBuffer<u16>,
+        b: &DeviceBuffer<u16>,
+        c: &DeviceBuffer<T>,
+        shape: [usize; 3],
+        offsets: [usize; 3],
+        batch: u32,
+    ) -> CudaResult<()> {
+        let [m, n, k] = shape;
+        if size_of::<T>() != self.output_bytes
+            || batch == 0
+            || batch > 65535
+            || m == 0
             || n == 0
             || k == 0
-            || first
-                .checked_add(m)
-                .and_then(|v| v.checked_mul(k))
+            || m.checked_mul(k)
+                .and_then(|v| v.checked_mul(batch as usize))
+                .and_then(|v| v.checked_add(offsets[0]))
                 .is_none_or(|v| v > a.len())
-            || k.checked_mul(n).is_none_or(|v| v > b.len())
-            || m.checked_mul(n).is_none_or(|v| v > c.len())
+            || k.checked_mul(n)
+                .and_then(|v| v.checked_mul(batch as usize))
+                .and_then(|v| v.checked_add(offsets[1]))
+                .is_none_or(|v| v > b.len())
+            || m.checked_mul(n)
+                .and_then(|v| v.checked_mul(batch as usize))
+                .and_then(|v| v.checked_add(offsets[2]))
+                .is_none_or(|v| v > c.len())
+            || !Arc::ptr_eq(a.context(), stream.context())
+            || !Arc::ptr_eq(b.context(), stream.context())
+            || !Arc::ptr_eq(c.context(), stream.context())
+            || a.cu_deviceptr() == c.cu_deviceptr()
+            || b.cu_deviceptr() == c.cu_deviceptr()
         {
             return Err("PTX GEMM buffer extent mismatch".into());
         }
-        let mut ap = a.cu_deviceptr() + (first * k * 2) as u64;
-        let mut bp = b.cu_deviceptr();
-        let mut cp = c.cu_deviceptr();
+        let mut ap = a.cu_deviceptr() + (offsets[0] * 2) as u64;
+        let mut bp = b.cu_deviceptr() + (offsets[1] * 2) as u64;
+        let mut cp = c.cu_deviceptr() + (offsets[2] * self.output_bytes) as u64;
         let mut m = u32::try_from(m).map_err(cuda_error)?;
         let mut n = u32::try_from(n).map_err(cuda_error)?;
         let mut k = u32::try_from(k).map_err(cuda_error)?;
@@ -110,12 +182,12 @@ impl Gemm {
             (&mut n as *mut u32).cast::<c_void>(),
             (&mut k as *mut u32).cast::<c_void>(),
         ];
-        // SAFETY: checked contiguous FP16 matrices match the generated PTX ABI;
+        // SAFETY: checked matrix types, extents and contexts match the PTX ABI;
         // one block covers 64x16 outputs, including predicated boundary tiles.
         unsafe {
             launch_kernel_on_stream(
                 &self.function,
-                (n.div_ceil(16), m.div_ceil(64), 1),
+                (n.div_ceil(16), m.div_ceil(64), batch),
                 (256, 1, 1),
                 0,
                 stream,
@@ -173,7 +245,8 @@ pub(crate) fn measure() -> CudaResult<String> {
     let context = CudaContext::new(0).map_err(cuda_error)?;
     let stream = context.default_stream();
     // SAFETY: generated bindings load their matching embedded module.
-    let baseline = unsafe { ennx_cuda_kernels::fbt_model::load(&context) }.map_err(cuda_error)?;
+    let baseline =
+        unsafe { blckbaux_cuda_device::fbt_model::load(&context) }.map_err(cuda_error)?;
     let mut records = Vec::new();
     for depth in [8, 16, 32, 64] {
         let kernel = Gemm::new(&context, depth)?;
@@ -214,8 +287,8 @@ pub(crate) fn measure() -> CudaResult<String> {
                     "PTX GEMM differs from CUDA-Oxide on {m}x{n}x{k}: {mismatches} elements"
                 ));
             }
-            records.push(ennx_wire::json::json!({"tile_k":depth,"m":m,"n":n,"k":k,"samples_ms":samples,"median_ms":samples[2],"baseline_ms":control[2],"speedup":control[2]/samples[2],"cpu_edge_parity":true,"baseline_mismatches":mismatches}));
+            records.push(blckbaux_artifact::json::json!({"tile_k":depth,"m":m,"n":n,"k":k,"samples_ms":samples,"median_ms":samples[2],"baseline_ms":control[2],"speedup":control[2]/samples[2],"cpu_edge_parity":true,"baseline_mismatches":mismatches}));
         }
     }
-    ennx_wire::json::pretty_string(&ennx_wire::json::json!({"schema":"ennx.ptx.gemm.v1","hardware":context.device_name().map_err(cuda_error)?,"kernels":records,"full_generation_loop":false})).map_err(cuda_error)
+    blckbaux_artifact::json::pretty_string(&blckbaux_artifact::json::json!({"schema":"blckbaux.ptx.gemm.v1","hardware":context.device_name().map_err(cuda_error)?,"kernels":records,"full_generation_loop":false})).map_err(cuda_error)
 }

@@ -17,7 +17,7 @@ from .native_parity import reference_loss
 def toy_forward():
     import torch
 
-    from ennx.experimental import MetalFlameEvaluator, MetalWeights
+    from blckbaux.experimental import MetalFlameEvaluator, MetalWeights
 
     from .reference import forward
 
@@ -88,7 +88,7 @@ def toy_forward():
 
 
 def search_parity():
-    from ennx.experimental import MetalParamBlock, MetalSearchState, MetalWeights
+    from blckbaux.experimental import MetalParamBlock, MetalSearchState, MetalWeights
     from ops.correlated_parity import candidate, check_rounding, decode, draw_normal
 
     initial = np.resize(np.asarray([0x3FC0, 0xBFC0], dtype=np.uint16), 513)

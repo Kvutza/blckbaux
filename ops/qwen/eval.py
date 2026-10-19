@@ -29,7 +29,7 @@ def validate_obj(document: dict) -> None:
     provenance = document.get("provenance")
     if (
         not isinstance(provenance, dict)
-        or provenance.get("prompt_template") != "ennx.qwen_fim_code.v1"
+        or provenance.get("prompt_template") != "blckbaux.qwen_fim_code.v1"
     ):
         raise ValueError(
             "Qwen generation requires an FIM objective prepared by ops.qwen"

@@ -47,7 +47,7 @@ def run_stress(*, num_obs: int, config_path: Path) -> tuple[float, float]:
         str(num_obs),
         "--work-dir",
         work_dir,
-        "--ennx-config",
+        "--blckbaux-config",
         str(config_path),
     ]
     proc = subprocess.run(
@@ -104,7 +104,7 @@ def main(num_obs: int, baseline_query_s: float, baseline_segment_s: float) -> No
     target_query = baseline_query_s / 2.0
     target_segment = baseline_segment_s / 2.0
     best: TuneResult | None = None
-    with tempfile.TemporaryDirectory(prefix="ennx_tune_cfg_") as tmp:
+    with tempfile.TemporaryDirectory(prefix="blckbaux_tune_cfg_") as tmp:
         cfg_path = Path(tmp) / "config.toml"
         for bpann in default_grid():
             write_config(cfg_path, bpann)
@@ -116,7 +116,7 @@ def main(num_obs: int, baseline_query_s: float, baseline_segment_s: float) -> No
     if best is None:
         click.echo("No configuration met 2x targets on both query_s and segment_s.")
         raise SystemExit(1)
-    click.echo("Recommended [bpann] section for ~/.ennx/config.toml:")
+    click.echo("Recommended [bpann] section for ~/.blckbaux/config.toml:")
     click.echo("[bpann]")
     for key in BPANN_CONFIG_KEYS:
         if key in best.bpann:

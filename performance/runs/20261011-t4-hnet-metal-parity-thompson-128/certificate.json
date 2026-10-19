@@ -1,0 +1,636 @@
+{
+  "schema": "blckbaux.performance-certificate.v1",
+  "config": "performance/runs/20261011-t4-hnet-metal-parity-thompson-128/config.toml",
+  "static-contract": {
+    "model": "fbt-pisa1-hnet-mhc4-v1",
+    "program-version": 2,
+    "backend": "cuda-oxide",
+    "compiler": "cuda-oxide",
+    "source-digest": "9efa84583678e7775da83568cab33c6430e56f11b2a25932a037e1e56296226e",
+    "source-files": [
+      "cuda/kernels/src/bf16.rs",
+      "cuda/kernels/src/diffusion.rs",
+      "cuda/kernels/src/fbt.rs",
+      "cuda/kernels/src/knn.rs",
+      "cuda/kernels/src/lib.rs",
+      "cuda/kernels/src/muon.rs",
+      "cuda/src/bf16_search.rs",
+      "cuda/src/context.rs",
+      "cuda/src/flame.rs",
+      "cuda/src/gemm.rs",
+      "cuda/src/graph.rs",
+      "cuda/src/knn.rs",
+      "cuda/src/lib.rs",
+      "cuda/src/main.rs",
+      "cuda/src/model/cached.rs",
+      "cuda/src/model/diffusion.rs",
+      "cuda/src/model/diffusion_run.rs",
+      "cuda/src/model/readout.rs",
+      "cuda/src/model/routing.rs",
+      "cuda/src/model/run.rs",
+      "cuda/src/model/weights.rs",
+      "cuda/src/model.rs",
+      "cuda/src/muon.rs",
+      "cuda/src/neighbors.rs",
+      "cuda/src/precision.rs",
+      "cuda/src/prefill.rs",
+      "cuda/src/ptx_probe.rs",
+      "rust/crates/blckbaux/src/apple_gpu.rs",
+      "rust/crates/blckbaux/src/bf16_metal.rs",
+      "rust/crates/blckbaux/src/bf16_search.rs",
+      "rust/crates/blckbaux/src/bin/turbo-enn/main.rs",
+      "rust/crates/blckbaux/src/bin/turbo-enn-worker/main.rs",
+      "rust/crates/blckbaux/src/code_environment.rs",
+      "rust/crates/blckbaux/src/config/diffusion.rs",
+      "rust/crates/blckbaux/src/config/experiment.rs",
+      "rust/crates/blckbaux/src/config/feedback.rs",
+      "rust/crates/blckbaux/src/config/generation.rs",
+      "rust/crates/blckbaux/src/config/initialization.rs",
+      "rust/crates/blckbaux/src/config/kernel.rs",
+      "rust/crates/blckbaux/src/config/objectives.rs",
+      "rust/crates/blckbaux/src/config/objectives_tests.rs",
+      "rust/crates/blckbaux/src/config/procedural.rs",
+      "rust/crates/blckbaux/src/config/resident.rs",
+      "rust/crates/blckbaux/src/config/seeds.rs",
+      "rust/crates/blckbaux/src/config/spec/conversion.rs",
+      "rust/crates/blckbaux/src/config/spec/execution.rs",
+      "rust/crates/blckbaux/src/config/spec/optimizer.rs",
+      "rust/crates/blckbaux/src/config/spec/tests.rs",
+      "rust/crates/blckbaux/src/config/spec.rs",
+      "rust/crates/blckbaux/src/config/validation.rs",
+      "rust/crates/blckbaux/src/config.rs",
+      "rust/crates/blckbaux/src/context.rs",
+      "rust/crates/blckbaux/src/context_metal/tests.rs",
+      "rust/crates/blckbaux/src/context_metal.rs",
+      "rust/crates/blckbaux/src/fbt.rs",
+      "rust/crates/blckbaux/src/fbt_ablation.rs",
+      "rust/crates/blckbaux/src/fbt_attention.rs",
+      "rust/crates/blckbaux/src/fbt_attentiontests.rs",
+      "rust/crates/blckbaux/src/fbt_block/stats.rs",
+      "rust/crates/blckbaux/src/fbt_block/target.rs",
+      "rust/crates/blckbaux/src/fbt_block/tests.rs",
+      "rust/crates/blckbaux/src/fbt_block/window.rs",
+      "rust/crates/blckbaux/src/fbt_block.rs",
+      "rust/crates/blckbaux/src/fbt_boundtests.rs",
+      "rust/crates/blckbaux/src/fbt_contrast.rs",
+      "rust/crates/blckbaux/src/fbt_decode/mhc.rs",
+      "rust/crates/blckbaux/src/fbt_decode.rs",
+      "rust/crates/blckbaux/src/fbt_decodetests.rs",
+      "rust/crates/blckbaux/src/fbt_diffusion.rs",
+      "rust/crates/blckbaux/src/fbt_draft.rs",
+      "rust/crates/blckbaux/src/fbt_generation/alignment.rs",
+      "rust/crates/blckbaux/src/fbt_generation/checkpoint.rs",
+      "rust/crates/blckbaux/src/fbt_generation/context.rs",
+      "rust/crates/blckbaux/src/fbt_generation/finish.rs",
+      "rust/crates/blckbaux/src/fbt_generation/metrics.rs",
+      "rust/crates/blckbaux/src/fbt_generation/muon.rs",
+      "rust/crates/blckbaux/src/fbt_generation/oracle.rs",
+      "rust/crates/blckbaux/src/fbt_generation/pool.rs",
+      "rust/crates/blckbaux/src/fbt_generation/protocol.rs",
+      "rust/crates/blckbaux/src/fbt_generation/reward.rs",
+      "rust/crates/blckbaux/src/fbt_generation/rounds.rs",
+      "rust/crates/blckbaux/src/fbt_generation/setup.rs",
+      "rust/crates/blckbaux/src/fbt_generation/validation.rs",
+      "rust/crates/blckbaux/src/fbt_generation.rs",
+      "rust/crates/blckbaux/src/fbt_heldout.rs",
+      "rust/crates/blckbaux/src/fbt_jitter.rs",
+      "rust/crates/blckbaux/src/fbt_journal.rs",
+      "rust/crates/blckbaux/src/fbt_losstests.rs",
+      "rust/crates/blckbaux/src/fbt_metal.rs",
+      "rust/crates/blckbaux/src/fbt_metaltests.rs",
+      "rust/crates/blckbaux/src/fbt_micro.rs",
+      "rust/crates/blckbaux/src/fbt_model.rs",
+      "rust/crates/blckbaux/src/fbt_modeltests.rs",
+      "rust/crates/blckbaux/src/fbt_moe/architecture.rs",
+      "rust/crates/blckbaux/src/fbt_moe/benchmarks.rs",
+      "rust/crates/blckbaux/src/fbt_moe/buffers.rs",
+      "rust/crates/blckbaux/src/fbt_moe/candidate.rs",
+      "rust/crates/blckbaux/src/fbt_moe/causal.rs",
+      "rust/crates/blckbaux/src/fbt_moe/dispatch.rs",
+      "rust/crates/blckbaux/src/fbt_moe/envelope.rs",
+      "rust/crates/blckbaux/src/fbt_moe/experiment.rs",
+      "rust/crates/blckbaux/src/fbt_moe/initialization.rs",
+      "rust/crates/blckbaux/src/fbt_moe/mhc_reference.rs",
+      "rust/crates/blckbaux/src/fbt_moe/objective.rs",
+      "rust/crates/blckbaux/src/fbt_moe/optimization.rs",
+      "rust/crates/blckbaux/src/fbt_moe/resources.rs",
+      "rust/crates/blckbaux/src/fbt_moe/round.rs",
+      "rust/crates/blckbaux/src/fbt_moe/validation.rs",
+      "rust/crates/blckbaux/src/fbt_moe/weight_stats.rs",
+      "rust/crates/blckbaux/src/fbt_moe.rs",
+      "rust/crates/blckbaux/src/fbt_mps.rs",
+      "rust/crates/blckbaux/src/fbt_pisa1/cache.rs",
+      "rust/crates/blckbaux/src/fbt_pisa1/certify.rs",
+      "rust/crates/blckbaux/src/fbt_pisa1/dirty.rs",
+      "rust/crates/blckbaux/src/fbt_pisa1/fallback.rs",
+      "rust/crates/blckbaux/src/fbt_pisa1/grad.rs",
+      "rust/crates/blckbaux/src/fbt_pisa1/hierarchical.rs",
+      "rust/crates/blckbaux/src/fbt_pisa1.rs",
+      "rust/crates/blckbaux/src/fbt_prefill.rs",
+      "rust/crates/blckbaux/src/fbt_readout.rs",
+      "rust/crates/blckbaux/src/fbt_reconstruction.rs",
+      "rust/crates/blckbaux/src/fbt_reward.rs",
+      "rust/crates/blckbaux/src/fbt_round.rs",
+      "rust/crates/blckbaux/src/fbt_routing.rs",
+      "rust/crates/blckbaux/src/fbt_scorer/input.rs",
+      "rust/crates/blckbaux/src/fbt_scorer/mhc.rs",
+      "rust/crates/blckbaux/src/fbt_scorer/replay.rs",
+      "rust/crates/blckbaux/src/fbt_scorer/trace.rs",
+      "rust/crates/blckbaux/src/fbt_scorer.rs",
+      "rust/crates/blckbaux/src/fbt_train.rs",
+      "rust/crates/blckbaux/src/fbt_updates.rs",
+      "rust/crates/blckbaux/src/forward_program/contract.rs",
+      "rust/crates/blckbaux/src/forward_program/diffusion.rs",
+      "rust/crates/blckbaux/src/forward_program/graph.rs",
+      "rust/crates/blckbaux/src/forward_program/hnet.rs",
+      "rust/crates/blckbaux/src/forward_program/model.rs",
+      "rust/crates/blckbaux/src/forward_program/recurrence.rs",
+      "rust/crates/blckbaux/src/forward_program/schedule.rs",
+      "rust/crates/blckbaux/src/forward_program/tensor.rs",
+      "rust/crates/blckbaux/src/hash.rs",
+      "rust/crates/blckbaux/src/objective_observation.rs",
+      "rust/crates/blckbaux/src/search/device_tests.rs",
+      "rust/crates/blckbaux/src/search/region.rs",
+      "rust/crates/blckbaux/src/search/region_tests.rs",
+      "rust/crates/blckbaux/src/search/view_tests.rs",
+      "rust/crates/blckbaux/src/search.rs",
+      "rust/crates/blckbaux/src/trust_region.rs",
+      "rust/crates/modal-runner/src/hnet.rs",
+      "rust/crates/modal-runner/src/main.rs"
+    ],
+    "workload": {
+      "prompt-token-cap": 524288,
+      "generated-token-cap": 524288,
+      "retained-context-tokens": 1048576,
+      "target-input-positions": 1048575,
+      "hnet-patch-tokens": 64,
+      "core-positions": 16384,
+      "broad-pass-positions": 16384,
+      "rounds": 128,
+      "target-round-ms": 200
+    },
+    "architecture": {
+      "parameters": 1047733016,
+      "physical-layers": 5,
+      "executed-layer-visits": 7,
+      "contraction-coefficients-per-position": 19852800,
+      "contraction-flops": 650536550400,
+      "pisa-state-bytes": 29818880,
+      "cache-capacity": 16384
+    },
+    "lowering": {
+      "kernel-count": 22,
+      "kernels": [
+        {
+          "name": "embed",
+          "nodes": [
+            "embed"
+          ],
+          "tile": [
+            1,
+            512,
+            1
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "rms",
+          "nodes": [
+            "attention-norm",
+            "moe-norm"
+          ],
+          "tile": [
+            1,
+            512,
+            1
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "matmul",
+          "nodes": [
+            "qkv",
+            "attention-project"
+          ],
+          "tile": [
+            16,
+            16,
+            16
+          ],
+          "threads": [
+            16,
+            16,
+            1
+          ]
+        },
+        {
+          "name": "cuda-graph(hnet_hierarchy_centroids+hnet_hierarchical_expand)",
+          "nodes": [
+            "readout"
+          ],
+          "tile": [
+            64,
+            8,
+            6
+          ],
+          "threads": [
+            64,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "pisaleaves+pisaupper",
+          "nodes": [
+            "pisa-summaries"
+          ],
+          "tile": [
+            64,
+            64,
+            1
+          ],
+          "threads": [
+            64,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "pisa_select",
+          "nodes": [
+            "pisa-select"
+          ],
+          "tile": [
+            1,
+            8,
+            64
+          ],
+          "threads": [
+            64,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "pisa_attention",
+          "nodes": [
+            "pisa-attention"
+          ],
+          "tile": [
+            1,
+            8,
+            512
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "routetopk",
+          "nodes": [
+            "route"
+          ],
+          "tile": [
+            1,
+            625,
+            1
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "route_counts+route_layout+route_pack",
+          "nodes": [
+            "pack-routes"
+          ],
+          "tile": [
+            64,
+            512,
+            3
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "routed_project+routed_activate",
+          "nodes": [
+            "gate-up"
+          ],
+          "tile": [
+            64,
+            16,
+            8
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "routed_project",
+          "nodes": [
+            "down"
+          ],
+          "tile": [
+            64,
+            16,
+            8
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "combine_routes",
+          "nodes": [
+            "combine-routes"
+          ],
+          "tile": [
+            1,
+            512,
+            3
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "residual",
+          "nodes": [
+            "attention-residual",
+            "moe-residual"
+          ],
+          "tile": [
+            1,
+            512,
+            1
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "feedback_shift",
+          "nodes": [
+            "feedback"
+          ],
+          "tile": [
+            1,
+            512,
+            1
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "feedback_norm",
+          "nodes": [
+            "feedback"
+          ],
+          "tile": [
+            1,
+            512,
+            1
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "matmul(state,gate)",
+          "nodes": [
+            "feedback"
+          ],
+          "tile": [
+            16,
+            16,
+            16
+          ],
+          "threads": [
+            16,
+            16,
+            1
+          ]
+        },
+        {
+          "name": "feedback_combine",
+          "nodes": [
+            "feedback"
+          ],
+          "tile": [
+            1,
+            512,
+            1
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "sample",
+          "nodes": [
+            "sample"
+          ],
+          "tile": [
+            1,
+            8192,
+            1
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "diffusion_sample",
+          "nodes": [
+            "draft"
+          ],
+          "tile": [
+            1,
+            8192,
+            1
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "verify_prefix",
+          "nodes": [
+            "verify"
+          ],
+          "tile": [
+            1,
+            256,
+            1
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "score",
+          "nodes": [
+            "score-generation"
+          ],
+          "tile": [
+            1,
+            8192,
+            1
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        },
+        {
+          "name": "objective",
+          "nodes": [
+            "objective"
+          ],
+          "tile": [
+            256,
+            1,
+            1
+          ],
+          "threads": [
+            256,
+            1,
+            1
+          ]
+        }
+      ],
+      "missing-count": 7,
+      "missing": [
+        "FineEncode",
+        "BoundaryRoute",
+        "SelectChunks",
+        "SmoothChunks",
+        "UpsampleChunks",
+        "FineSkip",
+        "FineDecode"
+      ]
+    },
+    "goal": {
+      "maximum-context-tokens": 1048576,
+      "context-met": true,
+      "lowering-complete": false,
+      "static-goal-met": false
+    },
+    "counting-boundary": "HNet core dense contractions and resident PISA state; excludes routing logistics, normalization, sampling, BO proposal, reward, and tell"
+  },
+  "measurement": {
+    "run": "performance/runs/20261011-t4-hnet-metal-parity-thompson-128",
+    "source-digest": "9efa84583678e7775da83568cab33c6430e56f11b2a25932a037e1e56296226e",
+    "matches-current-source": true,
+    "hardware": "Tesla T4",
+    "samples": 128,
+    "truth": {
+      "transaction-kind": "paired-hnet-bo",
+      "context-tokens": 1048576,
+      "prompt-tokens": 524288,
+      "generated-tokens": 524288,
+      "evaluations-per-round": 2,
+      "evaluated-tokens": 134217728,
+      "committed-tokens": 18874368,
+      "complete-candidate-transaction": true,
+      "same-condition-pair": true,
+      "incumbent-remeasured": true
+    },
+    "latency": {
+      "wall-ms": {
+        "count": 128,
+        "mean": 2195.3298448124997,
+        "p95": 2320.324893,
+        "max": 2337.617233
+      },
+      "proposal-ms": {
+        "count": 128,
+        "mean": 95.4523293437501,
+        "p95": 104.86992,
+        "max": 106.98771
+      },
+      "incumbent-evaluation-ms": {
+        "count": 128,
+        "mean": 1028.5208862500006,
+        "p95": 1085.2024,
+        "max": 1094.4448
+      },
+      "candidate-evaluation-ms": {
+        "count": 128,
+        "mean": 1040.6771624218752,
+        "p95": 1101.6168,
+        "max": 1108.2661
+      },
+      "evaluation-ms": {
+        "count": 128,
+        "mean": 2069.1980421875,
+        "p95": 2185.6,
+        "max": 2199.6975
+      },
+      "gpu-ms": {
+        "count": 128,
+        "mean": 2186.9148867187505,
+        "p95": 2312.7551,
+        "max": 2328.112
+      },
+      "restore-ms": {
+        "count": 128,
+        "mean": 22.264516031249983,
+        "p95": 22.421185,
+        "max": 22.472288
+      },
+      "host-overhead-ms": {
+        "count": 128,
+        "mean": 8.414958093750014,
+        "p95": 9.934970000000249,
+        "max": 18.525742000000264
+      }
+    },
+    "initialization-samples": 32,
+    "guided-samples": 96,
+    "target-round-ms": 200.0,
+    "p95-target-met": false,
+    "strict-target-met": false,
+    "required-p95-speedup": 11.601624465,
+    "stage-boundary": "each sample includes proposal materialization, same-condition incumbent evaluation, candidate evaluation, posterior/reliability update, and commit or restore",
+    "matches-workload": true
+  }
+}

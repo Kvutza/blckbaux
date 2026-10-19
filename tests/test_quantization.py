@@ -5,7 +5,7 @@ import importlib.util
 import numpy as np
 import pytest
 
-from ennx.quantization import quantize_e2m1, quantize_int4
+from blckbaux.quantization import quantize_e2m1, quantize_int4
 
 
 def test_packodd():
@@ -16,9 +16,9 @@ def test_packodd():
 
 
 def test_rustparity():
-    if importlib.util.find_spec("ennx.ennx_rust") is None:
-        pytest.skip("ennx_rust extension unavailable")
-    rust = pytest.importorskip("ennx._rust")
+    if importlib.util.find_spec("blckbaux.blckbaux_rust") is None:
+        pytest.skip("blckbaux_rust extension unavailable")
+    rust = pytest.importorskip("blckbaux._rust")
 
     x = np.array([-2.0, 0.5, 1.5, 2.5, 20.0], dtype=np.float32)
 

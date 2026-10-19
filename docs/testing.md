@@ -1,38 +1,97 @@
-# Tests
+# Tests & Quality Gates
+
+Run hermetic test suites, formatting checks, and codebase gates through `./blckbaux`.
+
+## Source Contracts
+
+Read each module being changed in full before editing it, including its local
+tests. Follow callers and callees when a contract crosses a module boundary;
+search results locate code but do not replace understanding the module.
+
+Owned Rust, Metal, CUDA, and Lean source should document the scientific role of
+each module and the non-obvious contract of each function. State the operation,
+input/output units and shapes, preconditions, state or buffer changes, completion
+and failure behavior, and relevant callers. Include only what applies: avoid
+boilerplate that merely repeats a function name. Put the mathematical operation
+next to its implementation and identify where configuration selects it.
+
+Distinguish generated proposals from evaluated candidates and accepted updates;
+measured objectives from predictions; sampled geometry from full parameter rows;
+requested latency from measured latency; and proved properties from assumptions.
+For Lean results, name the actual hypotheses and scope rather than describing a
+conditional result as a guarantee of the deployed optimizer. Imported/generated
+source is not part of this documentation pass.
+
+Keep contracts current in the same change as behavior. A change to a proposal
+formula, objective protocol, default, or acceptance/controller policy is an
+algorithm change, not a documentation fix or behavior-preserving refactor. State
+that change and agree its scope before implementation. Retain the source/config
+identity of the comparison run rather than substituting another historical run.
+
+For documentation-only changes, verify that executable source is unchanged and
+run the appropriate format/build/test checks. Do not launch training merely to
+validate comments. Documentation aids navigation; it does not replace checks of
+the implementation or establish a mathematical guarantee.
+
+## Quick Execution
+
+The default Buck2 suite includes the optimizer, runtime, CLI, development tools,
+and platform integration tests. Hegel properties live in
+`rust/crates/blckbaux/tests/hegel_prop.rs` and run as part of that suite. Use generated
+multi-step inputs to test state transitions, configuration round trips, wrapper
+agreement, and invariants across failures. Keep concrete regression examples
+alongside these properties when they identify a specific defect.
+
+The default suite also builds `blckbaux-semantics` independently. Shared ABI records
+generate Metal declarations with compiler-checked sizes and field offsets;
+Hegel reads sentinel fields on the GPU. Recurrence and neighbor-prefix properties
+use independently constructed expected results. The production H-Net shader is
+compiled with that generated preamble. CUDA's shared record implementations
+still require a CUDA-toolchain build and NVIDIA device checks; passing Metal
+tests does not establish CUDA numerical parity.
 
 ```sh
-./ennx dev
-./ennx test
-ENNX_WHEEL_PATH=dist/ennx-...whl ./ennx test --python
-kiss test                    # inside: pixi shell -e ennx
-./ennx test --affected       # Test only targets affected by working changes
+./blckbaux test              # repository verification policy
+./blckbaux test --affected   # run only test targets affected by working changes
+./blckbaux fmt               # format Rust and Python source
 ```
 
-`./ennx dev` formats, builds, and runs Rust and Python tests. Python tests run
-against each of the three built wheels, including the BoTorch, Optuna, and Ax
-integrations.
+## Build Verification
 
-`./ennx test` runs Rust unit tests, integration tests, CLI tests, and kernel
-tests. GPU checks require the corresponding hardware and driver.
+```sh
+./blckbaux build --tests                             # verify the native build
+./blckbaux build --distribution --tests              # verify wheels across Py 3.12-3.15
+```
 
-`./ennx test --affected` queries codebase AST reachability through Radar to
-discover and run only the test targets impacted by working directory changes.
+Default Python version is 3.13. Set `BLCKBAUX_PYTHON_VERSION` to `3.12`, `3.14`, or `3.15` to target another interpreter. Ax and BoTorch integration checks currently run through Python 3.14 because PyTorch has not published CPython 3.15 wheels; the core Blckbaux wheel is built and checked on 3.15.
 
-Inside the `ennx` Pixi shell, `kiss test` is provided by the repository adapter:
-Rust tests run through Buck2, while `kiss test --lang python` delegates to
-upstream KISS. Pixi and uv continue to own the Python verification environments.
+A `v*` tag runs `.github/workflows/release.yml`. Each supported platform builds
+and verifies four ABI-specific wheels, and the publish job attaches the complete
+twelve-wheel set to the GitHub Release only after provenance and metadata checks
+pass.
 
-`./ennx fmt` is the formatting and source-policy gate. In addition to Rust and
-Python formatting, it runs KISS for the repository and for every Rust crate. It
-also rejects sentence-like code names: local Python/Rust definitions and source
-file stems may contain at most two snake-case words (one underscore) and 24
-characters. Put the explanation in a comment or docstring, not in the name.
+## Quality & Radar Gates
 
-For `--python`, replace `ennx-...whl` with the wheel filename. Python 3.13 is the
-default; set `ENNX_PYTHON_VERSION=3.12` or `3.14` to test another wheel.
+```sh
+./blckbaux fmt               # apply Rust and Python formatting
+./blckbaux radar performance show   # static HNet work, coverage, and goal certificate
+```
 
-The standard Python suite selects `not slow or gp`. Other stress and performance
-tests run separately. Bazel checks are also separate.
+`radar performance record --run RUN` records p95 whole-round and stage latency only
+from a completed run whose hot-path digest matches the current source. After
+that, `radar performance gate` passes without device work for unrelated edits and
+requires `--run RUN` after a Metal or CUDA hot-path change. Produce that replay
+without copying or editing the experiment file:
 
-If a local `formal/` directory exists, `./ennx test` also checks its Lean proofs.
-These cover the stated contracts, not GPU kernels or drivers.
+```sh
+./blckbaux tune --prepare performance/configs/hnet-1m-causal-1000.toml
+./blckbaux tune performance/configs/hnet-1m-causal-1000.toml
+```
+
+For Metal, the measured replay also has to match the separate reviewed
+`performance/hnet-1m-round-parity.json` first-round result exactly: model size,
+workload truth labels, evaluated tokens, candidate and incumbent objectives and
+conditional NLLs, the acceptance decision, and SHA-256 identities of both
+decoded outputs. This semantic check is separate from the older latency
+certificate and its tolerance. Update it only from a reviewed full 1M run. The
+unit tests exercise the comparison without running the 1M workload.

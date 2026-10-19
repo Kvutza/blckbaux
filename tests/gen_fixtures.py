@@ -57,7 +57,7 @@ def generation_state(tmp_path):
         ),
         "extension_sha256": "training-extension",
         "tokens": {
-            "format": "ennx.solution_tokens.v1",
+            "format": "blckbaux.solution_tokens.v1",
             "examples": examples,
             "provenance": {},
         },
@@ -245,12 +245,12 @@ def harness(tmp_path, monkeypatch):
             coding.DATASET_URL: dataset_bytes,
         }[url]
 
-    package = ModuleType("ennx")
-    extension = ModuleType("ennx.ennx_rust")
+    package = ModuleType("blckbaux")
+    extension = ModuleType("blckbaux.blckbaux_rust")
     extension.__file__ = __file__
-    experimental = ModuleType("ennx.experimental")
+    experimental = ModuleType("blckbaux.experimental")
     experimental.MetalFlameEvaluator = Engine
-    package.ennx_rust = extension
+    package.blckbaux_rust = extension
     package.experimental = experimental
     tokenizers = ModuleType("tokenizers")
     tokenizers.Tokenizer = Tokenizer

@@ -4,8 +4,8 @@ import numpy as np
 import pytest
 from enn_helpers import enn_model, enn_rows
 
-from ennx.ennx.enn_class import ENN
-from ennx.ennx.enn_params import ENNParams, PosteriorFlags
+from blckbaux.enn.enn_class import ENN
+from blckbaux.enn.enn_params import ENNParams, PosteriorFlags
 
 
 def _params(
@@ -22,7 +22,7 @@ def _params(
 
 
 def test_001():
-    from ennx.ennx.enn_normal import ENNNormal
+    from blckbaux.enn.enn_normal import ENNNormal
 
     rng = np.random.default_rng(0)
     mu = np.array([[0.0, 1.0]], dtype=float)

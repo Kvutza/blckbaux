@@ -1,6 +1,6 @@
 import numpy as np
 
-from ennx.benchmarks import Ackley, DoubleAckley
+from blckbaux.benchmarks import Ackley, DoubleAckley
 
 
 def test_ackley1dinput():
@@ -73,7 +73,7 @@ def test_004():
 
 
 def test_005():
-    from ennx.benchmarks.separable_unimodal import separable_objective
+    from blckbaux.benchmarks.separable_unimodal import separable_objective
 
     y = separable_objective(np.array([[120.0, 0.91]]))
     assert y.shape == (1, 2)

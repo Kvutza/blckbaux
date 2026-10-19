@@ -6,6 +6,8 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use tempfile::NamedTempFile;
 
+mod hnet;
+
 const CUDA_IMAGE: &str = "im-tZRy6QPZXIJyPrv4zZqPOM";
 const CUDA_REV: &str = "6abfaa091e29a6275c1943895bfbc97efa306e98";
 const RUST_NIGHTLY: &str = "nightly-2026-08-28";
@@ -30,6 +32,7 @@ enum Action {
         unroll: u32,
         chunk: u32,
     },
+    Hnet(hnet::Config),
     Ptx {
         output: PathBuf,
         elements: u32,
@@ -57,7 +60,7 @@ fn parse_bo<I: Iterator<Item = std::ffi::OsString>>(mut args: I) -> Result<Actio
             Some("--iterations") => iterations = value.to_string_lossy().parse()?,
             _ => {
                 return Err(io::Error::other(
-                    "usage: ennx-modal bo --output PATH --candidates N --history N --iterations N",
+                    "usage: blckbaux-modal bo --output PATH --candidates N --history N --iterations N",
                 )
                 .into());
             }
@@ -96,7 +99,7 @@ fn parse_generate<I: Iterator<Item = std::ffi::OsString>>(mut args: I) -> Result
             Some("--seed") => seed = value.to_string_lossy().parse()?,
             Some("--unroll") => unroll = value.to_string_lossy().parse()?,
             Some("--chunk") => chunk = value.to_string_lossy().parse()?,
-            _ => return Err(io::Error::other("usage: ennx-modal generate --output DIR --context N --prompt N --visits N --temperature F --seed N --unroll N").into()),
+            _ => return Err(io::Error::other("usage: blckbaux-modal generate --output DIR --context N --prompt N --visits N --temperature F --seed N --unroll N").into()),
         }
     }
     if context == 0
@@ -127,7 +130,7 @@ fn parse_generate<I: Iterator<Item = std::ffi::OsString>>(mut args: I) -> Result
 }
 
 fn parse_wheel<I: Iterator<Item = std::ffi::OsString>>(args: I) -> Result<Action> {
-    let mut output = PathBuf::from("/tmp/ennx-cuda-wheel.whl");
+    let mut output = PathBuf::from("/tmp/blckbaux-cuda-wheel.whl");
     let mut output_set = false;
     let mut mjx = false;
     for arg in args {
@@ -137,7 +140,7 @@ fn parse_wheel<I: Iterator<Item = std::ffi::OsString>>(args: I) -> Result<Action
             output = arg.into();
             output_set = true;
         } else {
-            return Err(io::Error::other("usage: ennx-modal wheel [OUTPUT] [--mjx]").into());
+            return Err(io::Error::other("usage: blckbaux-modal wheel [OUTPUT] [--mjx]").into());
         }
     }
     Ok(Action::Wheel { output, mjx })
@@ -157,7 +160,7 @@ fn parse_ptx<I: Iterator<Item = std::ffi::OsString>>(mut args: I) -> Result<Acti
             Some("--iterations") => iterations = value.to_string_lossy().parse()?,
             _ => {
                 return Err(io::Error::other(
-                    "usage: ennx-modal ptx [--output PATH] [--elements N] [--iterations N]",
+                    "usage: blckbaux-modal ptx [--output PATH] [--elements N] [--iterations N]",
                 )
                 .into());
             }
@@ -179,17 +182,18 @@ fn parse_ptx<I: Iterator<Item = std::ffi::OsString>>(mut args: I) -> Result<Acti
 fn parse_args() -> Result<Action> {
     let mut args = std::env::args_os().skip(1);
     let action = args.next().ok_or_else(|| {
-        io::Error::other("usage: ennx-modal <bo | generate | image | ptx | wheel>")
+        io::Error::other("usage: blckbaux-modal <bo | generate | image | ptx | wheel>")
     })?;
     match action.to_str() {
         Some("bo") => parse_bo(args),
         Some("image") if args.next().is_none() => Ok(Action::Image),
         Some("generate") => parse_generate(args),
+        Some("hnet") => Ok(Action::Hnet(hnet::parse(args)?)),
         Some("wheel") => parse_wheel(args),
         Some("ptx") => parse_ptx(args),
-        _ => {
-            Err(io::Error::other("usage: ennx-modal <bo | generate | image | ptx | wheel>").into())
-        }
+        _ => Err(
+            io::Error::other("usage: blckbaux-modal <bo | generate | image | ptx | wheel>").into(),
+        ),
     }
 }
 
@@ -219,11 +223,11 @@ fn tool_image() -> Result<Image> {
                 "CUDA_OXIDE_BACKEND",
                 "/opt/cuda-oxide/crates/rustc-codegen-cuda/target/x86_64-unknown-linux-gnu/debug/librustc_codegen_cuda.so",
             ),
-            ("ENNX_FAISS_UNAVAILABLE", "1"),
+            ("BLCKBAUX_FAISS_UNAVAILABLE", "1"),
             ("LIBCLANG_PATH", "/usr/lib/llvm-21/lib"),
             ("LLVM_CONFIG_PATH", "/usr/bin/llvm-config-21"),
             ("PATH", path.as_str()),
-            ("PYTHONPATH", "/opt/ennx/ops"),
+            ("PYTHONPATH", "/opt/blckbaux/ops"),
             ("RUSTUP_TOOLCHAIN", RUST_NIGHTLY),
         ])?;
     Ok(image)
@@ -311,12 +315,12 @@ fn source_tar() -> Result<NamedTempFile> {
 fn wheel_cmd(mjx: bool) -> String {
     let wheel = wheel_path();
     let mut command = format!(
-        "set -euo pipefail; cd /opt/ennx; \
-         rm -rf /tmp/ennx-wheel /tmp/ennx-wheel-env; \
-         mkdir -p /tmp/ennx-wheel; \
-         python -m venv /tmp/ennx-wheel-env; \
-         /tmp/ennx-wheel-env/bin/python -m pip install --quiet 'jax[cuda12]'; \
-         export PATH=/tmp/ennx-wheel-env/bin:$PATH; \
+        "set -euo pipefail; cd /opt/blckbaux; \
+         rm -rf /tmp/blckbaux-wheel /tmp/blckbaux-wheel-env; \
+         mkdir -p /tmp/blckbaux-wheel; \
+         python -m venv /tmp/blckbaux-wheel-env; \
+         /tmp/blckbaux-wheel-env/bin/python -m pip install --quiet 'jax[cuda12]'; \
+         export PATH=/tmp/blckbaux-wheel-env/bin:$PATH; \
          export XLA_PYTHON_CLIENT_PREALLOCATE=false; \
          unset LD_LIBRARY_PATH; \
          PARITY=$(./buck2w --isolation-dir cuda build //:cuda-parity \
@@ -326,15 +330,15 @@ fn wheel_cmd(mjx: bool) -> String {
          ./buck2w --isolation-dir cuda build //:cuda-wheel \
          --target-platforms //:linux-x86_64-platform --local-only --num-threads 4 \
          --out {wheel}; \
-         /tmp/ennx-wheel-env/bin/python -m pip install --quiet {wheel}; \
-         /tmp/ennx-wheel-env/bin/python ops/cusprbench.py; \
-         /tmp/ennx-wheel-env/bin/python ops/bf16_bench.py",
+         /tmp/blckbaux-wheel-env/bin/python -m pip install --quiet {wheel}; \
+         /tmp/blckbaux-wheel-env/bin/python ops/cusprbench.py; \
+         /tmp/blckbaux-wheel-env/bin/python ops/bf16_bench.py",
     );
     if mjx {
         command.push_str(
-            "; /tmp/ennx-wheel-env/bin/python -m pip install --quiet \
+            "; /tmp/blckbaux-wheel-env/bin/python -m pip install --quiet \
              mujoco==3.6.0 mujoco-mjx==3.6.0; \
-             /tmp/ennx-wheel-env/bin/python ops/mjx_batch.py",
+             /tmp/blckbaux-wheel-env/bin/python ops/mjx_batch.py",
         );
     }
     command
@@ -342,28 +346,29 @@ fn wheel_cmd(mjx: bool) -> String {
 
 fn wheel_path() -> String {
     format!(
-        "/tmp/ennx-wheel/ennx-{}+cuda75-cp312-cp312-manylinux_2_28_x86_64.whl",
+        "/tmp/blckbaux-wheel/blckbaux-{}+cuda75-cp312-cp312-manylinux_2_28_x86_64.whl",
         env!("CARGO_PKG_VERSION")
     )
 }
 
 fn ptx_cmd(elements: u32, iterations: u32) -> String {
     format!(
-        "set -euo pipefail; cd /opt/ennx; \
+        "set -euo pipefail; cd /opt/blckbaux; \
          CARGO_HOME=/cache/cargo CARGO_TARGET_DIR=/cache/target ./tools/cuda-run build; \
-         /cache/target/release/ennx-cuda ptx-probe {elements} {iterations} > /tmp/ptx-synth-result.json; \
+         /cache/target/release/blckbaux-cuda ptx-probe {elements} {iterations} > /tmp/ptx-synth-result.json; \
          cat /tmp/ptx-synth-result.json"
     )
 }
 
 fn bo_cmd(candidates: u32, history: u32, iterations: u32) -> String {
     format!(
-        "set -euo pipefail; cd /opt/ennx; \
+        "set -euo pipefail; cd /opt/blckbaux; \
          CARGO_HOME=/cache/cargo CARGO_TARGET_DIR=/cache/target ./tools/cuda-run build; \
-         /cache/target/release/ennx-cuda parity; \
-         /cache/target/release/ennx-cuda bf16-curve {candidates} {history} {iterations} \
-         > /tmp/ennx-bo-result.json; \
-         cat /tmp/ennx-bo-result.json"
+         /cache/target/release/blckbaux-cuda parity; \
+         /cache/target/release/blckbaux-cuda resident; \
+         /cache/target/release/blckbaux-cuda bf16-curve {candidates} {history} {iterations} \
+         > /tmp/blckbaux-bo-result.json; \
+         cat /tmp/blckbaux-bo-result.json"
     )
 }
 
@@ -378,32 +383,34 @@ fn generation_cmd(
     synth: Option<u32>,
     prompt_file: bool,
 ) -> String {
-    let mut env = synth.map_or(String::new(), |k| format!("export ENNX_SYNTH_GEMM={k}; "));
-    if std::env::var_os("ENNX_CUDA_PROFILE").is_some() {
-        env.push_str("export ENNX_CUDA_PROFILE=1; ");
+    let mut env = synth.map_or(String::new(), |k| {
+        format!("export BLCKBAUX_SYNTH_GEMM={k}; ")
+    });
+    if std::env::var_os("BLCKBAUX_CUDA_PROFILE").is_some() {
+        env.push_str("export BLCKBAUX_CUDA_PROFILE=1; ");
     }
-    if let Ok(rows) = std::env::var("ENNX_CUDA_REPAIR_CHUNK") {
+    if let Ok(rows) = std::env::var("BLCKBAUX_CUDA_REPAIR_CHUNK") {
         // Parse before constructing the remote shell command.
         if let Ok(rows) = rows.parse::<u32>() {
-            env.push_str(&format!("export ENNX_CUDA_REPAIR_CHUNK={rows}; "));
+            env.push_str(&format!("export BLCKBAUX_CUDA_REPAIR_CHUNK={rows}; "));
         }
     }
     let prompt_arg = if prompt_file {
-        " /tmp/ennx-prompt.json"
+        " /tmp/blckbaux-prompt.json"
     } else {
         ""
     };
     format!(
-        "set -euo pipefail; cd /opt/ennx; \
+        "set -euo pipefail; cd /opt/blckbaux; \
          {env}\
          CARGO_HOME=/cache/cargo CARGO_TARGET_DIR=/cache/target ./tools/cuda-run build; \
          test -f /ckpt/looped-571e8175/checkpoint.safetensors; \
-         /cache/target/release/ennx-cuda model-check; \
-         /cache/target/release/ennx-cuda diffusion-check; \
-         /cache/target/release/ennx-cuda context 4096 128 1; \
-         rm -rf /tmp/ennx-generation; \
-         /cache/target/release/ennx-cuda generation-bench \
-         /ckpt/looped-571e8175/checkpoint.safetensors /tmp/ennx-generation \
+         /cache/target/release/blckbaux-cuda model-check; \
+         /cache/target/release/blckbaux-cuda diffusion-check; \
+         /cache/target/release/blckbaux-cuda context 4096 128 1; \
+         rm -rf /tmp/blckbaux-generation; \
+         /cache/target/release/blckbaux-cuda generation-bench \
+         /ckpt/looped-571e8175/checkpoint.safetensors /tmp/blckbaux-generation \
          {context} {prompt} {visits} {temperature} {seed} {unroll} {chunk}{prompt_arg}"
     )
 }
@@ -420,7 +427,7 @@ async fn upload_source(
             SandboxExecOptions::new(vec![
                 "bash",
                 "-lc",
-                "rm -rf /opt/ennx && mkdir -p /opt/ennx && tar -xzf - -C /opt/ennx",
+                "rm -rf /opt/blckbaux && mkdir -p /opt/blckbaux && tar -xzf - -C /opt/blckbaux",
             ])
             .with_stdin(source)
             .with_timeout(120),
@@ -444,12 +451,12 @@ async fn ptx_run(
     let cache = client
         .volumes()
         .from_name(
-            "ennx-cuda-build",
+            "blckbaux-cuda-build",
             "main",
             VolumeFromNameOptions::create_if_missing(),
         )
         .await?;
-    let mut image = match std::env::var("ENNX_MODAL_IMAGE") {
+    let mut image = match std::env::var("BLCKBAUX_MODAL_IMAGE") {
         Ok(image_id) => Image::from_id(image_id),
         Err(_) => {
             let mut image = tool_image()?;
@@ -541,12 +548,12 @@ async fn bo_run(
     let cache = client
         .volumes()
         .from_name(
-            "ennx-cuda-build",
+            "blckbaux-cuda-build",
             "main",
             VolumeFromNameOptions::create_if_missing(),
         )
         .await?;
-    let mut image = match std::env::var("ENNX_MODAL_IMAGE") {
+    let mut image = match std::env::var("BLCKBAUX_MODAL_IMAGE") {
         Ok(image_id) => Image::from_id(image_id),
         Err(_) => {
             let mut image = tool_image()?;
@@ -586,7 +593,8 @@ async fn bo_run(
         let artifact = sandbox
             .exec(
                 client,
-                SandboxExecOptions::new(vec!["cat", "/tmp/ennx-bo-result.json"]).with_timeout(30),
+                SandboxExecOptions::new(vec!["cat", "/tmp/blckbaux-bo-result.json"])
+                    .with_timeout(30),
             )
             .await?;
         if !artifact.exit_status.is_success() {
@@ -609,21 +617,21 @@ async fn bo_run(
 }
 
 fn env_config(chunk: u32, output: &Path) -> Result<(Option<Vec<u8>>, Option<u32>)> {
-    let prompt_data = std::env::var_os("ENNX_CUDA_PROMPT")
+    let prompt_data = std::env::var_os("BLCKBAUX_CUDA_PROMPT")
         .map(std::fs::read)
         .transpose()?;
-    if let Ok(value) = std::env::var("ENNX_CUDA_REPAIR_CHUNK") {
+    if let Ok(value) = std::env::var("BLCKBAUX_CUDA_REPAIR_CHUNK") {
         let rows = value.parse::<u32>()?;
         if !(64..=4096).contains(&rows) || !rows.is_power_of_two() || chunk == 0 {
-            return Err("ENNX_CUDA_REPAIR_CHUNK requires streamed execution and a power of two from 64 through 4096".into());
+            return Err("BLCKBAUX_CUDA_REPAIR_CHUNK requires streamed execution and a power of two from 64 through 4096".into());
         }
     }
-    let synth = std::env::var("ENNX_SYNTH_GEMM")
+    let synth = std::env::var("BLCKBAUX_SYNTH_GEMM")
         .ok()
         .map(|s| s.parse::<u32>())
         .transpose()?;
     if synth.is_some_and(|k| ![8, 16, 32, 64].contains(&k)) {
-        return Err("ENNX_SYNTH_GEMM must be 8, 16, 32, or 64".into());
+        return Err("BLCKBAUX_SYNTH_GEMM must be 8, 16, 32, or 64".into());
     }
     if output.exists() {
         return Err("generation output already exists; choose a fresh result directory".into());
@@ -634,18 +642,18 @@ fn env_config(chunk: u32, output: &Path) -> Result<(Option<Vec<u8>>, Option<u32>
 async fn make_sandbox(client: &mut ModalClient, app: &modal_rs::App) -> Result<modal_rs::Sandbox> {
     let volume = client
         .volumes()
-        .from_name("ennx-ckpt", "main", VolumeFromNameOptions::default())
+        .from_name("blckbaux-ckpt", "main", VolumeFromNameOptions::default())
         .await?
         .read_only();
     let cache = client
         .volumes()
         .from_name(
-            "ennx-cuda-build",
+            "blckbaux-cuda-build",
             "main",
             VolumeFromNameOptions::create_if_missing(),
         )
         .await?;
-    let mut image = match std::env::var("ENNX_MODAL_IMAGE") {
+    let mut image = match std::env::var("BLCKBAUX_MODAL_IMAGE") {
         Ok(image_id) => Image::from_id(image_id),
         Err(_) => {
             let mut image = tool_image()?;
@@ -679,14 +687,14 @@ async fn pull_artifacts(
     let result = sandbox
         .exec(
             client,
-            SandboxExecOptions::new(vec!["cat", "/tmp/ennx-generation/result.json"])
+            SandboxExecOptions::new(vec!["cat", "/tmp/blckbaux-generation/result.json"])
                 .with_timeout(30),
         )
         .await?;
     let tokens = sandbox
         .exec(
             client,
-            SandboxExecOptions::new(vec!["cat", "/tmp/ennx-generation/tokens.json"])
+            SandboxExecOptions::new(vec!["cat", "/tmp/blckbaux-generation/tokens.json"])
                 .with_timeout(30),
         )
         .await?;
@@ -697,7 +705,7 @@ async fn pull_artifacts(
         let gemm = sandbox
             .exec(
                 client,
-                SandboxExecOptions::new(vec!["cat", "/tmp/ennx-generation/gemm.json"])
+                SandboxExecOptions::new(vec!["cat", "/tmp/blckbaux-generation/gemm.json"])
                     .with_timeout(30),
             )
             .await?;
@@ -742,7 +750,7 @@ async fn generation_run(
             let upload = sandbox
                 .exec(
                     client,
-                    SandboxExecOptions::new(vec!["bash", "-lc", "cat > /tmp/ennx-prompt.json"])
+                    SandboxExecOptions::new(vec!["bash", "-lc", "cat > /tmp/blckbaux-prompt.json"])
                         .with_stdin(data.clone())
                         .with_timeout(30),
                 )
@@ -796,7 +804,7 @@ async fn wheel_run(
     mjx: bool,
 ) -> Result<()> {
     let archive = source_tar()?;
-    let image_id = std::env::var("ENNX_MODAL_IMAGE").unwrap_or_else(|_| CUDA_IMAGE.to_string());
+    let image_id = std::env::var("BLCKBAUX_MODAL_IMAGE").unwrap_or_else(|_| CUDA_IMAGE.to_string());
     let image = Image::from_id(image_id);
     let sandbox = client
         .sandboxes()
@@ -818,7 +826,7 @@ async fn wheel_run(
                 SandboxExecOptions::new(vec![
                     "bash",
                     "-lc",
-                    "rm -rf /opt/ennx && mkdir -p /opt/ennx && tar -xzf - -C /opt/ennx",
+                    "rm -rf /opt/blckbaux && mkdir -p /opt/blckbaux && tar -xzf - -C /opt/blckbaux",
                 ])
                 .with_stdin(source)
                 .with_timeout(120),
@@ -878,7 +886,7 @@ async fn image_run(client: &mut ModalClient, app: &modal_rs::App) -> Result<()> 
 async fn main() {
     if let Err(error) = run().await {
         // Debug formatting of RPC errors can include authentication metadata.
-        eprintln!("ennx-modal: {error}");
+        eprintln!("blckbaux-modal: {error}");
         std::process::exit(1);
     }
 }
@@ -888,7 +896,11 @@ async fn run() -> Result<()> {
     let action = parse_args()?;
     let mut client = ModalClient::connect().await?;
     let app = client
-        .get_or_create_app("ennx-rust-modal", "main", AppOptions::create_if_missing())
+        .get_or_create_app(
+            "blckbaux-rust-modal",
+            "main",
+            AppOptions::create_if_missing(),
+        )
         .await?;
     match action {
         Action::Bo {
@@ -922,6 +934,7 @@ async fn run() -> Result<()> {
             )
             .await
         }
+        Action::Hnet(config) => hnet::run(&mut client, &app, config).await,
         Action::Ptx {
             output,
             elements,

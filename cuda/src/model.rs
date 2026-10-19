@@ -1,18 +1,19 @@
 //! Resident checkpoint execution. Physical weights are shared across recurrent visits.
 use crate::{CudaResult, copy_prefix, cuda_error, read_prefix, timing_event};
+use blckbaux_cuda_device::{
+    FbtShape, HnetEncodeShape, MatmulShape, MoeShape, ObjectiveShape, PisaShape, RouteShape,
+    RoutedTile, ScoreStats, fbt_model,
+};
+use blckbaux_semantics::optimizer as bo;
 use cuda_core::{
     CudaContext, CudaEvent, CudaStream, DeviceBuffer, LaunchConfig1D, simt::LaunchConfig2D,
-};
-use ennx_cuda_kernels::{
-    FbtShape, MatmulShape, MoeShape, PisaShape, RouteShape, RoutedTile, fbt_model,
 };
 use std::path::Path;
 use std::sync::Arc;
 use std::time::Instant;
 mod cached;
 mod readout;
-#[path = "../../rust/crates/ennx/src/forward_program/recurrence.rs"]
-pub mod recurrence;
+pub use blckbaux_semantics::recurrence;
 #[path = "model/routing.rs"]
 mod routing;
 pub(crate) mod run;
@@ -25,9 +26,9 @@ mod diffusion;
 pub(crate) mod diffusion_run;
 use diffusion::DiffusionState;
 
-const WIDTH: usize = 512;
-const VOCAB: usize = 8192;
-const EXPERTS: usize = 625;
+const WIDTH: usize = blckbaux_semantics::hnet::WIDTH;
+const VOCAB: usize = blckbaux_cuda_device::VOCAB as usize;
+const EXPERTS: usize = blckbaux_semantics::shape::HNET_SHAPE.experts as usize;
 
 #[derive(Clone, Copy)]
 enum Stage {
@@ -38,7 +39,10 @@ enum Stage {
     Pisa,
     Output,
     Update,
-    Moe,
+    MoeRouter,
+    MoeRoute,
+    MoeExperts,
+    MoeCombine,
     Readout,
 }
 
@@ -58,6 +62,13 @@ pub struct ModelOutput {
     pub hidden: Vec<u16>,
     pub stream_probe: Vec<u16>,
     pub device_ms: f32,
+    pub wall_ms: f32,
+    pub visits: usize,
+}
+
+pub(super) struct EvaluationOutput {
+    pub device_ms: f32,
+    pub macro_score_ms: f32,
     pub wall_ms: f32,
     pub visits: usize,
 }
@@ -82,6 +93,10 @@ pub struct WaveProfile {
     pub pisa_ms: f32,
     pub output_ms: f32,
     pub attention_ms: f32,
+    pub moe_router_ms: f32,
+    pub moe_route_ms: f32,
+    pub moe_experts_ms: f32,
+    pub moe_combine_ms: f32,
     pub moe_ms: f32,
     pub readout_ms: f32,
     pub total_ms: f32,
@@ -96,10 +111,19 @@ pub struct FbtModel {
     pub(crate) rows: usize,
     pub(crate) sequence: usize,
     pub(crate) diffusion: Option<DiffusionState>,
+    hnet: Option<readout::HnetState>,
     synth: Option<crate::gemm::Gemm>,
     parallel_mhc: bool,
     cache: Option<cached::State>,
     first: usize,
+    readout_from: usize,
+    scoring: Option<Scoring>,
+}
+
+struct Scoring {
+    targets: DeviceBuffer<u32>,
+    losses: DeviceBuffer<f32>,
+    count: usize,
 }
 
 struct Scratch {
@@ -204,7 +228,7 @@ impl Scratch {
 impl FbtModel {
     pub fn fixture() -> CudaResult<Self> {
         let context = CudaContext::new(0).map_err(cuda_error)?;
-        let stream = context.default_stream();
+        let stream = context.new_stream().map_err(cuda_error)?;
         // SAFETY: the generated binding loads the matching embedded module.
         let module = unsafe { fbt_model::load(&context) }.map_err(cuda_error)?;
         let weights = Weights::fixture(&stream)?;
@@ -219,10 +243,13 @@ impl FbtModel {
             rows: 4096,
             sequence: 4096,
             diffusion: None,
+            hnet: None,
             synth,
             parallel_mhc: true,
             cache: None,
             first: 0,
+            readout_from: 0,
+            scoring: None,
         })
     }
     pub fn open(path: &Path, rows: usize, sequence: usize) -> CudaResult<Self> {
@@ -256,9 +283,50 @@ impl FbtModel {
         Self::load(path, chunk, sequence)
     }
 
+    pub fn initialize_hnet(seed: u64, rows: usize, sequence: usize) -> CudaResult<Self> {
+        if !(64..=65_536).contains(&rows)
+            || !(4_096..=65_536).contains(&sequence)
+            || !rows.is_power_of_two()
+            || !sequence.is_power_of_two()
+            || rows > sequence
+            || sequence % rows != 0
+        {
+            return Err("procedural H-Net requires power-of-two active rows 64..65536 dividing a 4096..65536 context".into());
+        }
+        if rows == sequence {
+            PisaShape::fbt(rows as u32, sequence as u32).map_err(str::to_string)?;
+        } else {
+            PisaShape::cached(rows as u32, sequence as u32, 0).map_err(str::to_string)?;
+        }
+        let context = CudaContext::new(0).map_err(cuda_error)?;
+        let stream = context.new_stream().map_err(cuda_error)?;
+        // SAFETY: generated binding loads the matching embedded module.
+        let module = unsafe { fbt_model::load(&context) }.map_err(cuda_error)?;
+        let weights = Weights::initialize_hnet(seed, &stream)?;
+        let synth = crate::gemm::Gemm::from_env(&context)?;
+        let scratch = Scratch::new(&stream, rows, sequence)?;
+        Ok(Self {
+            context,
+            stream,
+            module,
+            weights,
+            scratch,
+            rows,
+            sequence,
+            diffusion: None,
+            hnet: None,
+            synth,
+            parallel_mhc: true,
+            cache: None,
+            first: 0,
+            readout_from: 0,
+            scoring: None,
+        })
+    }
+
     fn load(path: &Path, rows: usize, sequence: usize) -> CudaResult<Self> {
         let context = CudaContext::new(0).map_err(cuda_error)?;
-        let stream = context.default_stream();
+        let stream = context.new_stream().map_err(cuda_error)?;
         // SAFETY: generated binding loads the matching embedded module.
         let module = unsafe { fbt_model::load(&context) }.map_err(cuda_error)?;
         let weights = Weights::open(path, &stream)?;
@@ -273,10 +341,13 @@ impl FbtModel {
             rows,
             sequence,
             diffusion: None,
+            hnet: None,
             synth,
             parallel_mhc: true,
             cache: None,
             first: 0,
+            readout_from: 0,
+            scoring: None,
         })
     }
 
@@ -287,21 +358,7 @@ impl FbtModel {
         temperature: f32,
         seed: u64,
     ) -> CudaResult<ModelOutput> {
-        if self.weights.diffusion.is_some()
-            || self.cache.is_some()
-            || tokens.len() != self.rows
-            || tokens.iter().any(|&token| token >= VOCAB as u32)
-            || !temperature.is_finite()
-            || temperature < 0.0
-        {
-            return Err("model token count, vocabulary, or temperature is invalid".into());
-        }
-        let plan = recurrence::RecurrentCore::selective_fbt().layer_visits(5, visits)?;
-        let wall = Instant::now();
-        copy_prefix(&self.scratch.tokens, tokens, &self.stream)?;
-        let start = timing_event(&self.stream)?;
-        let visits = self.enqueue(&plan, temperature, seed)?;
-        let end = timing_event(&self.stream)?;
+        let (wall, start, end, visits) = self.launch(tokens, visits, temperature, seed, None)?;
         let tokens = read_prefix(&self.scratch.sampled, &self.stream, self.rows)?;
         if tokens.iter().any(|&token| token >= VOCAB as u32) {
             return Err("readout contains no finite logit in at least one row".into());
@@ -322,13 +379,63 @@ impl FbtModel {
         })
     }
 
+    pub(super) fn evaluate(
+        &mut self,
+        tokens: &[u32],
+        visits: usize,
+        temperature: f32,
+        seed: u64,
+    ) -> CudaResult<EvaluationOutput> {
+        let mut score_events = Vec::new();
+        let (wall, start, end, visits) =
+            self.launch(tokens, visits, temperature, seed, Some(&mut score_events))?;
+        self.context.check_err().map_err(cuda_error)?;
+        let macro_score_ms = score_events
+            .iter()
+            .map(|(start, end)| start.elapsed_ms(end).map_err(cuda_error))
+            .sum::<CudaResult<f32>>()?;
+        Ok(EvaluationOutput {
+            device_ms: start.elapsed_ms(&end).map_err(cuda_error)?,
+            macro_score_ms,
+            wall_ms: wall.elapsed().as_secs_f32() * 1000.0,
+            visits,
+        })
+    }
+
+    fn launch(
+        &mut self,
+        tokens: &[u32],
+        visits: usize,
+        temperature: f32,
+        seed: u64,
+        score_events: Option<&mut Vec<(CudaEvent, CudaEvent)>>,
+    ) -> CudaResult<(Instant, CudaEvent, CudaEvent, usize)> {
+        if self.weights.diffusion.is_some()
+            || self.cache.is_some()
+            || tokens.len() != self.rows
+            || tokens.iter().any(|&token| token >= VOCAB as u32)
+            || !temperature.is_finite()
+            || temperature < 0.0
+        {
+            return Err("model token count, vocabulary, or temperature is invalid".into());
+        }
+        let plan = recurrence::RecurrentCore::selective_fbt().layer_visits(5, visits)?;
+        let wall = Instant::now();
+        copy_prefix(&self.scratch.tokens, tokens, &self.stream)?;
+        let start = timing_event(&self.stream)?;
+        let visits = self.enqueue(&plan, temperature, seed, score_events)?;
+        let end = timing_event(&self.stream)?;
+        Ok((wall, start, end, visits))
+    }
+
     fn enqueue(
         &mut self,
         plan: &[recurrence::LayerVisit],
         temperature: f32,
         seed: u64,
+        score_events: Option<&mut Vec<(CudaEvent, CudaEvent)>>,
     ) -> CudaResult<usize> {
-        self.enqueue_events(plan, temperature, seed, None)
+        self.enqueue_events(plan, temperature, seed, None, score_events)
     }
 
     fn enqueue_events(
@@ -337,9 +444,10 @@ impl FbtModel {
         temperature: f32,
         seed: u64,
         mut events: Option<&mut Vec<(Stage, CudaEvent)>>,
+        score_events: Option<&mut Vec<(CudaEvent, CudaEvent)>>,
     ) -> CudaResult<usize> {
         let rows = self.rows as u32;
-        let shape = FbtShape::new(rows, 512, 8192, 1.0e-5).map_err(str::to_string)?;
+        let shape = FbtShape::new(rows, 512, VOCAB as u32, 1.0e-5).map_err(str::to_string)?;
         if let Some(state) = &mut self.diffusion {
             let weights = self
                 .weights
@@ -393,20 +501,32 @@ impl FbtModel {
             )
             .map_err(cuda_error)?;
         mark(&mut events, &self.stream, Stage::Embed)?;
+        self.enqueue_core(plan, temperature, seed, events, score_events, true)
+    }
+
+    pub(super) fn enqueue_core(
+        &mut self,
+        plan: &[recurrence::LayerVisit],
+        temperature: f32,
+        seed: u64,
+        mut events: Option<&mut Vec<(Stage, CudaEvent)>>,
+        score_events: Option<&mut Vec<(CudaEvent, CudaEvent)>>,
+        readout: bool,
+    ) -> CudaResult<usize> {
+        let rows = self.rows as u32;
         for (ordinal, visit) in plan.iter().enumerate() {
             self.prepare(visit.layer, true)?;
             mark(&mut events, &self.stream, Stage::Prepare)?;
             if self.cache.is_some() {
                 self.cached_attention(visit.layer, ordinal, &mut events)?;
             } else {
-                self.attention(visit.layer, &mut events)?;
+                self.attention(visit.layer, ordinal, &mut events)?;
             }
             self.update()?;
             mark(&mut events, &self.stream, Stage::Update)?;
             self.prepare(visit.layer, false)?;
             mark(&mut events, &self.stream, Stage::Prepare)?;
-            self.moe(visit.layer)?;
-            mark(&mut events, &self.stream, Stage::Moe)?;
+            self.moe(visit.layer, &mut events)?;
             self.update()?;
             mark(&mut events, &self.stream, Stage::Update)?;
         }
@@ -426,8 +546,10 @@ impl FbtModel {
                 1,
             )
             .map_err(cuda_error)?;
-        self.readout(temperature, seed)?;
-        mark(&mut events, &self.stream, Stage::Readout)?;
+        if readout {
+            self.readout(temperature, seed, score_events)?;
+            mark(&mut events, &self.stream, Stage::Readout)?;
+        }
         Ok(plan.len())
     }
 
@@ -449,9 +571,9 @@ impl FbtModel {
         let plan = recurrence::RecurrentCore::selective_fbt().layer_visits(5, visits)?;
         copy_prefix(&self.scratch.tokens, tokens, &self.stream)?;
         let start = timing_event(&self.stream)?;
-        let mut events = Vec::with_capacity(plan.len() * 9 + 2);
-        self.enqueue_events(&plan, temperature, seed, Some(&mut events))?;
-        if events.len() != plan.len() * 9 + 2 {
+        let mut events = Vec::with_capacity(plan.len() * 12 + 2);
+        self.enqueue_events(&plan, temperature, seed, Some(&mut events), None)?;
+        if events.len() != plan.len() * 12 + 2 {
             return Err("wave profile event count is invalid".into());
         }
         let profile = WaveProfile::from_events(&start, &events)?;
@@ -468,7 +590,10 @@ impl WaveProfile {
         let mut index_ms = 0.0;
         let mut pisa_ms = 0.0;
         let mut output_ms = 0.0;
-        let mut moe_ms = 0.0;
+        let mut moe_router_ms = 0.0;
+        let mut moe_route_ms = 0.0;
+        let mut moe_experts_ms = 0.0;
+        let mut moe_combine_ms = 0.0;
         let mut readout_ms = 0.0;
         let mut previous = start;
         for (stage, event) in events {
@@ -480,12 +605,16 @@ impl WaveProfile {
                 Stage::Index => index_ms += elapsed,
                 Stage::Pisa => pisa_ms += elapsed,
                 Stage::Output => output_ms += elapsed,
-                Stage::Moe => moe_ms += elapsed,
+                Stage::MoeRouter => moe_router_ms += elapsed,
+                Stage::MoeRoute => moe_route_ms += elapsed,
+                Stage::MoeExperts => moe_experts_ms += elapsed,
+                Stage::MoeCombine => moe_combine_ms += elapsed,
                 Stage::Readout => readout_ms += elapsed,
             }
             previous = event;
         }
         let attention_ms = qkv_ms + index_ms + pisa_ms + output_ms;
+        let moe_ms = moe_router_ms + moe_route_ms + moe_experts_ms + moe_combine_ms;
         let end = &events.last().ok_or("wave profile is empty")?.1;
         Ok(WaveProfile {
             embed_ms,
@@ -495,6 +624,10 @@ impl WaveProfile {
             pisa_ms,
             output_ms,
             attention_ms,
+            moe_router_ms,
+            moe_route_ms,
+            moe_experts_ms,
+            moe_combine_ms,
             moe_ms,
             readout_ms,
             total_ms: start.elapsed_ms(end).map_err(cuda_error)?,
@@ -541,7 +674,7 @@ impl FbtModel {
         let mut frontiers = vec![frontier];
         while frontier < self.rows {
             for _ in 0..unroll {
-                self.enqueue(&plan, temperature, seed)?;
+                self.enqueue(&plan, temperature, seed, None)?;
                 self.module
                     .verify_prefix(
                         &self.stream,
@@ -650,6 +783,7 @@ impl FbtModel {
     fn attention(
         &mut self,
         layer: usize,
+        ordinal: usize,
         events: &mut Option<&mut Vec<(Stage, CudaEvent)>>,
     ) -> CudaResult<()> {
         let rows = self.rows as u32;
@@ -729,20 +863,63 @@ impl FbtModel {
                 )
                 .map_err(cuda_error)?;
         }
-        let launch = self
-            .module
-            .prepare_pisa_select(LaunchConfig1D::new(rows, 64, 0))
-            .map_err(cuda_error)?;
-        self.module
-            .pisa_select(
-                &self.stream,
-                &launch,
-                self.diffusion.as_ref().map_or(&s.qkv, |state| &state.index),
-                &s.pyramid,
-                &mut s.blocks,
-                shape,
-            )
-            .map_err(cuda_error)?;
+        let index_query = self.diffusion.as_ref().map_or(&s.qkv, |state| &state.index);
+        let shadow = self.hnet.as_ref().is_some_and(|state| state.index_shadow);
+        if shadow {
+            let state = self.hnet.as_ref().ok_or("missing H-Net PISA state")?;
+            let visit_offset = u32::try_from(ordinal * self.rows * 8).map_err(cuda_error)?;
+            let launch = self
+                .module
+                .prepare_pisa_shadow_refine(LaunchConfig1D::new(rows, 64, 0))
+                .map_err(cuda_error)?;
+            self.module
+                .pisa_shadow_refine(
+                    &self.stream,
+                    &launch,
+                    index_query,
+                    &s.pyramid,
+                    &state.index_incumbent,
+                    &mut s.blocks,
+                    visit_offset,
+                    shape,
+                )
+                .map_err(cuda_error)?;
+        } else {
+            let launch = self
+                .module
+                .prepare_pisa_select(LaunchConfig1D::new(rows, 64, 0))
+                .map_err(cuda_error)?;
+            self.module
+                .pisa_select(
+                    &self.stream,
+                    &launch,
+                    index_query,
+                    &s.pyramid,
+                    &mut s.blocks,
+                    shape,
+                )
+                .map_err(cuda_error)?;
+        }
+        if let Some(state) = self.hnet.as_ref().filter(|state| state.index_enabled) {
+            let destination = if shadow {
+                &state.index_candidate
+            } else {
+                &state.index_incumbent
+            };
+            let bytes = self.rows * 8 * size_of::<u32>();
+            let offset = ordinal * bytes;
+            // SAFETY: the buffers reserve eleven complete recurrent plans and
+            // ordinal was checked against that capacity by evaluate_hnet.
+            unsafe {
+                cuda_core::simt::memory::memcpy_dtod_async(
+                    destination.cu_deviceptr() + offset as u64,
+                    s.blocks.cu_deviceptr(),
+                    bytes,
+                    self.stream.cu_stream(),
+                )
+                .map_err(cuda_error)?;
+            }
+        }
         mark(events, &self.stream, Stage::Index)?;
         let launch = self
             .module
@@ -774,7 +951,11 @@ impl FbtModel {
         mark(events, &self.stream, Stage::Output)
     }
 
-    fn moe(&mut self, layer: usize) -> CudaResult<()> {
+    fn moe(
+        &mut self,
+        layer: usize,
+        events: &mut Option<&mut Vec<(Stage, CudaEvent)>>,
+    ) -> CudaResult<()> {
         let s = &mut self.scratch;
         let weights = &self.weights.layers[layer];
         let rows = self.rows as u32;
@@ -798,6 +979,7 @@ impl FbtModel {
             EXPERTS,
             WIDTH,
         )?;
+        mark(events, &self.stream, Stage::MoeRouter)?;
         let launch = self
             .module
             .prepare_routetopk(LaunchConfig1D::new(rows, 256, 0))
@@ -859,6 +1041,7 @@ impl FbtModel {
                 rows * 3,
             )
             .map_err(cuda_error)?;
+        mark(events, &self.stream, Stage::MoeRoute)?;
         experts(
             &self.module,
             &self.stream,
@@ -885,6 +1068,7 @@ impl FbtModel {
             rows,
             false,
         )?;
+        mark(events, &self.stream, Stage::MoeExperts)?;
         let launch = self
             .module
             .prepare_combine_routes(LaunchConfig1D::new((rows * 512).div_ceil(256), 256, 0))
@@ -901,7 +1085,8 @@ impl FbtModel {
                 route,
                 moe,
             )
-            .map_err(cuda_error)
+            .map_err(cuda_error)?;
+        mark(events, &self.stream, Stage::MoeCombine)
     }
 }
 

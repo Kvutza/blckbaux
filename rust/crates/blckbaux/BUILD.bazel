@@ -1,0 +1,229 @@
+load("@crates//:defs.bzl", "aliases", "crate_edition")
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library", "rust_test")
+load("//build:targets.bzl", "BLCKBAUX_CRATES", "BLCKBAUX_PROGRAMS", "BLCKBAUX_TEST_CRATES")
+load("//rust/crates/blckbaux:defs.bzl", "blckbaux_crate_deps", "blckbaux_program_targets")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["Cargo.toml"])
+
+BLCKBAUX_SRCS = glob(
+    ["src/**/*.rs"],
+    exclude = ["src/blckbaux_build.rs"],
+)
+
+BLCKBAUX_SHADER_SRCS = glob([
+    "src/**/*.cl",
+    "src/**/*.metal",
+])
+
+BLCKBAUX_DEPS = blckbaux_crate_deps(BLCKBAUX_CRATES) + [
+    "//rust/crates/semantics",
+    "//rust/crates/neighbor-index",
+    "//rust/crates/artifact",
+]
+
+BLCKBAUX_TEST_DEPS = blckbaux_crate_deps(BLCKBAUX_TEST_CRATES) + [
+    "//rust/crates/semantics",
+    "//rust/crates/neighbor-index",
+    "//rust/crates/artifact",
+]
+
+cc_library(
+    name = "usearch_bridge",
+    srcs = ["src/usearch_bridge.cpp"],
+    hdrs = ["src/usearch_bridge.h"],
+    copts = [
+        "-std=c++17",
+        "-Wno-unknown-pragmas",
+    ],
+    includes = ["src"],
+    deps = ["@usearch_src//:usearch"],
+)
+
+rust_library(
+    name = "blckbaux_cpu",
+    srcs = BLCKBAUX_SRCS,
+    aliases = aliases(),
+    compile_data = BLCKBAUX_SHADER_SRCS,
+    crate_features = ["usearch-native"],
+    crate_name = "blckbaux",
+    crate_root = "src/lib.rs",
+    edition = crate_edition(),
+    link_deps = [
+        ":usearch_bridge",
+    ],
+    deps = BLCKBAUX_DEPS,
+)
+
+rust_library(
+    name = "blckbaux_metal",
+    srcs = BLCKBAUX_SRCS,
+    aliases = aliases(),
+    compile_data = BLCKBAUX_SHADER_SRCS,
+    crate_features = [
+        "metal",
+        "usearch-native",
+    ],
+    crate_name = "blckbaux",
+    crate_root = "src/lib.rs",
+    edition = crate_edition(),
+    link_deps = [
+        ":usearch_bridge",
+    ],
+    target_compatible_with = ["@platforms//os:macos"],
+    deps = BLCKBAUX_DEPS + [
+        "@crates//:metal",
+    ],
+)
+
+rust_library(
+    name = "blckbaux_opencl",
+    srcs = BLCKBAUX_SRCS,
+    aliases = aliases(),
+    compile_data = BLCKBAUX_SHADER_SRCS,
+    crate_features = [
+        "opencl",
+        "usearch-native",
+    ],
+    crate_name = "blckbaux",
+    crate_root = "src/lib.rs",
+    edition = crate_edition(),
+    link_deps = [
+        ":usearch_bridge",
+    ],
+    deps = BLCKBAUX_DEPS + [
+        "@crates//:opencl3",
+    ],
+)
+
+alias(
+    name = "blckbaux",
+    actual = ":blckbaux_cpu",
+)
+
+alias(
+    name = "blckbaux_accelerators",
+    actual = select({
+        "@platforms//os:linux": ":blckbaux_opencl",
+        "@platforms//os:macos": ":blckbaux_metal",
+        "//conditions:default": ":blckbaux_cpu",
+    }),
+)
+
+blckbaux_program_targets(BLCKBAUX_PROGRAMS, glob(["src/**/*.rs", "examples/**/*.rs"]))
+
+rust_test(
+    name = "blckbaux_test",
+    aliases = aliases(
+        normal_dev = True,
+        proc_macro_dev = True,
+    ),
+    crate = ":blckbaux_cpu",
+    compile_data = ["//examples/tuning:turbo-enn.toml"],
+    deps = BLCKBAUX_TEST_DEPS,
+)
+
+# Metal unit tests are separate from blckbaux_test because the CPU crate compiles
+# accelerator modules out. Keep this target narrow and filter it in local/CI
+# invocations when validating Qwen context compilation.
+rust_test(
+    name = "qwen_metal_test",
+    aliases = aliases(
+        normal_dev = True,
+        proc_macro_dev = True,
+    ),
+    compile_data = ["//examples/tuning:turbo-enn.toml"],
+    crate = ":blckbaux_metal",
+    crate_features = [
+        "metal",
+        "usearch-native",
+    ],
+    deps = BLCKBAUX_TEST_DEPS,
+    target_compatible_with = ["@platforms//os:macos"],
+)
+
+rust_binary(
+    name = "trial_bench_metal",
+    srcs = ["examples/trial_bench.rs"],
+    aliases = aliases(normal_dev = True),
+    crate_name = "trial_bench_metal",
+    crate_root = "examples/trial_bench.rs",
+    edition = crate_edition(),
+    target_compatible_with = ["@platforms//os:macos"],
+    deps = [
+        ":blckbaux_metal",
+    ],
+)
+
+rust_binary(
+    name = "trial_bench_opencl",
+    srcs = ["examples/trial_bench.rs"],
+    aliases = aliases(normal_dev = True),
+    crate_name = "trial_bench_opencl",
+    crate_root = "examples/trial_bench.rs",
+    edition = crate_edition(),
+    deps = [
+        ":blckbaux_opencl",
+    ],
+)
+
+rust_binary(
+    name = "knn_frontier_metal",
+    srcs = ["examples/knn_frontier.rs"],
+    aliases = aliases(normal_dev = True),
+    crate_name = "knn_frontier_metal",
+    crate_root = "examples/knn_frontier.rs",
+    edition = crate_edition(),
+    target_compatible_with = ["@platforms//os:macos"],
+    deps = [
+        ":blckbaux_metal",
+    ] + blckbaux_crate_deps(["ndarray"]),
+)
+
+rust_test(
+    name = "knn_metal_test",
+    srcs = ["tests/knn_metal.rs"],
+    aliases = aliases(normal_dev = True),
+    crate_name = "knn_metal_test",
+    crate_root = "tests/knn_metal.rs",
+    edition = crate_edition(),
+    target_compatible_with = ["@platforms//os:macos"],
+    deps = [
+        ":blckbaux_metal",
+    ] + blckbaux_crate_deps(["ndarray"]),
+)
+
+rust_test(
+    name = "trial_search_metal_test",
+    srcs = ["tests/trial_search.rs"],
+    aliases = aliases(
+        normal_dev = True,
+        proc_macro_dev = True,
+    ),
+    crate_features = ["metal"],
+    crate_name = "trial_search_metal_test",
+    crate_root = "tests/trial_search.rs",
+    edition = crate_edition(),
+    target_compatible_with = ["@platforms//os:macos"],
+    deps = BLCKBAUX_TEST_DEPS + [
+        ":blckbaux_metal",
+    ],
+)
+
+rust_test(
+    name = "trial_search_opencl_test",
+    srcs = ["tests/trial_search.rs"],
+    aliases = aliases(
+        normal_dev = True,
+        proc_macro_dev = True,
+    ),
+    crate_features = ["opencl"],
+    crate_name = "trial_search_opencl_test",
+    crate_root = "tests/trial_search.rs",
+    edition = crate_edition(),
+    deps = BLCKBAUX_TEST_DEPS + [
+        ":blckbaux_opencl",
+    ],
+)

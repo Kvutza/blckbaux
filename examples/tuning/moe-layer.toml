@@ -1,7 +1,0 @@
-version = 2
-experiment = "moe-layer"
-output = "../../results/moe-layer"
-
-[run]
-rounds = 10
-target-ms = 1000

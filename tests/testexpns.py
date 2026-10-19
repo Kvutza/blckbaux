@@ -2,10 +2,10 @@ from __future__ import annotations
 
 
 def test_001():
-    import ennx
-    import ennx.experimental as experimental_mod
-    import ennx.experimental.mtrregn as mtr
-    from ennx import experimental
+    import blckbaux
+    import blckbaux.experimental as experimental_mod
+    import blckbaux.experimental.mtrregn as mtr
+    from blckbaux import experimental
 
     assert experimental is experimental_mod
     assert experimental.mtrregn is mtr
@@ -22,13 +22,13 @@ def test_001():
     assert callable(mtr.allocate_batches)
     assert callable(mtr.select_candidates)
     assert mtr.mtrregn is mtr
-    assert ennx.__file__
+    assert blckbaux.__file__
 
 
 def test_002():
     import numpy as np
 
-    import ennx.experimental as experimental
+    import blckbaux.experimental as experimental
 
     x = np.array([0.0, 1.0, 2.0], dtype=np.float32)
     np.testing.assert_array_equal(experimental.quantize_int4(x), np.array([0x10, 0x02]))
@@ -38,7 +38,7 @@ def test_002():
 def test_003():
     import numpy as np
 
-    import ennx.experimental.mtrregn as mtr
+    import blckbaux.experimental.mtrregn as mtr
 
     class _FakeState:
         def allocate(self, budget, utility=None):

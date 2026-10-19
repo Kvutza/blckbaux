@@ -41,7 +41,7 @@ def config():
 @pytest.fixture
 def document():
     return {
-        "format": "ennx.solution_tokens.v1",
+        "format": "blckbaux.solution_tokens.v1",
         "provenance": {"dataset": "test"},
         "examples": [
             {
@@ -129,12 +129,12 @@ def binding(monkeypatch, tmp_path, config):
         ask_options=[],
         paired_updates=[],
     )
-    extension = ModuleType("ennx.ennx_rust")
+    extension = ModuleType("blckbaux.blckbaux_rust")
     extension.__file__ = str(tmp_path / "fake-extension.so")
     Path(extension.__file__).write_bytes(b"fake extension")
-    package = ModuleType("ennx")
-    package.ennx_rust = extension
-    experimental = ModuleType("ennx.experimental")
+    package = ModuleType("blckbaux")
+    package.blckbaux_rust = extension
+    experimental = ModuleType("blckbaux.experimental")
     package.experimental = experimental
 
     class Engine:
@@ -273,9 +273,9 @@ def binding(monkeypatch, tmp_path, config):
     experimental.SearchState = Search
     experimental.ParamBlock = lambda *args: args
     for name, module in (
-        ("ennx", package),
-        ("ennx.ennx_rust", extension),
-        ("ennx.experimental", experimental),
+        ("blckbaux", package),
+        ("blckbaux.blckbaux_rust", extension),
+        ("blckbaux.experimental", experimental),
     ):
         monkeypatch.setitem(sys.modules, name, module)
     monkeypatch.setattr(native, "cuda_device", lambda: "Tesla T4")

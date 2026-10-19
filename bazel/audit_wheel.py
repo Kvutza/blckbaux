@@ -9,16 +9,18 @@ def wheel_paths(root: str) -> tuple[str, str]:
     dist_infos = [
         name
         for name in os.listdir(root)
-        if name.startswith("ennx-") and name.endswith(".dist-info")
+        if name.startswith("blckbaux-") and name.endswith(".dist-info")
     ]
     extensions = [
         name
-        for name in os.listdir(os.path.join(root, "ennx"))
-        if name.startswith("ennx_rust") and name.endswith(".so")
+        for name in os.listdir(os.path.join(root, "blckbaux"))
+        if name.startswith("blckbaux_rust") and name.endswith(".so")
     ]
     assert len(dist_infos) == 1, f"Expected one dist-info directory, got {dist_infos}"
     assert len(extensions) == 1, f"Expected one native extension, got {extensions}"
-    return os.path.join(root, dist_infos[0]), os.path.join(root, "ennx", extensions[0])
+    return os.path.join(root, dist_infos[0]), os.path.join(
+        root, "blckbaux", extensions[0]
+    )
 
 
 def audit_macos(extension: str) -> None:
@@ -48,11 +50,13 @@ def audit_wheel(wheel_path: str):
         audit_macos(extension)
 
         sys.path.insert(0, tmpdir)
-        from ennx.ennx_rust import search
+        from blckbaux.blckbaux_rust import search
 
-        assert hasattr(search, "Search"), "Missing Search class on PyO3 search module"
+        assert hasattr(search, "TrialEngine"), (
+            "Missing TrialEngine on PyO3 search module"
+        )
         print(
-            "Successfully imported ennx and verified Search API from audited release wheel!"
+            "Successfully imported blckbaux and verified TrialEngine from the audited wheel."
         )
 
 

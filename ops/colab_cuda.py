@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import json
 import os
 import platform
@@ -12,6 +11,8 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+
+import click
 
 from cuoxtool import (
     CUDA_OXIDE_REV,
@@ -24,7 +25,7 @@ from cuoxtool import (
 DEFAULT_WORKSPACE = Path("/content/cuda-oxide")
 DEFAULT_PROJECT = Path(__file__).resolve().parents[1] / "cuda"
 LLVM_KEY_URL = "https://apt.llvm.org/llvm-snapshot.gpg.key"
-TOOLCHAIN_STATE = Path.home() / ".cache/ennx/cuda-oxide-toolchain.json"
+TOOLCHAIN_STATE = Path.home() / ".cache/blckbaux/cuda-oxide-toolchain.json"
 CUDA_TOOLKIT_ROOT = Path(f"/usr/local/cuda-{CUDA_TOOLKIT_VERSION}")
 
 
@@ -301,7 +302,9 @@ def exercise(workspace: Path, command: list[str]) -> dict[str, object]:
 def run_project(project: Path, command: list[str]) -> dict[str, object]:
     cargo = Path.home() / ".cargo/bin/cargo"
     if not cargo.exists() or not project.is_dir():
-        raise RuntimeError("Run setup first and ensure the ENNx repository is present")
+        raise RuntimeError(
+            "Run setup first and ensure the Blckbaux repository is present"
+        )
     seconds = run(
         [str(cargo), f"+{RUST_TOOLCHAIN}", "oxide", *command],
         cwd=project,
@@ -312,9 +315,9 @@ def run_project(project: Path, command: list[str]) -> dict[str, object]:
 
 def run_sanitize(project: Path) -> dict[str, object]:
     repo = project.resolve().parent
-    executable = repo / "target/release/ennx-cuda"
+    executable = repo / "target/release/blckbaux-cuda"
     if not executable.is_file():
-        raise RuntimeError("Run the ennx command before the sanitizer")
+        raise RuntimeError("Run the blckbaux command before the sanitizer")
     command = [
         "compute-sanitizer",
         "--tool",
@@ -333,12 +336,12 @@ def run_python(project: Path) -> dict[str, object]:
     rust = repo / "rust"
     check = repo / "ops/cuda_python.py"
     if not rust.is_dir() or not check.is_file():
-        raise RuntimeError("The CUDA project must be inside an ENNx checkout")
+        raise RuntimeError("The CUDA project must be inside an Blckbaux checkout")
 
     env = toolchain_env()
     env.update(
         {
-            "ENNX_FAISS_UNAVAILABLE": "1",
+            "BLCKBAUX_FAISS_UNAVAILABLE": "1",
             "PYO3_PYTHON": sys.executable,
             "RUSTUP_TOOLCHAIN": RUST_TOOLCHAIN,
         }
@@ -352,16 +355,16 @@ def run_python(project: Path) -> dict[str, object]:
         "--arch",
         "sm_75",
         "--device-codegen-crate",
-        "ennx_cuda_kernels",
+        "blckbaux_cuda_device",
         "--",
         "-p",
-        "ennx-py",
+        "blckbaux-py",
         "--features",
         "cuda",
         "--release",
     ]
     build_seconds = run(build, cwd=repo, env=env)
-    extension = repo / "target/release/libennx_rust.so"
+    extension = repo / "target/release/libblckbaux_rust.so"
     check_command = [sys.executable, str(check), str(extension)]
     check_seconds = run(check_command, cwd=repo, env=env)
     return {
@@ -372,61 +375,71 @@ def run_python(project: Path) -> dict[str, object]:
     }
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "action",
-        choices=[
+@click.command(help=__doc__)
+@click.argument(
+    "action",
+    type=click.Choice(
+        [
             "fingerprint",
             "setup",
             "doctor",
             "vecadd",
-            "ennx",
+            "blckbaux",
             "resident",
             "sanitize",
             "bench",
             "python",
             "all",
-        ],
-    )
-    parser.add_argument("--workspace", type=Path, default=DEFAULT_WORKSPACE)
-    parser.add_argument("--project", type=Path, default=DEFAULT_PROJECT)
-    args = parser.parse_args()
-
+        ]
+    ),
+)
+@click.option(
+    "--workspace",
+    type=click.Path(file_okay=False, path_type=Path),
+    default=DEFAULT_WORKSPACE,
+    show_default=True,
+)
+@click.option(
+    "--project",
+    type=click.Path(file_okay=False, path_type=Path),
+    default=DEFAULT_PROJECT,
+    show_default=True,
+)
+def main(action: str, workspace: Path, project: Path) -> None:
     result: dict[str, object] = {
         "cuda_oxide_rev": CUDA_OXIDE_REV,
         "cuda_toolkit_version": CUDA_TOOLKIT_VERSION,
         "rust_toolchain": RUST_TOOLCHAIN,
     }
-    if args.action in {"setup", "all"}:
-        result["setup"] = setup(args.workspace)
+    if action in {"setup", "all"}:
+        result["setup"] = setup(workspace)
     result["runtime"] = fingerprint()
-    if args.action in {"doctor", "all"}:
-        result["doctor"] = exercise(args.workspace, ["doctor"])
-    if args.action in {"vecadd", "all"}:
-        result["vecadd"] = exercise(args.workspace, ["run", "vecadd"])
-    if args.action in {"ennx", "all"}:
-        result["ennx"] = run_project(
-            args.project, ["run", "--arch", "sm_75", "--", "parity"]
+    if action in {"doctor", "all"}:
+        result["doctor"] = exercise(workspace, ["doctor"])
+    if action in {"vecadd", "all"}:
+        result["vecadd"] = exercise(workspace, ["run", "vecadd"])
+    if action in {"blckbaux", "all"}:
+        result["blckbaux"] = run_project(
+            project, ["run", "--arch", "sm_75", "--", "parity"]
         )
-    if args.action in {"resident", "all"}:
+    if action in {"resident", "all"}:
         result["resident"] = run_project(
-            args.project, ["run", "--arch", "sm_75", "--", "resident"]
+            project, ["run", "--arch", "sm_75", "--", "resident"]
         )
-    if args.action in {"sanitize", "all"}:
-        if args.action == "sanitize":
+    if action in {"sanitize", "all"}:
+        if action == "sanitize":
             result["resident"] = run_project(
-                args.project, ["run", "--arch", "sm_75", "--", "resident"]
+                project, ["run", "--arch", "sm_75", "--", "resident"]
             )
-        result["sanitize"] = run_sanitize(args.project)
-    if args.action in {"bench", "all"}:
+        result["sanitize"] = run_sanitize(project)
+    if action in {"bench", "all"}:
         result["bench"] = run_project(
-            args.project, ["run", "--arch", "sm_75", "--", "bench"]
+            project, ["run", "--arch", "sm_75", "--", "bench"]
         )
-    if args.action in {"python", "all"}:
-        result["python"] = run_python(args.project)
+    if action in {"python", "all"}:
+        result["python"] = run_python(project)
     result["ok"] = True
-    print(json.dumps(result, indent=2))
+    click.echo(json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":

@@ -1,18 +1,51 @@
-import argparse
+from __future__ import annotations
+
 import json
 import statistics
+import sys
 from collections import defaultdict
+from dataclasses import dataclass
 from pathlib import Path
 
 
-DESCRIPTION = "Summarize the bounded GPU selection and geometry audits."
+@dataclass(frozen=True)
+class Config:
+    geometry: str | None = None
+    selection: str | None = None
+    same_pool: str | None = None
+    scaling: str | None = None
 
 
-def records(path):
-    return [json.loads(line) for line in Path(path).read_text().splitlines() if line]
+def parse_args(argv: list[str]) -> Config:
+    opts: dict[str, str] = {}
+    idx = 0
+    while idx < len(argv):
+        arg = argv[idx]
+        if arg in (
+            "--geometry",
+            "--selection",
+            "--same-pool",
+            "--distance-scaling",
+        ):
+            if idx + 1 < len(argv):
+                opts[arg.lstrip("-").replace("-", "_")] = argv[idx + 1]
+                idx += 2
+                continue
+        idx += 1
+    return Config(
+        geometry=opts.get("geometry"),
+        selection=opts.get("selection"),
+        same_pool=opts.get("same_pool"),
+        scaling=opts.get("distance_scaling"),
+    )
 
 
-def geometry(path):
+def records(path: str) -> list[dict]:
+    lines = Path(path).read_text().splitlines()
+    return [json.loads(line) for line in lines if line]
+
+
+def geometry(path: str) -> list[dict]:
     groups = defaultdict(list)
     for row in records(path):
         groups[(row["dimensions"], row["perturbation"])].append(row)
@@ -53,7 +86,7 @@ def geometry(path):
     return result
 
 
-def selection(path):
+def selection(path: str) -> dict:
     data = records(path)
     assert data[-1]["kind"] == "completed", "incomplete selection experiment"
     protocol = data[0]
@@ -112,7 +145,7 @@ def selection(path):
     }
 
 
-def validate_initialization(seed, rounds):
+def validate_initialization(seed: int, rounds: dict) -> None:
     keys = [
         "initializing",
         "candidate_seed",
@@ -128,7 +161,7 @@ def validate_initialization(seed, rounds):
             assert left[key] == right[key], (seed, key, left, right)
 
 
-def distance_scaling(path):
+def distance_scaling(path: str) -> dict:
     rows = records(path)
     assert len(rows) == 3, "incomplete distance-scaling experiment"
     assert {row["seed"] for row in rows} == {123, 1009, 2027}
@@ -155,37 +188,35 @@ def distance_scaling(path):
     }
 
 
-def main():
-    parser = argparse.ArgumentParser(description=DESCRIPTION)
-    parser.add_argument("--geometry")
-    parser.add_argument("--selection")
-    parser.add_argument("--same-pool")
-    parser.add_argument("--distance-scaling")
-    args = parser.parse_args()
+def extract_pool(rows: list[dict]) -> list[dict]:
+    assert len(rows) == 3
+    assert {r["seed"] for r in rows} == {123, 1009, 2027}
+    return [
+        {
+            "seed": r["seed"],
+            "selected": r["selected"],
+            "candidate_mean_nlls": r["candidate_mean_nlls"],
+            "enn_minus_uniform_expected_nll": r["enn_minus_uniform_expected_nll"],
+            "enn_minus_same_radius_expected_nll": r[
+                "enn_minus_same_radius_expected_nll"
+            ],
+            "incumbent_mean_nll": r["incumbent_mean_nll"],
+        }
+        for r in rows
+    ]
+
+
+def main() -> None:
+    cfg = parse_args(sys.argv[1:])
     summary = {}
-    if args.geometry:
-        summary["geometry"] = geometry(args.geometry)
-    if args.selection:
-        summary["selection"] = selection(args.selection)
-    if args.same_pool:
-        rows = records(args.same_pool)
-        assert len(rows) == 3
-        assert {r["seed"] for r in rows} == {123, 1009, 2027}
-        summary["same_pool"] = [
-            {
-                "seed": r["seed"],
-                "selected": r["selected"],
-                "candidate_mean_nlls": r["candidate_mean_nlls"],
-                "enn_minus_uniform_expected_nll": r["enn_minus_uniform_expected_nll"],
-                "enn_minus_same_radius_expected_nll": r[
-                    "enn_minus_same_radius_expected_nll"
-                ],
-                "incumbent_mean_nll": r["incumbent_mean_nll"],
-            }
-            for r in rows
-        ]
-    if args.distance_scaling:
-        summary["distance_scaling"] = distance_scaling(args.distance_scaling)
+    if cfg.geometry:
+        summary["geometry"] = geometry(cfg.geometry)
+    if cfg.selection:
+        summary["selection"] = selection(cfg.selection)
+    if cfg.same_pool:
+        summary["same_pool"] = extract_pool(records(cfg.same_pool))
+    if cfg.scaling:
+        summary["distance_scaling"] = distance_scaling(cfg.scaling)
     print(json.dumps(summary, indent=2))
 
 

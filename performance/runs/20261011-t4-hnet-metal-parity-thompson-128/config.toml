@@ -1,0 +1,61 @@
+version = 2
+
+experiment = "pretrain"
+model = "fbt-pisa1-hnet-mhc4-v1"
+corpus = "stack-v3-rust-go-v1"
+
+[run]
+optimizer = "turbo-enn"
+rounds = 128
+target-ms = 200
+
+[proposal]
+method = "posterior"
+distribution = "gaussian"
+arms = 4
+candidates = 4
+
+[enn]
+scaling = "global"
+neighbors = 32
+epistemic-scale = 0.05
+aleatoric-scale = 0.05
+
+[enn.fit]
+neighbors = true
+candidates = 4
+samples = 4
+
+[acquisition]
+method = "thompson"
+
+[trust-region]
+method = "reliability"
+initial = 0.1
+min = 0.1
+max = 2.0
+
+[seeds]
+model = 240105308887621659
+reference = 150813718214252701
+proposal = 91614869253048103
+acquisition = 314159265358979323
+
+[generation]
+purpose = "pretrain"
+initialization = "fbt-pisa1-hnet-mhc4"
+max-tokens = 524288
+temperature = 1.0
+seed = 150813718214252701
+corpus-prompt-tokens = 524288
+save-final-checkpoint = false
+record-tensor-updates = false
+
+[generation.verify]
+mode = "accepted-prefix"
+window = 4096
+max-window = 4096
+passes = 1
+
+[generation.reward]
+kind = "conditional-cross-entropy"

@@ -1,5 +1,5 @@
 [package]
-name = "ennx-cuda"
+name = "blckbaux-cuda"
 version = "0.2.0"
 edition = "2024"
 publish = false
@@ -10,9 +10,12 @@ native-flame = []
 [dependencies]
 cuda-core.workspace = true
 cuda-host.workspace = true
-ennx-cuda-kernels = { path = "kernels" }
-ennx-wire.workspace = true
+blckbaux-cuda-device = { path = "device" }
+blckbaux-semantics = { workspace = true, features = ["cuda"] }
+blckbaux-artifact.workspace = true
 memmap2 = "0.9"
 deser.workspace = true
 ptx-synth.workspace = true
 half = "2.7"
+rand.workspace = true
+rand_distr.workspace = true

@@ -1,0 +1,31 @@
+{
+  "schema": "blckbaux.route-neighbor-ablation.v1",
+  "date": "2026-10-09",
+  "hardware": "Apple M4",
+  "model": "fbt-pisa1-hnet-mhc4-v1",
+  "parameters": 1177756440,
+  "context_tokens": 4096,
+  "rounds": 128,
+  "baseline_run": ".cache/blckbaux/runs/pretrain/fd55c1e5e284ccfdc2bc/run-1791597958472-25403-0",
+  "route_conditioned_run": ".cache/blckbaux/runs/pretrain/fd55c1e5e284ccfdc2bc/run-1791600601092-35629-0",
+  "baseline": {
+    "accepted": 28,
+    "heldout_nll_reduction": 0.000178873538971,
+    "prediction_response_correlation": 0.0321701
+  },
+  "route_conditioned": {
+    "accepted": 25,
+    "heldout_nll_reduction": -0.000012484374993,
+    "prediction_response_correlation": 0.00833464,
+    "mean_round_ms": 100.16835023437501,
+    "max_round_ms": 163.269208,
+    "conditioned_rounds": 96,
+    "active_experts_min": 88,
+    "active_experts_mean": 328.5,
+    "active_experts_max": 506,
+    "selection_differences": 72,
+    "acceptance_differences": 27
+  },
+  "decision": "rejected-and-reverted",
+  "reason": "A query-only route mask discards coordinates without representing the historical episode route. It changed acquisition materially but reduced held-out performance and predictive correlation."
+}

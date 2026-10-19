@@ -1,0 +1,65 @@
+{
+  "schema": "blckbaux.optimizer-state-comparison.v1",
+  "date": "2026-10-09",
+  "hardware": "Apple M4",
+  "revision": "a1667f04b9418395df60a6b5c71393ca3ac9ab9b",
+  "model": "fbt-pisa1-hnet-mhc4-v1",
+  "parameters": 1177756440,
+  "context_tokens": 4096,
+  "objective": "held-out-conditional-cross-entropy",
+  "initial_mean_nll": 12.485830890625003,
+  "bayesian_optimization": {
+    "config": "examples/tuning/hnet-4k-gaussian.toml",
+    "run": ".cache/blckbaux/runs/pretrain/fd55c1e5e284ccfdc2bc/run-1791597958472-25403-0",
+    "rounds": 512,
+    "accepted": 104,
+    "loop_seconds": 50.82063882999999,
+    "mean_round_ms": 99.25906021484374,
+    "final_mean_nll": 12.485460890625,
+    "mean_nll_reduction": 0.0003700000000037562,
+    "changed_coordinate_fraction": 0.9773689414086328,
+    "global_relative_delta_rms": 0.009801138591135562,
+    "global_cosine_to_initialization": 0.9999519718172544,
+    "surrogate_selected_prediction_correlation": -0.0492047,
+    "surrogate_selected_sign_accuracy": 0.427734,
+    "surrogate_predicted_positive_fraction": 0.972656,
+    "observed_positive_fraction": 0.423828,
+    "update_energy_share": {
+      "expert_gate_up": 0.7392975652041532,
+      "embedding_readout": 0.14332585647331075,
+      "expert_down": 0.11192369979868268
+    }
+  },
+  "muon": {
+    "config": "examples/tuning/hnet-4k-muon.toml",
+    "run": ".cache/blckbaux/runs/pretrain/9fee45d624c7459408c6/run-1791598102066-25889-0",
+    "rounds": 4,
+    "loop_seconds": 55.26437824999999,
+    "mean_round_ms": 13816.094562499999,
+    "final_mean_nll": 11.834019906250003,
+    "mean_nll_reduction": 0.6518109843750004,
+    "changed_coordinate_fraction": 0.02125525970378052,
+    "active_tensors": 89,
+    "total_tensors": 6319,
+    "global_relative_delta_rms": 0.005440624662952832,
+    "global_cosine_to_initialization": 0.9999852000321857,
+    "update_energy_share": {
+      "embedding_readout": 0.23325331570113036,
+      "expert_down": 0.21941050579477578,
+      "expert_gate_up": 0.21703697047579418,
+      "index_query": 0.09836574743497781,
+      "attention_output": 0.0763025077494019,
+      "router": 0.07038061583881386,
+      "qkv": 0.047741329988687485
+    }
+  },
+  "diagnosis": {
+    "initialization_explains_optimizer_gap": false,
+    "bo_moves_too_little": false,
+    "bo_update_is_effectively_isotropic_across_tensor_families": true,
+    "enn_selected_candidate_predictions_have_detectable_signal": false,
+    "expert_tensor_blocks": 6260,
+    "total_tensor_blocks": 6319,
+    "expert_block_fraction": 0.9906624465896503
+  }
+}

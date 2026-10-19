@@ -316,7 +316,7 @@ def check_solution(code: str, setup: str, tests: list[str], *, timeout=5.0) -> d
         return result("sandbox_unavailable", "macOS sandbox-exec is required.")
 
     try:
-        with tempfile.TemporaryDirectory(prefix="ennx-codecheck-") as directory:
+        with tempfile.TemporaryDirectory(prefix="blckbaux-codecheck-") as directory:
             root = Path(directory).resolve()
             work = root / "work"
             work.mkdir(mode=0o700)

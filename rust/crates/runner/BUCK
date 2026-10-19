@@ -1,0 +1,26 @@
+load("//buck2:blckbaux_targets.bzl", "blckbaux_program_targets")
+load("//build:targets.bzl", "RUNNER_PROGRAMS", "RUNNER_TEST_CRATES", "RUST_EDITION")
+
+filegroup(
+    name = "source",
+    srcs = glob(["src/**"]) + ["Cargo.toml"],
+    visibility = ["PUBLIC"],
+)
+
+blckbaux_program_targets(RUNNER_PROGRAMS, RUST_EDITION, glob(["src/**/*.rs"]))
+
+rust_test(
+    name = "blckbaux-runner-test",
+    srcs = glob(["src/**/*.rs"]),
+    crate = "blckbaux_runner_test",
+    crate_root = [program["root"] for program in RUNNER_PROGRAMS if program["name"] == "blckbaux-runner"][0],
+    env = {"CARGO_PKG_VERSION": [program["version"] for program in RUNNER_PROGRAMS if program["name"] == "blckbaux-runner"][0]},
+    edition = RUST_EDITION,
+    deps = ["//rust:" + crate for crate in RUNNER_TEST_CRATES] + [
+        "//rust/crates/tooling:tooling",
+        "//rust/crates/semantics:semantics",
+        "//rust/crates/blckbaux:blckbaux",
+        "//rust/crates/artifact:artifact",
+    ],
+    visibility = ["//buck2/tests:all"],
+)

@@ -1,0 +1,72 @@
+{
+  "schema": "blckbaux.performance.patch-nll.v1",
+  "date": "2026-10-10",
+  "metric": {
+    "name": "conditional NLL by intra-patch octile",
+    "patch_tokens": 64,
+    "octile_tokens": 8,
+    "training_objective_changed": false
+  },
+  "metal": {
+    "hardware": "Apple M4, 10 GPU cores, 24 GB unified memory",
+    "config": "examples/tuning/hnet-64k-gaussian.toml",
+    "run": ".cache/blckbaux/runs/pretrain/76b20718fa7e936adb18/run-1791647652592-99236-0",
+    "rounds": 128,
+    "accepted_updates": 41,
+    "mean_round_ms": 479.8580937265625,
+    "maximum_round_ms": 754.981125,
+    "validation_initial_nll": 12.483882578125002,
+    "validation_final_nll": 12.468208828124999,
+    "validation_nll_reduction": 0.01567375000000304,
+    "initial_octiles": [
+      12.470199421875003,
+      12.470284015625,
+      12.484523734375001,
+      12.480463593750004,
+      12.496612890625004,
+      12.477142328125,
+      12.486404578124999,
+      12.505415421874998
+    ],
+    "final_octiles": [
+      12.453854078125003,
+      12.4498258125,
+      12.462872531249998,
+      12.470882703125,
+      12.484228109375,
+      12.457861375,
+      12.470947484374994,
+      12.49519246875
+    ],
+    "octile_nll_reductions": [
+      0.016345343750000296,
+      0.02045820312499913,
+      0.02165120312500335,
+      0.009580890625004557,
+      0.012384781250004195,
+      0.019280953124999556,
+      0.015457093750004702,
+      0.010222953124998213
+    ]
+  },
+  "cuda": {
+    "hardware": "NVIDIA Tesla T4, sm_75",
+    "config": "examples/tuning/hnet-4k-gaussian.toml",
+    "artifact": "results/cuda/hnet-4k-patch-profile/result.json",
+    "objective_reduce_device_ms": 0.014336,
+    "candidate_evaluation_device_ms": 211.157,
+    "candidate_octiles": [
+      12.47998,
+      12.481014,
+      12.483991,
+      12.479785,
+      12.477842,
+      12.477654,
+      12.481353,
+      12.477393
+    ],
+    "optimizer_parity": false,
+    "optimizer_parity_reason": "The CUDA runner still uses its polynomial-threshold Rademacher arm search rather than the TOML's posterior Gaussian ENN/UCB policy."
+  },
+  "finding": "Every Metal octile improved, but the final octile remained 0.04133839062499756 NLL above the first. The observed error is not an entrance-boundary spike. The fixed local prefix transition is the next architectural object to test before variable chunk boundaries."
+}

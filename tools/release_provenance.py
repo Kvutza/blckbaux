@@ -2,16 +2,17 @@
 
 from __future__ import annotations
 
-import argparse
 import configparser
 from email.parser import Parser
-from pathlib import Path
 import subprocess
 import tomllib
 import zipfile
+from pathlib import Path
+
+import click
 
 
-PYTHON_ABIS = ("cp312", "cp313", "cp314")
+PYTHON_ABIS = ("cp312", "cp313", "cp314", "cp315")
 PLATFORM_TAGS = (
     "macosx_11_0_arm64",
     "manylinux_2_28_aarch64",
@@ -33,12 +34,12 @@ def resolve_release(root: Path, tag: str) -> str:
     commit = git(root, "rev-parse", "--verify", f"{ref}^{{commit}}")
     workspace = tomllib.loads(git(root, "show", f"{commit}:Cargo.toml"))
     versions = {workspace["workspace"]["package"]["version"]}
-    for path in ("cuda/Cargo.toml", "cuda/kernels/Cargo.toml"):
+    for path in ("cuda/Cargo.toml", "cuda/device/Cargo.toml"):
         package = tomllib.loads(git(root, "show", f"{commit}:{path}"))
         versions.add(package["package"]["version"])
     buck = configparser.ConfigParser()
     buck.read_string(git(root, "show", f"{commit}:.buckconfig"))
-    versions.add(buck["ennx"]["release_version"])
+    versions.add(buck["blckbaux"]["release_version"])
     if versions != {tag[1:]}:
         raise ValueError(
             f"tag {tag} disagrees with package versions: {sorted(versions)}"
@@ -57,7 +58,7 @@ def verify_checkout(root: Path, tag: str, commit: str) -> None:
 
 def wheel_names(version: str, platform_tags: tuple[str, ...]) -> set[str]:
     return {
-        f"ennx-{version}-{abi}-{abi}-{platform_tag}.whl"
+        f"blckbaux-{version}-{abi}-{abi}-{platform_tag}.whl"
         for abi in PYTHON_ABIS
         for platform_tag in platform_tags
     }
@@ -88,28 +89,38 @@ def verify_wheels(
             if len(metadata_paths) != 1:
                 raise ValueError(f"expected one wheel metadata document: {wheel.name}")
             metadata = Parser().parsestr(archive.read(metadata_paths[0]).decode())
-        if metadata.get_all("Name") != ["ennx"] or metadata.get_all("Version") != [
+        if metadata.get_all("Name") != ["blckbaux"] or metadata.get_all("Version") != [
             version
         ]:
             raise ValueError(f"wheel metadata disagrees with release: {wheel.name}")
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("tag")
-    parser.add_argument("--commit")
-    parser.add_argument("--platform-tag", action="append", choices=PLATFORM_TAGS)
-    parser.add_argument("--wheels", type=Path)
-    args = parser.parse_args()
+@click.command(help=__doc__)
+@click.argument("tag")
+@click.option("--commit")
+@click.option(
+    "--platform-tag",
+    "platform_tags",
+    multiple=True,
+    type=click.Choice(PLATFORM_TAGS),
+)
+@click.option("--wheels", type=click.Path(exists=True, file_okay=False, path_type=Path))
+def main(
+    tag: str,
+    commit: str | None,
+    platform_tags: tuple[str, ...],
+    wheels: Path | None,
+) -> None:
     root = Path.cwd()
-    commit = resolve_release(root, args.tag)
-    if args.commit:
-        verify_checkout(root, args.tag, args.commit)
-    if args.wheels:
-        verify_wheels(
-            args.wheels, args.tag[1:], tuple(args.platform_tag or PLATFORM_TAGS)
-        )
-    print(f"tag={args.tag}\ncommit={commit}")
+    try:
+        resolved = resolve_release(root, tag)
+        if commit:
+            verify_checkout(root, tag, commit)
+        if wheels:
+            verify_wheels(wheels, tag[1:], platform_tags or PLATFORM_TAGS)
+    except (OSError, subprocess.CalledProcessError, ValueError) as error:
+        raise click.ClickException(str(error)) from error
+    click.echo(f"tag={tag}\ncommit={resolved}")
 
 
 if __name__ == "__main__":

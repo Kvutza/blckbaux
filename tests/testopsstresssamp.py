@@ -3,13 +3,13 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from ennx.turbo.config.eidxdrv import ENNIndexDriver
+from blckbaux.turbo.config.surrogate import NeighborIndex
 
 pytestmark = pytest.mark.slow
 
 
 def _bpannstore(work_dir, *, num_obs: int = 10, num_dim: int = 4):
-    from ennx.ennx.enn_class import ENN
+    from blckbaux.enn.enn_class import ENN
     from ops.stress import make_observations
 
     train_x, train_y = make_observations(num_obs, num_dim=num_dim, seed=0)
@@ -17,7 +17,7 @@ def _bpannstore(work_dir, *, num_obs: int = 10, num_dim: int = 4):
         train_x,
         train_y,
         scale_x=False,
-        index_driver=ENNIndexDriver.BPANN_DISK,
+        index_driver=NeighborIndex.BPANN_DISK,
         work_dir=str(work_dir),
         enn_storage="disk",
     )
@@ -101,7 +101,7 @@ def test_006(tmp_path):
     """After persist_index, 10k-row reopen init should be mmap-fast."""
     import time
 
-    from ennx.ennx.enn_class import ENN
+    from blckbaux.enn.enn_class import ENN
     from ops.stress import make_observations
 
     work_dir = tmp_path / "enn_persist_reopen_10k"
@@ -111,7 +111,7 @@ def test_006(tmp_path):
         np.empty((0, num_dim)),
         np.empty((0, 1)),
         scale_x=False,
-        index_driver=ENNIndexDriver.BPANN_DISK,
+        index_driver=NeighborIndex.BPANN_DISK,
         work_dir=str(work_dir),
         enn_storage="disk",
     )
@@ -128,7 +128,7 @@ def test_006(tmp_path):
         np.empty((0, num_dim)),
         np.empty((0, 1)),
         scale_x=False,
-        index_driver=ENNIndexDriver.BPANN_DISK,
+        index_driver=NeighborIndex.BPANN_DISK,
         work_dir=str(work_dir),
         enn_storage="disk",
     )
@@ -144,7 +144,7 @@ def test_007(tmp_path):
     """
     import time
 
-    from ennx.ennx.enn_class import ENN
+    from blckbaux.enn.enn_class import ENN
     from ops.stress import make_observations
 
     work_dir = tmp_path / "enn_persist_reopen"
@@ -154,7 +154,7 @@ def test_007(tmp_path):
         np.empty((0, num_dim)),
         np.empty((0, 1)),
         scale_x=False,
-        index_driver=ENNIndexDriver.BPANN_DISK,
+        index_driver=NeighborIndex.BPANN_DISK,
         work_dir=str(work_dir),
         enn_storage="disk",
     )
@@ -171,7 +171,7 @@ def test_007(tmp_path):
         np.empty((0, num_dim)),
         np.empty((0, 1)),
         scale_x=False,
-        index_driver=ENNIndexDriver.BPANN_DISK,
+        index_driver=NeighborIndex.BPANN_DISK,
         work_dir=str(work_dir),
         enn_storage="disk",
     )

@@ -206,7 +206,7 @@ private func placement(_ plan: MLComputePlan) -> [[String: Any]] {
 enum ANEReadoutProbe {
     static func run(_ options: ANEReadoutConfiguration, source: String) async throws -> [String: Any] {
         let directory = FileManager.default.temporaryDirectory
-            .appendingPathComponent("ennx-ane-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("blckbaux-ane-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: directory) }
         let sourceModel = directory.appendingPathComponent("Readout.mlmodel")

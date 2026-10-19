@@ -24,17 +24,18 @@ python_bin_for_version() {
     local environment=$2
     local override=
     case "$python_version" in
-        3.12) override=${ENNX_PYTHON_312:-} ;;
-        3.13) override=${ENNX_PYTHON_313:-} ;;
-        3.14) override=${ENNX_PYTHON_314:-} ;;
+        3.12) override=${BLCKBAUX_PYTHON_312:-} ;;
+        3.13) override=${BLCKBAUX_PYTHON_313:-} ;;
+        3.14) override=${BLCKBAUX_PYTHON_314:-} ;;
+        3.15) override=${BLCKBAUX_PYTHON_315:-} ;;
         *) echo "unsupported Python version: $python_version" >&2; exit 2 ;;
     esac
     if [ -n "$override" ]; then
         printf '%s\n' "$override"
         return
     fi
-    if [ -n "${ENNX_PYTHON:-}" ]; then
-        printf '%s\n' "$ENNX_PYTHON"
+    if [ -n "${BLCKBAUX_PYTHON:-}" ]; then
+        printf '%s\n' "$BLCKBAUX_PYTHON"
         return
     fi
     printf '.pixi/envs/%s/bin/python\n' "$environment"
@@ -44,7 +45,7 @@ ensure_python_bin() {
     local python_version=$1
     local environment=$2
     local python_bin=$3
-    local override_var="ENNX_PYTHON_${python_version/./}"
+    local override_var="BLCKBAUX_PYTHON_${python_version/./}"
     local absolute_python_bin=$python_bin
     case "$absolute_python_bin" in
         /*) ;;
@@ -53,13 +54,13 @@ ensure_python_bin() {
     if python_ready "$absolute_python_bin" "$python_version"; then
         return 0
     fi
-    if [ -z "${!override_var:-}" ] && [ -z "${ENNX_PYTHON:-}" ]; then
+    if [ -z "${!override_var:-}" ] && [ -z "${BLCKBAUX_PYTHON:-}" ]; then
         echo "Preparing Python $python_version environment ($environment)..."
         sh tools/pixiw install --environment "$environment"
     fi
     if ! python_ready "$absolute_python_bin" "$python_version"; then
-        echo "ennx: $python_bin must be CPython $python_version with the verification dependencies from pixi.toml" >&2
-        echo "check ENNX_PYTHON_${python_version/./} or ENNX_PYTHON if set" >&2
+        echo "blckbaux: $python_bin must be CPython $python_version with the verification dependencies from pixi.toml" >&2
+        echo "check BLCKBAUX_PYTHON_${python_version/./} or BLCKBAUX_PYTHON if set" >&2
         exit 1
     fi
 }
@@ -72,7 +73,9 @@ import sys
 
 if sys.implementation.name != "cpython" or sys.version_info[:2] != tuple(map(int, sys.argv[1].split("."))):
     sys.exit(1)
-modules = ("numpy", "scipy", "pytest", "click", "requests", "botorch", "optuna", "ax")
+modules = ("numpy", "scipy", "pytest", "click", "requests")
+if sys.version_info[:2] < (3, 15):
+    modules += ("botorch", "optuna", "ax")
 if sys.platform == "linux":
     modules += ("auditwheel",)
     if not all(shutil.which(tool) for tool in ("auditwheel", "patchelf", "readelf")):
@@ -86,6 +89,7 @@ python_abi() {
         3.12) printf 'cp312\n' ;;
         3.13) printf 'cp313\n' ;;
         3.14) printf 'cp314\n' ;;
+        3.15) printf 'cp315\n' ;;
         *) echo "unsupported Python version: $1" >&2; exit 2 ;;
     esac
 }
@@ -99,9 +103,9 @@ wheel_platform_tag() {
     esac
 }
 
-# Finish with the default ABI so ./ennx test uses the same config.
-python_versions=(3.12 3.14 3.13)
-environments=(ennx-py312 ennx-py314 ennx)
+# Finish with the default ABI so ./blckbaux test uses the same config.
+python_versions=(3.12 3.14 3.15 3.13)
+environments=(blckbaux-py312 blckbaux-py314 blckbaux-py315 blckbaux)
 python_bins=()
 for index in "${!python_versions[@]}"; do
     python_bin=$(python_bin_for_version "${python_versions[$index]}" "${environments[$index]}")
@@ -114,13 +118,13 @@ for index in "${!python_versions[@]}"; do
     python_bin=${python_bins[$index]}
     targets=(//:wheel)
     if [ "$index" -eq 0 ]; then
-        targets+=(//buck2/tests:all //rust/crates/dev-cli:ennx)
+        targets+=(//buck2/tests:all //rust/crates/cli:blckbaux)
     fi
-    build_report=$(mktemp "${TMPDIR:-/tmp}/ennx-buck2-report.XXXXXX")
+    build_report=$(mktemp "${TMPDIR:-/tmp}/blckbaux-buck2-report.XXXXXX")
     ./buck2w \
         build "${targets[@]}" \
         --build-test-info \
-        --config "ennx.python_version=$python_version" \
+        --config "blckbaux.python_version=$python_version" \
         --local-only \
         --build-report "$build_report"
     wheel=$("$python_bin" - "$build_report" <<'PY'
@@ -137,7 +141,7 @@ PY
     case "$(basename "$wheel")" in
         *-"$abi"-"$abi"-"$platform_tag".whl) ;;
         *)
-            echo "ennx: Buck produced the wrong wheel for this host: $wheel" >&2
+            echo "blckbaux: Buck produced the wrong wheel for this host: $wheel" >&2
             echo "expected Python ABI $abi and platform tag $platform_tag" >&2
             exit 1
             ;;
@@ -160,8 +164,8 @@ PY
         # Verify each wheel with its matching interpreter. In full mode this
         # includes the Python suite, so supported interpreter behavior is tested
         # rather than inferred from import smoke coverage.
-        ENNX_PYTHON_VERSION="$python_version" \
-            ENNX_PYTHON="$python_bin" \
-            ENNX_WHEEL_PATH="$wheel" tools/buck2-wheel-verify ${verification:+"$verification"}
+        BLCKBAUX_PYTHON_VERSION="$python_version" \
+            BLCKBAUX_PYTHON="$python_bin" \
+            BLCKBAUX_WHEEL_PATH="$wheel" tools/buck2-wheel-verify ${verification:+"$verification"}
     )
 done

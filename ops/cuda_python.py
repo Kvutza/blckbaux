@@ -1,13 +1,14 @@
-"""Check the Cargo-built CUDA extension through ENNx's public Python API."""
+"""Check the Cargo-built CUDA extension through Blckbaux's public Python API."""
 
 from __future__ import annotations
 
-import argparse
 import math
 import shutil
 import sys
 import tempfile
 from pathlib import Path
+
+import click
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -24,27 +25,24 @@ def run_round(session, seeds: list[int], neighbors: int, reward: float, accept: 
     return trial
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "extension",
-        nargs="?",
-        type=Path,
-        default=ROOT / "rust/target/release/libennx_rust.so",
-    )
-    args = parser.parse_args()
-    extension = args.extension.resolve()
-    if not extension.is_file():
-        raise SystemExit(f"CUDA extension not found: {extension}")
+@click.command(help=__doc__)
+@click.argument(
+    "extension",
+    required=False,
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+    default=ROOT / "rust/target/release/libblckbaux_rust.so",
+)
+def main(extension: Path) -> None:
+    extension = extension.resolve()
 
-    with tempfile.TemporaryDirectory(prefix="ennx-cuda-python-") as directory:
-        package = Path(directory) / "ennx"
-        shutil.copytree(ROOT / "src/ennx", package)
-        shutil.copy2(extension, package / "ennx_rust.so")
+    with tempfile.TemporaryDirectory(prefix="blckbaux-cuda-python-") as directory:
+        package = Path(directory) / "blckbaux"
+        shutil.copytree(ROOT / "src/blckbaux", package)
+        shutil.copy2(extension, package / "blckbaux_rust.so")
         sys.path.insert(0, directory)
 
-        from ennx.experimental import ResidentBoSession
-        from ennx.search import Parameter
+        from blckbaux.experimental import ResidentBoSession
+        from blckbaux.search import Parameter
 
         leaves = [
             Parameter(
@@ -77,20 +75,24 @@ def main() -> None:
             cpu_trial = run_round(cpu, seeds, neighbors, reward, accept)
             cuda_trial = run_round(cuda, seeds, neighbors, reward, accept)
             if cpu_trial[:2] != cuda_trial[:2]:
-                raise SystemExit(
+                raise click.ClickException(
                     f"CUDA Python choice {cuda_trial[:2]} differs from CPU {cpu_trial[:2]}"
                 )
             tolerance = 2.0e-5 * max(abs(cpu_trial[2]), 1.0)
             if not math.isclose(cpu_trial[2], cuda_trial[2], abs_tol=tolerance):
-                raise SystemExit(
+                raise click.ClickException(
                     f"CUDA Python score {cuda_trial[2]} differs from CPU {cpu_trial[2]}"
                 )
             if cpu_trial[3] != cuda_trial[3]:
-                raise SystemExit("CUDA Python program version differs from CPU")
+                raise click.ClickException(
+                    "CUDA Python program version differs from CPU"
+                )
 
         if cpu.rewards != cuda.rewards:
-            raise SystemExit("CUDA Python rewards differ from CPU")
-        print(f"CUDA_PYTHON ok=true rounds={len(rounds)} python={sys.version_info[:3]}")
+            raise click.ClickException("CUDA Python rewards differ from CPU")
+        click.echo(
+            f"CUDA_PYTHON ok=true rounds={len(rounds)} python={sys.version_info[:3]}"
+        )
 
 
 if __name__ == "__main__":

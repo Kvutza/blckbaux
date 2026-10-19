@@ -10,11 +10,11 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT))
 
-from ennx import create_optimizer  # noqa: E402
-from ennx.turbo.config import (  # noqa: E402
-    AcqType,
-    ENNFitConfig,
-    ENNSurrogateConfig,
+from blckbaux import create_optimizer  # noqa: E402
+from blckbaux.turbo.config import (  # noqa: E402
+    AcquisitionKind,
+    SurrogateFit,
+    ENNSurrogate,
     turbo_enn,
 )
 from scripts.optqualcore import y_best  # noqa: E402
@@ -30,8 +30,8 @@ def _buildcells(dims: tuple[int, ...], seeds: tuple[int, ...]) -> list[dict]:
     for dim in dims:
         bounds = np.tile(np.array([[0.0, 1.0]], dtype=float), (dim, 1))
         config = turbo_enn(
-            acq_type=AcqType.UCB,
-            enn=ENNSurrogateConfig(k=10, fit=ENNFitConfig(num_samples=10)),
+            acquisition=AcquisitionKind.UCB,
+            enn=ENNSurrogate(k=10, fit=SurrogateFit(num_samples=10)),
             num_init=min(10, 2 * dim),
         )
         for seed in seeds:

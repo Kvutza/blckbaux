@@ -1,0 +1,40 @@
+[package]
+name = "blckbaux-py"
+version.workspace = true
+publish = false
+edition.workspace = true
+build = "src/xpybld.rs"
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+keywords.workspace = true
+categories.workspace = true
+description = "Python bindings for ENN core algorithms"
+readme = "../../../README.md"
+
+[lib]
+name = "blckbaux_rust"
+crate-type = ["cdylib", "rlib"]
+
+[build-dependencies]
+blckbaux = { workspace = true, default-features = false }
+
+[dependencies]
+blckbaux = { workspace = true, default-features = false }
+ndarray = { workspace = true }
+numpy = { workspace = true }
+pyo3 = { workspace = true }
+rand = { workspace = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+metal = { version = "0.33.0", optional = true }
+
+[features]
+default = []
+cuda = ["blckbaux/cuda"]
+native-flame = ["cuda", "blckbaux/native-flame"]
+metal = ["blckbaux/metal", "dep:metal"]
+opencl = ["blckbaux/opencl"]
+usearch = ["blckbaux/usearch"]
+usearch-native = ["blckbaux/usearch-native"]
+usearch-numkong = ["blckbaux/usearch-numkong"]

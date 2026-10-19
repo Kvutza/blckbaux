@@ -1,0 +1,51 @@
+load("//buck2:blckbaux_targets.bzl", "blckbaux_program_targets")
+load("//buck2:reindeer_rules.bzl", "app_rust_library")
+load("//build:targets.bzl", "TOOLING_PROGRAMS", "RUST_EDITION")
+
+filegroup(
+    name = "source",
+    srcs = glob(["src/**"]) + ["Cargo.toml"],
+    visibility = ["PUBLIC"],
+)
+
+app_rust_library(
+    name = "tooling",
+    srcs = [
+        "src/build.rs",
+        "src/lib.rs",
+        "src/names.rs",
+        "src/radar.rs",
+        "src/radar_scip.rs",
+        "src/terminal.rs",
+    ],
+    crate = "blckbaux_tooling",
+    crate_root = "src/lib.rs",
+    edition = RUST_EDITION,
+    deps = [
+        "//rust:clap",
+        "//rust/crates/artifact:artifact",
+    ],
+    visibility = ["PUBLIC"],
+)
+
+rust_test(
+    name = "tooling-unit",
+    srcs = [
+        "src/build.rs",
+        "src/lib.rs",
+        "src/names.rs",
+        "src/radar.rs",
+        "src/radar_scip.rs",
+        "src/terminal.rs",
+    ],
+    crate = "blckbaux_tooling",
+    crate_root = "src/lib.rs",
+    edition = RUST_EDITION,
+    visibility = ["//buck2/tests:all"],
+    deps = [
+        "//rust:clap",
+        "//rust/crates/artifact:artifact",
+    ],
+)
+
+[blckbaux_program_targets([program], RUST_EDITION, [program["root"]]) for program in TOOLING_PROGRAMS]

@@ -1,0 +1,23 @@
+load("@crates//:defs.bzl", "aliases", "crate_deps", "crate_edition")
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+load("//build:targets.bzl", "ARTIFACT_CRATES")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["Cargo.toml"])
+
+rust_library(
+    name = "artifact",
+    srcs = glob(["src/**/*.rs"]),
+    aliases = aliases(),
+    crate_name = "blckbaux_artifact",
+    crate_root = "src/lib.rs",
+    edition = crate_edition(),
+    deps = crate_deps(ARTIFACT_CRATES) + ["//rust/crates/semantics:semantics"],
+)
+
+rust_test(
+    name = "artifact_test",
+    crate = ":artifact",
+    deps = crate_deps(["tempfile"]),
+)

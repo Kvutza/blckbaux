@@ -53,7 +53,7 @@ _tools = rule(
     },
 )
 
-def ennx_cxx_toolchain(name):
+def blckbaux_cxx_toolchain(name):
     native_archives()
     arch = select({"prelude//cpu:arm64": "aarch64", "prelude//cpu:x86_64": "x86_64"})
     _tools(

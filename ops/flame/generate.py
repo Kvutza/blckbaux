@@ -254,10 +254,10 @@ def render_report(record):
 
 
 def run(original, run_directory, output, *, count=8, max_new_tokens=128, candidates=4):
-    import ennx.ennx_rust as extension
+    import blckbaux.blckbaux_rust as extension
     from tokenizers import Tokenizer
 
-    from ennx.experimental import MetalFlameEvaluator
+    from blckbaux.experimental import MetalFlameEvaluator
 
     from .codecheck import check_solution
 

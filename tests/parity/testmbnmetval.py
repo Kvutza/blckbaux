@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from ennx.turbo.config import MultiObjectiveConfig
+from blckbaux.turbo.config import MultiObjectiveConfig
 
 
 def test_001():

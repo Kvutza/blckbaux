@@ -12,7 +12,7 @@ import numpy as np
 if TYPE_CHECKING:
     import jax
 
-FORMAT = "ennx.solution_tokens.v1"
+FORMAT = "blckbaux.solution_tokens.v1"
 
 
 def problem_indices(indices, population):

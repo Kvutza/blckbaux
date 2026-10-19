@@ -21,37 +21,37 @@ def _constfn(n: int):
 
 def _importconfigs() -> dict[str, Any]:
     try:
-        from ennx.turbo.config import (
-            AcqType,
-            CandidateGenConfig,
-            ENNFitConfig,
-            ENNSurrogateConfig,
-            MorboTRConfig,
+        from blckbaux.turbo.config import (
+            AcquisitionKind,
+            CandidateConfig,
+            SurrogateFit,
+            ENNSurrogate,
+            MorboTrustRegion,
             MultiObjectiveConfig,
-            TurboTRConfig,
+            TurboTrustRegion,
             turbo_enn,
             turbo_one,
         )
     except ImportError:
-        from ennx.turbo.optimizer_config import (
-            AcqType,
-            CandidateGenConfig,
-            ENNFitConfig,
-            ENNSurrogateConfig,
-            MorboTRConfig,
+        from blckbaux.turbo.config import (
+            AcquisitionKind,
+            CandidateConfig,
+            SurrogateFit,
+            ENNSurrogate,
+            MorboTrustRegion,
             MultiObjectiveConfig,
-            TurboTRConfig,
+            TurboTrustRegion,
             turbo_enn,
             turbo_one,
         )
     return {
-        "AcqType": AcqType,
-        "CandidateGenConfig": CandidateGenConfig,
-        "ENNFitConfig": ENNFitConfig,
-        "ENNSurrogateConfig": ENNSurrogateConfig,
-        "MorboTRConfig": MorboTRConfig,
+        "AcquisitionKind": AcquisitionKind,
+        "CandidateConfig": CandidateConfig,
+        "SurrogateFit": SurrogateFit,
+        "ENNSurrogate": ENNSurrogate,
+        "MorboTrustRegion": MorboTrustRegion,
         "MultiObjectiveConfig": MultiObjectiveConfig,
-        "TurboTRConfig": TurboTRConfig,
+        "TurboTrustRegion": TurboTrustRegion,
         "turbo_enn": turbo_enn,
         "turbo_one": turbo_one,
     }
@@ -59,23 +59,23 @@ def _importconfigs() -> dict[str, Any]:
 
 def _candidates(num_candidates: int | None = None) -> Any:
     cfg = _importconfigs()
-    CandidateGenConfig = cfg["CandidateGenConfig"]
+    CandidateConfig = cfg["CandidateConfig"]
     if num_candidates is None:
-        return CandidateGenConfig()
-    probe = CandidateGenConfig()
+        return CandidateConfig()
+    probe = CandidateConfig()
     if callable(getattr(probe, "num_candidates", None)):
         try:
-            from ennx.turbo.config.ncandsfn import const_candidates
+            from blckbaux.turbo.config.candidates import fixed_candidates
         except ImportError:
-            const_candidates = _constfn
+            fixed_candidates = _constfn
 
-        return CandidateGenConfig(num_candidates=const_candidates(num_candidates))
-    return CandidateGenConfig(num_candidates=num_candidates)
+        return CandidateConfig(num_candidates=fixed_candidates(num_candidates))
+    return CandidateConfig(num_candidates=num_candidates)
 
 
 def separable_objective(x: np.ndarray) -> np.ndarray:
     try:
-        from ennx.benchmarks.separable_unimodal import (
+        from blckbaux.benchmarks.separable_unimodal import (
             separable_objective as objective,
         )
 
@@ -91,8 +91,8 @@ def separable_objective(x: np.ndarray) -> np.ndarray:
 
 
 def compute_hypervolume(y: np.ndarray, ref_point: np.ndarray) -> float:
-    from ennx.ennx.enn_util import pareto2d_max
-    from ennx.turbo.hypervolume import hypervolume2d_max
+    from blckbaux.enn.enn_util import pareto2d_max
+    from blckbaux.turbo.hypervolume import hypervolume2d_max
 
     y = np.asarray(y, dtype=float)
     if y.size == 0:
@@ -118,7 +118,7 @@ class ProblemSpec:
     def bounds(self) -> np.ndarray:
         if self.name == "separable_unimodal":
             return np.array([[-300.0, 600.0], [0.2, 1.0]], dtype=float)
-        from ennx.benchmarks import Ackley, DoubleAckley
+        from blckbaux.benchmarks import Ackley, DoubleAckley
 
         rng = np.random.default_rng(self.rng_seed)
         if self.name == "ackley_30d":
@@ -137,7 +137,7 @@ class ProblemSpec:
         if self.name == "separable_unimodal":
             return separable_objective
 
-        from ennx.benchmarks import Ackley, DoubleAckley
+        from blckbaux.benchmarks import Ackley, DoubleAckley
 
         rng = np.random.default_rng(self.rng_seed)
         if self.name == "ackley_30d":
@@ -158,7 +158,7 @@ class ProblemSpec:
             mid = self.num_dim // 2
 
             def objective(x: np.ndarray) -> np.ndarray:
-                from ennx.benchmarks.ackley_core import ackley_core
+                from blckbaux.benchmarks.ackley_core import ackley_core
 
                 x = np.asarray(x, dtype=float)
                 if x.ndim == 1:
@@ -248,48 +248,52 @@ def build_config(optimizer: str, problem: ProblemSpec) -> Any:
     if optimizer not in OPTIMIZER_NAMES:
         raise ValueError(optimizer)
     cfg = _importconfigs()
-    AcqType = cfg["AcqType"]
-    ENNFitConfig = cfg["ENNFitConfig"]
-    ENNSurrogateConfig = cfg["ENNSurrogateConfig"]
-    MorboTRConfig = cfg["MorboTRConfig"]
+    AcquisitionKind = cfg["AcquisitionKind"]
+    SurrogateFit = cfg["SurrogateFit"]
+    ENNSurrogate = cfg["ENNSurrogate"]
+    MorboTrustRegion = cfg["MorboTrustRegion"]
     MultiObjectiveConfig = cfg["MultiObjectiveConfig"]
-    TurboTRConfig = cfg["TurboTRConfig"]
+    TurboTrustRegion = cfg["TurboTrustRegion"]
     turbo_enn = cfg["turbo_enn"]
     turbo_one = cfg["turbo_one"]
 
-    turbo_tr = TurboTRConfig(noise_aware=True)
+    turbo_tr = TurboTrustRegion(noise_aware=True)
     morbo_tr = None
     if problem.num_metrics > 1:
         multi_objective = MultiObjectiveConfig(num_metrics=problem.num_metrics)
-        morbo_tr = MorboTRConfig(multi_objective=multi_objective, noise_aware=True)
+        morbo_tr = MorboTrustRegion(multi_objective=multi_objective, noise_aware=True)
 
     if optimizer == "morbo":
         if morbo_tr is None:
             raise ValueError(f"MORBO requires num_metrics >= 2, got {problem.name}")
         return turbo_enn(
-            enn=ENNSurrogateConfig(
+            enn=ENNSurrogate(
                 k=10,
-                fit=ENNFitConfig(num_samples=100),
+                fit=SurrogateFit(num_samples=100),
             ),
             trust_region=morbo_tr,
-            acq_type=AcqType.UCB,
+            acquisition=AcquisitionKind.UCB,
             candidates=_candidates(),
             num_init=min(20, 2 * problem.num_dim),
         )
 
     if optimizer == "turbo_enn":
         trust_region = morbo_tr if morbo_tr is not None else turbo_tr
-        acq_type = AcqType.UCB if problem.num_metrics == 1 else AcqType.THOMPSON
+        acquisition = (
+            AcquisitionKind.UCB
+            if problem.num_metrics == 1
+            else AcquisitionKind.THOMPSON
+        )
         candidates = (
             _candidates(64) if problem.name == "separable_unimodal" else _candidates()
         )
         return turbo_enn(
-            enn=ENNSurrogateConfig(
+            enn=ENNSurrogate(
                 k=10,
-                fit=ENNFitConfig(num_samples=100),
+                fit=SurrogateFit(num_samples=100),
             ),
             trust_region=trust_region,
-            acq_type=acq_type,
+            acquisition=acquisition,
             candidates=candidates,
             num_init=min(20, 2 * problem.num_dim),
         )
@@ -328,7 +332,7 @@ def run_benchmark(
 ) -> BenchmarkResult:
     import torch
 
-    from ennx import create_optimizer
+    from blckbaux import create_optimizer
 
     torch.manual_seed(problem.torch_seed)
     rng = np.random.default_rng(problem.rng_seed)

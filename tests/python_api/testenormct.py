@@ -6,16 +6,16 @@ import inspect
 
 import numpy as np
 
-from ennx import ENN
-from ennx.ennx.enn_normal import ENNNormal
-from ennx.ennx.enn_params import ENNParams, PosteriorFlags
+from blckbaux import ENN
+from blckbaux.enn.enn_normal import ENNNormal
+from blckbaux.enn.enn_params import ENNParams, PosteriorFlags
 
 
 class TestENNNormalContract:
     """API contract tests for ENNNormal return type."""
 
     def test_existsandisclass3(self):
-        from ennx.ennx.enn_normal import ENNNormal
+        from blckbaux.enn.enn_normal import ENNNormal
 
         assert inspect.isclass(ENNNormal)
 

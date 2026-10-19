@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import pytest
 
-from ennx.turbo.config import (
-    AcqType,
-    ENNFitConfig,
-    ENNSurrogateConfig,
+from blckbaux.turbo.config import (
+    AcquisitionKind,
+    SurrogateFit,
+    ENNSurrogate,
     UCBAcquisitionConfig,
     turbo_enn,
 )
-from ennx.turbo.config.encode import encode
-from ennx.turbo.config.eidxdrv import ENNIndexDriver
+from blckbaux.turbo.config.encode import encode
+from blckbaux.turbo.config.surrogate import NeighborIndex
 
 
 @pytest.mark.parametrize(
@@ -19,9 +19,9 @@ from ennx.turbo.config.eidxdrv import ENNIndexDriver
 )
 def test_fitparams(samples, candidates):
     cfg = turbo_enn(
-        enn=ENNSurrogateConfig(
+        enn=ENNSurrogate(
             k=4,
-            fit=ENNFitConfig(
+            fit=SurrogateFit(
                 num_samples=samples,
                 num_candidates=candidates,
             ),
@@ -36,14 +36,14 @@ def test_fitparams(samples, candidates):
 
 
 def test_indexdriver():
-    cfg = turbo_enn(enn=ENNSurrogateConfig(index_driver=ENNIndexDriver.BPANN_DISK))
+    cfg = turbo_enn(enn=ENNSurrogate(index_driver=NeighborIndex.BPANN_DISK))
     assert encode(cfg)["index_driver"] == "bpann_disk"
 
 
 def test_ucbbeta():
     cfg = turbo_enn(
-        acq_type=AcqType.UCB,
-        enn=ENNSurrogateConfig(fit=ENNFitConfig(num_samples=8)),
+        acquisition=AcquisitionKind.UCB,
+        enn=ENNSurrogate(fit=SurrogateFit(num_samples=8)),
     )
     out = encode(cfg)
     assert out == {

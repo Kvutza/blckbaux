@@ -1,0 +1,39 @@
+{
+  "schema": "blckbaux.experiment-regression.v1",
+  "config": "examples/tuning/hnet-1m-gaussian.toml",
+  "model": "fbt-pisa1-hnet-mhc4-v1",
+  "parameters": 1177756440,
+  "truth": {
+    "context-tokens": 1048576,
+    "prompt-tokens": 177280,
+    "drafted-tokens": 0,
+    "evaluated-tokens": 871296,
+    "evaluated-core-positions": 16384,
+    "scored-tokens": 871296,
+    "repaired-tokens": 0,
+    "generated-tokens": 871296,
+    "committed-tokens": 871296,
+    "repair-batches": 0,
+    "exact-per-token-generation": true,
+    "direct-token-decisions": 1046400,
+    "hash-expanded-tokens": 0
+  },
+  "round": 1,
+  "evaluated-tokens": 871296,
+  "candidate-objective": -12.495894,
+  "incumbent-objective": -12.48408,
+  "candidate-nll": 12.494953,
+  "incumbent-nll": 12.483136,
+  "accepted": false,
+  "decoded-output": {
+    "identity": "sha256-decoded-utf8",
+    "candidate": "42eee23edf24c24f18bff5eb3768a51e561fb033e8e5e22304145ea42b6b03a1",
+    "incumbent": "da91287180cbe72d254c665b5a8248a5f312ff7ca4a1e55269ec90438158b82d"
+  },
+  "evidence": {
+    "source-digest": "d7ad896044dd738b02d2fa0c828790579f97fe28c7a3afe03db64ff121bc5736",
+    "representative-run": ".cache/blckbaux/runs/pretrain/c3ff6e9c5b0779b3509c/run-1791710508959-59107-0",
+    "identical-replays": 10,
+    "numeric-policy": "exact serialized f32 equality after ten identical same-hardware replays"
+  }
+}

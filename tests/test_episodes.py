@@ -107,7 +107,7 @@ def test_recipe(tmp_path):
     assert old["corpus"] != new["corpus"]
     assert old["stage"] == new["stage"]
     assert new["recipe"]["episodes"]["prompt_tokens"] == 128
-    assert new["recipe"]["episodes"]["schema"] == "ennx.document_episodes.v2"
+    assert new["recipe"]["episodes"]["schema"] == "blckbaux.document_episodes.v2"
     assert new["recipe"]["episodes"]["counts"] == {
         "train": 16,
         "validation": 3,

@@ -1,5 +1,5 @@
 use super::*;
-use futures::TryStreamExt;
+use futures::{StreamExt, TryStreamExt, stream};
 use opendal::{Operator, layers, services};
 use parquet::arrow::arrow_reader::{ArrowPredicateFn, RowFilter};
 use parquet::arrow::{ParquetRecordBatchStreamBuilder, ProjectionMask};
@@ -7,14 +7,21 @@ use parquet::errors::ParquetError;
 use parquet_opendal::AsyncReader;
 
 pub(super) async fn collect(job: Job) -> Result<Selection> {
-    if job.targets.is_empty()
-        || job.targets.iter().any(|(s, b)| {
-            !SPLITS.contains(&s.as_str())
-                || b.len() != BUCKETS.len()
-                || BUCKETS.iter().any(|name| !b.contains_key(*name))
-        })
+    if (job.targets.is_empty() == job.target_characters.is_empty())
+        || (!job.targets.is_empty()
+            && job.targets.iter().any(|(s, b)| {
+                !SPLITS.contains(&s.as_str())
+                    || b.len() != BUCKETS.len()
+                    || BUCKETS.iter().any(|name| !b.contains_key(*name))
+            }))
+        || (!job.target_characters.is_empty()
+            && job
+                .target_characters
+                .iter()
+                .any(|(split, target)| !SPLITS.contains(&split.as_str()) || *target == 0))
+        || job.languages.is_empty()
     {
-        return Err("invalid corpus split/bucket targets".into());
+        return Err("invalid corpus language or split targets".into());
     }
     let operator = if job.root.starts_with("https://") || job.root.starts_with("http://") {
         Operator::new(services::Http::default().endpoint(&job.root))?.finish()
@@ -23,47 +30,41 @@ pub(super) async fn collect(job: Job) -> Result<Selection> {
     }
     .layer(layers::TimeoutLayer::new().with_timeout(Duration::from_secs(60)))
     .layer(layers::RetryLayer::new().with_max_times(3));
-    let mut selected = Selection::new(&job.targets);
-    let active = Arc::new(AtomicU16::new(selected.active(&job.targets)));
+    let mut selected = Selection::new(&job);
     let started = Instant::now();
-    let mut reported = Instant::now();
-    for (index, path) in job.paths.iter().enumerate() {
-        if active.load(Ordering::Relaxed) == 0 {
+    let reads = stream::iter(job.paths.iter().enumerate())
+        .map(|(index, path)| {
+            let operator = &operator;
+            let job = &job;
+            async move {
+                eprintln!(
+                    "read | shard {}/{} | {}",
+                    index + 1,
+                    job.paths.len(),
+                    path.rsplit('/').next().unwrap_or(path)
+                );
+                read_shard(operator, path, job).await
+            }
+        })
+        .buffered(8);
+    futures::pin_mut!(reads);
+    while let Some(shard) = reads.next().await {
+        selected.merge(shard?, &job);
+        selected.report(&job, started);
+        if selected.active(&job) == 0 {
             break;
         }
-        eprintln!(
-            "read | shard {}/{} | {}",
-            index + 1,
-            job.paths.len(),
-            path.rsplit('/').next().unwrap_or(path)
-        );
-        read_shard(
-            &operator,
-            path,
-            &job,
-            &mut selected,
-            &active,
-            started,
-            &mut reported,
-        )
-        .await?;
     }
     selected.report(&job, started);
-    if selected.active(&job.targets) != 0 {
+    if selected.active(&job) != 0 {
         return Err("source exhausted before corpus quotas were met".into());
     }
     Ok(selected)
 }
 
-async fn read_shard(
-    operator: &Operator,
-    path: &str,
-    job: &Job,
-    selected: &mut Selection,
-    active: &Arc<AtomicU16>,
-    started: Instant,
-    reported: &mut Instant,
-) -> Result<()> {
+async fn read_shard(operator: &Operator, path: &str, job: &Job) -> Result<Selection> {
+    let mut selected = Selection::new(job);
+    let active = Arc::new(AtomicU16::new(selected.active(job)));
     let length = operator.stat(path).await?.content_length();
     let reader = operator
         .reader_with(path)
@@ -92,14 +93,24 @@ async fn read_shard(
             .then_some(i)
         }),
     );
+    let holdout = job.holdout_partitions;
     let predicate = ArrowPredicateFn::new(filter_mask, move |batch| {
-        Ok(eligible(&batch, mask.load(Ordering::Relaxed))
+        Ok(eligible(&batch, mask.load(Ordering::Relaxed), holdout)
             .map_err(|e| ParquetError::General(e.to_string()))?)
     });
     let mask = active.clone();
+    let holdout = job.holdout_partitions;
+    let languages = job.languages.clone();
+    let excluded_names = job.excluded_names.clone();
     let files = ArrowPredicateFn::new(file_mask, move |batch| {
-        Ok(eligible_files(&batch, mask.load(Ordering::Relaxed))
-            .map_err(|e| ParquetError::General(e.to_string()))?)
+        Ok(eligible_files(
+            &batch,
+            mask.load(Ordering::Relaxed),
+            holdout,
+            &languages,
+            &excluded_names,
+        )
+        .map_err(|e| ParquetError::General(e.to_string()))?)
     });
     let mut stream = builder
         .with_batch_size(64)
@@ -107,17 +118,13 @@ async fn read_shard(
         .with_row_filter(RowFilter::new(vec![Box::new(predicate), Box::new(files)]))
         .build()?;
     while let Some(batch) = stream.try_next().await? {
-        selected.accept(&batch, &job)?;
-        active.store(selected.active(&job.targets), Ordering::Relaxed);
-        if reported.elapsed() >= Duration::from_secs(5) {
-            selected.report(&job, started);
-            *reported = Instant::now();
-        }
+        selected.accept(&batch, job)?;
+        active.store(selected.active(job), Ordering::Relaxed);
         if active.load(Ordering::Relaxed) == 0 {
             break;
         }
     }
-    Ok(())
+    Ok(selected)
 }
 
 fn projection(schema: &parquet::schema::types::SchemaDescriptor) -> ProjectionMask {

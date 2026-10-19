@@ -1,13 +1,13 @@
 use std::sync::Arc;
 use std::time::Instant;
 
+use blckbaux_cuda_device::{FbtShape, MatmulShape, PisaShape, RouteShape, fbt_model};
 use cuda_core::{CudaContext, CudaStream, DeviceBuffer, LaunchConfig1D, simt::LaunchConfig2D};
-use ennx_cuda_kernels::{FbtShape, MatmulShape, PisaShape, RouteShape, fbt_model};
 
 use crate::{CudaResult, copy_prefix, cuda_error, read_prefix, timing_event};
 
-const WIDTH: usize = 512;
-const VOCAB: usize = 8192;
+const WIDTH: usize = blckbaux_semantics::hnet::WIDTH;
+const VOCAB: usize = blckbaux_cuda_device::VOCAB as usize;
 const QKV: usize = 640;
 const CONTEXT: usize = 4096;
 const HEADS: usize = 8;
@@ -39,7 +39,7 @@ pub struct FbtPrefillProfile {
     pub end_to_end_ms: f32,
 }
 
-/// Resident buffers for the verified sm75 embedding through PISA attention slice.
+/// Resident buffers for the embedding-through-PISA attention slice.
 /// This is not yet a complete FBT layer or generation path.
 pub struct FbtPrefill {
     context: Arc<CudaContext>,
@@ -151,7 +151,7 @@ impl FbtPrefill {
 
     pub fn run(&mut self, tokens: &[u32]) -> CudaResult<(Vec<u16>, Vec<u32>, FbtPrefillProfile)> {
         if tokens.len() != CONTEXT || tokens.iter().any(|&token| token as usize >= VOCAB) {
-            return Err("FBT attention requires 4096 token IDs below vocab 8192".into());
+            return Err("FBT attention requires 4096 token IDs below vocab 262144".into());
         }
         let rows = tokens.len();
         self.reserve(rows)?;

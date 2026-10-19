@@ -10,12 +10,12 @@ from typing import NamedTuple
 import numpy as np
 import pytest
 
-from ennx import ENNStatefulFitter, ENN
-from ennx.ennx.eclssup import (
+from blckbaux import ENNFitter, ENN
+from blckbaux.enn.eclssup import (
     posterior_neighbors,
     nearest_neighbors,
 )
-from ennx.ennx.enn_params import ENNParams, PosteriorFlags
+from blckbaux.enn.enn_params import ENNParams, PosteriorFlags
 
 pytestmark = pytest.mark.slow
 
@@ -35,7 +35,7 @@ def enn_data(num_samples: int, k: int, noise: float, m: int = 1):
     yvar = (noise**2) * np.ones_like(y)
     model = ENN(x[:, None], y[:, None], yvar[:, None])
     rng = np.random.default_rng(0)
-    fitter = ENNStatefulFitter(k=k, rng=rng)
+    fitter = ENNFitter(k=k, rng=rng)
     x_all, y_all, yvar_all = model.train_rows(list(range(len(model))))
     fitter.tell(x_all, y_all, yvar_all)
     params = fitter.ask(

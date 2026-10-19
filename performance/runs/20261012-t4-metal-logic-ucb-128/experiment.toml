@@ -1,0 +1,76 @@
+# T4 parity run for the canonical one-million-token Gaussian experiment.
+version = 3
+
+experiment = "pretrain"
+model = "fbt-pisa1-hnet-mhc4-v1"
+corpus = "stack-v3-rust-go-v1"
+
+[run]
+rounds = 128
+target-ms = 200
+validation-interval = 128
+
+[optimizer]
+algorithm = "paired-response-reliability-v1"
+
+[optimizer.candidate-generation]
+generator = "posterior"
+arms = 4
+candidates = 4
+
+[optimizer.candidate-generation.perturbation]
+distribution = "gaussian"
+
+[optimizer.candidate-generation.response-estimator]
+estimator = "linear-operator-response-v1"
+
+[optimizer.surrogate]
+estimator = "neighbor-value-v1"
+scaling = "global"
+neighbors = 32
+epistemic-scale = 0.05
+aleatoric-scale = 0.05
+
+[optimizer.surrogate.fitting]
+procedure = "leave-one-out-neighbor-search-v1"
+candidates = 4
+samples = 4
+
+[optimizer.acquisition]
+function = "upper-confidence-bound"
+
+[optimizer.acceptance]
+criterion = "calibrated-positive-improvement-v1"
+
+[optimizer.radius-control]
+policy = "reliability-v1"
+initial = 0.1
+min = 0.1
+max = 2.0
+
+[seeds]
+model = 240105308887621659
+reference = 150813718214252701
+proposal = 91614869253048103
+acquisition = 314159265358979323
+
+[generation]
+purpose = "pretrain"
+initialization = "fbt-pisa1-hnet-mhc4"
+max-tokens = 524288
+temperature = 1.0
+corpus-prompt-tokens = 524288
+save-final-checkpoint = false
+record-tensor-updates = false
+
+[generation.verify]
+mode = "accepted-prefix"
+window = 4096
+max-window = 4096
+passes = 1
+
+[generation.reward]
+kind = "conditional-cross-entropy"
+
+[diagnostics]
+stage-samples = 3

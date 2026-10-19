@@ -5,10 +5,7 @@ use std::io::Write as _;
 use std::process::Command;
 
 use cuda_core::{CudaContext, CudaEvent, DeviceBuffer, simt::launch_kernel_on_stream};
-use ptx_synth::{
-    ProbeOp, ProbeShape, synthesize_turing_fused_rademacher, synthesize_turing_probe,
-    synthesize_turing_vector_scale,
-};
+use ptx_synth::{ProbeOp, ProbeShape, TargetArch, emit_probe, emit_rademacher, emit_scale};
 
 use crate::AppResult;
 
@@ -63,13 +60,14 @@ fn before(text: &str, suffix: &[&str]) -> u32 {
         .unwrap_or(0)
 }
 
-fn compile(ptx: &str, name: &str) -> AppResult<Compiled> {
+fn compile(ptx: &str, name: &str, target: TargetArch) -> AppResult<Compiled> {
     let ptx_path = format!("/tmp/{name}.ptx");
     let cubin = format!("/tmp/{name}.cubin");
     std::fs::write(&ptx_path, ptx)?;
+    let arch = format!("-arch={}", target.ptx_target());
     let assembled = Command::new("ptxas")
         .args([
-            "-arch=sm_75",
+            &arch,
             "-O3",
             "--warn-on-spills",
             "-v",
@@ -163,15 +161,16 @@ fn clock_cycles(
 fn calibrate(
     context: &std::sync::Arc<CudaContext>,
     stream: &cuda_core::CudaStream,
+    target: TargetArch,
     op: ProbeOp,
     shape: ProbeShape,
 ) -> AppResult<Probe> {
-    let stem = format!("ennx_turing_{}_{}", op.name(), shape.name());
+    let stem = format!("blckbaux_probe_{}_{}", op.name(), shape.name());
     let baseline_name = format!("{stem}_baseline");
-    let baseline_ptx = synthesize_turing_probe(&baseline_name, op, shape, false);
-    let kernel_ptx = synthesize_turing_probe(&stem, op, shape, true);
-    let baseline = compile(&baseline_ptx, &baseline_name)?;
-    let kernel = compile(&kernel_ptx, &stem)?;
+    let baseline_ptx = emit_probe(&baseline_name, target, op, shape, false);
+    let kernel_ptx = emit_probe(&stem, target, op, shape, true);
+    let baseline = compile(&baseline_ptx, &baseline_name, target)?;
+    let kernel = compile(&kernel_ptx, &stem, target)?;
     let baseline_module = context.load_module_from_file(&baseline.cubin)?;
     let baseline_function = baseline_module.load_function(&baseline_name)?;
     let kernel_module = context.load_module_from_file(&kernel.cubin)?;
@@ -410,18 +409,22 @@ pub fn run(args: &[String]) -> AppResult<()> {
         Err(error) => return Err(error.into()),
     }
 
-    let vector_ptx = synthesize_turing_vector_scale("ennx_turing_vector_scale");
-    let rademacher_ptx = synthesize_turing_fused_rademacher("ennx_turing_rademacher");
-    let vector_code = compile(&vector_ptx, "ennx_turing_vector_scale")?;
-    let rademacher_code = compile(&rademacher_ptx, "ennx_turing_rademacher")?;
     let context = CudaContext::new(0)?;
     let device = context.device_name()?;
     let (major, minor) = context.compute_capability()?;
+    let target = TargetArch::from_compute(major, minor)
+        .ok_or_else(|| format!("PTX probe does not support compute capability {major}.{minor}"))?;
+    let vector_name = "blckbaux_vector_scale";
+    let rademacher_name = "blckbaux_rademacher";
+    let vector_ptx = emit_scale(vector_name, target);
+    let rademacher_ptx = emit_rademacher(rademacher_name, target);
+    let vector_code = compile(&vector_ptx, vector_name, target)?;
+    let rademacher_code = compile(&rademacher_ptx, rademacher_name, target)?;
     let stream = context.new_stream()?;
     let vector_module = context.load_module_from_file(&vector_code.cubin)?;
-    let vector_function = vector_module.load_function("ennx_turing_vector_scale")?;
+    let vector_function = vector_module.load_function(vector_name)?;
     let rademacher_module = context.load_module_from_file(&rademacher_code.cubin)?;
-    let rademacher_function = rademacher_module.load_function("ennx_turing_rademacher")?;
+    let rademacher_function = rademacher_module.load_function(rademacher_name)?;
     let host = (0..elements)
         .map(|index| (index as f32 - elements as f32 * 0.5) / elements as f32)
         .collect::<Vec<_>>();
@@ -492,18 +495,20 @@ pub fn run(args: &[String]) -> AppResult<()> {
             ProbeOp::Fadd,
             ProbeOp::Fmul,
         ] {
-            probes.push(calibrate(&context, &stream, op, shape)?);
+            probes.push(calibrate(&context, &stream, target, op, shape)?);
         }
     }
     let calibration = probes_json(&probes);
     let calibration_valid = probes.iter().all(probe_valid);
     println!(
-        "{{\"schema\":\"ennx.ptx-synth.t4-probe.v6\",\"hardware\":\"{}\",\"compute_capability\":\"{}.{}\",\"elements\":{},\"iterations\":{},\"vector\":{{\"kernel\":\"ennx_turing_vector_scale\",\"ptx_hash\":\"{:016x}\",\"cubin_hash\":\"{:016x}\",\"sass_hash\":\"{:016x}\",\"registers\":{},\"spill_load_bytes\":{},\"spill_store_bytes\":{},\"sass_instructions\":{},\"kernel_ms\":{:.6},\"effective_gb_s\":{:.6},\"max_abs_error\":{},\"parity\":{}}},\"rademacher\":{{\"kernel\":\"ennx_turing_rademacher\",\"ptx_hash\":\"{:016x}\",\"cubin_hash\":\"{:016x}\",\"sass_hash\":\"{:016x}\",\"registers\":{},\"spill_load_bytes\":{},\"spill_store_bytes\":{},\"sass_instructions\":{},\"radius\":{},\"seed\":{},\"kernel_ms\":{:.6},\"effective_gb_s\":{:.6},\"max_abs_error\":{},\"mismatches\":{},\"positive_steps\":{},\"negative_steps\":{},\"parity\":{}}},\"calibration\":{},\"calibration_valid\":{},\"all_parity\":{}}}",
+        "{{\"schema\":\"blckbaux.ptx-synth.probe.v7\",\"hardware\":\"{}\",\"target\":\"{}\",\"compute_capability\":\"{}.{}\",\"elements\":{},\"iterations\":{},\"vector\":{{\"kernel\":\"{}\",\"ptx_hash\":\"{:016x}\",\"cubin_hash\":\"{:016x}\",\"sass_hash\":\"{:016x}\",\"registers\":{},\"spill_load_bytes\":{},\"spill_store_bytes\":{},\"sass_instructions\":{},\"kernel_ms\":{:.6},\"effective_gb_s\":{:.6},\"max_abs_error\":{},\"parity\":{}}},\"rademacher\":{{\"kernel\":\"{}\",\"ptx_hash\":\"{:016x}\",\"cubin_hash\":\"{:016x}\",\"sass_hash\":\"{:016x}\",\"registers\":{},\"spill_load_bytes\":{},\"spill_store_bytes\":{},\"sass_instructions\":{},\"radius\":{},\"seed\":{},\"kernel_ms\":{:.6},\"effective_gb_s\":{:.6},\"max_abs_error\":{},\"mismatches\":{},\"positive_steps\":{},\"negative_steps\":{},\"parity\":{}}},\"calibration\":{},\"calibration_valid\":{},\"all_parity\":{}}}",
         device.replace('"', ""),
+        target.ptx_target(),
         major,
         minor,
         elements,
         iterations,
+        vector_name,
         vector_code.ptx_hash,
         vector_code.cubin_hash,
         vector_code.sass_hash,
@@ -515,6 +520,7 @@ pub fn run(args: &[String]) -> AppResult<()> {
         bandwidth(elements, vector_ms),
         vector_error,
         vector_parity,
+        rademacher_name,
         rademacher_code.ptx_hash,
         rademacher_code.cubin_hash,
         rademacher_code.sass_hash,

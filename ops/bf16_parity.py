@@ -9,8 +9,8 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 
-from ennx._rust import ENN
-from ennx.experimental import ParamBlock, ParamBuffer, turbo_enn
+from blckbaux._rust import ENN
+from blckbaux.experimental import ParamBlock, ParamBuffer, turbo_enn
 
 MASK64 = (1 << 64) - 1
 MAX_F32 = 3.4028234663852886e38

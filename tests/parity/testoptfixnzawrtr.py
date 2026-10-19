@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import pytest
 
-from ennx.turbo.optimizer_fixtures import load_fixture
+from blckbaux.turbo.optimizer_fixtures import load_fixture
 
 try:
-    from ennx._rust import Optimizer  # noqa: F401
+    from blckbaux._rust import BayesOptimizer  # noqa: F401
 
     RUST_AVAILABLE = True
 except ImportError:

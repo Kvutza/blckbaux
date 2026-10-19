@@ -27,7 +27,7 @@ from native_fixtures import Source, binding, checkpoint, config, document
 
 @pytest.mark.parametrize("method", ["enable_relative", "tell_relative"])
 def test_api(checkpoint, document, binding, tmp_path, monkeypatch, method):
-    monkeypatch.delattr(sys.modules["ennx.experimental"].SearchState, method)
+    monkeypatch.delattr(sys.modules["blckbaux.experimental"].SearchState, method)
     with pytest.raises(RuntimeError, match="[Pp]aired"):
         bo.run(
             checkpoint[0],
@@ -53,7 +53,7 @@ def test_api(checkpoint, document, binding, tmp_path, monkeypatch, method):
 def test_signature(
     checkpoint, document, binding, tmp_path, monkeypatch, *, backend, policy, signature
 ):
-    experimental = sys.modules["ennx.experimental"]
+    experimental = sys.modules["blckbaux.experimental"]
     module = native
     if backend == "metal":
         from ops.flame import metal
@@ -157,7 +157,7 @@ def test_backend(tmp_path, monkeypatch, backend, batch, explicit):
 
 
 def test_feature(config, document, binding, monkeypatch):
-    monkeypatch.setattr(sys.modules["ennx.experimental"], "FlameEvaluator", None)
+    monkeypatch.setattr(sys.modules["blckbaux.experimental"], "FlameEvaluator", None)
     with pytest.raises(RuntimeError, match="--features native-flame"):
         native.NativeEvaluator(SolutionObjective.parse(document, config), config)
     assert binding.calls == []
@@ -247,19 +247,19 @@ def test_lazynojax():
             IMPORT_GUARD
             + """
 from types import ModuleType
-import ennx
-from ennx import experimental
-assert 'ennx._rust' not in sys.modules
-assert 'ennx.ennx_rust' not in sys.modules
+import blckbaux
+from blckbaux import experimental
+assert 'blckbaux._rust' not in sys.modules
+assert 'blckbaux.blckbaux_rust' not in sys.modules
 sentinel = object()
 class Namespace:
     def __getattr__(self, name):
         return sentinel
-extension = ModuleType('ennx.ennx_rust')
+extension = ModuleType('blckbaux.blckbaux_rust')
 for name in ('hypervolume', 'hash', 'util', 'model', 'fit', 'optimizer', 'experimental'):
     setattr(extension, name, Namespace())
-sys.modules['ennx.ennx_rust'] = extension
-from ennx.experimental import ParamBlock, SearchState, FlameEvaluator
+sys.modules['blckbaux.blckbaux_rust'] = extension
+from blckbaux.experimental import ParamBlock, SearchState, FlameEvaluator
 assert ParamBlock is SearchState is FlameEvaluator is sentinel
 assert not any(n.split('.')[0] in ('jax', 'jaxlib') for n in sys.modules)
 """,

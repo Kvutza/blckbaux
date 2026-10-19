@@ -12,7 +12,7 @@ _STRESS_ROW_RE = re.compile(r" *\d+ \d+\.\d{4} \d+\.\d{4}")
 def test_001(monkeypatch):
     from click.testing import CliRunner
 
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
+    from blckbaux.enn.enn_fitter import ENNFitter
     from ops.stress import cli
 
     tell_calls: list[int] = []
@@ -24,8 +24,8 @@ def test_001(monkeypatch):
     def _countask2(self, *args, **kwargs):
         ask_calls.append(1)
 
-    monkeypatch.setattr(ENNStatefulFitter, "tell", _counttell2)
-    monkeypatch.setattr(ENNStatefulFitter, "ask", _countask2)
+    monkeypatch.setattr(ENNFitter, "tell", _counttell2)
+    monkeypatch.setattr(ENNFitter, "ask", _countask2)
 
     num_obs = 10
     result = CliRunner().invoke(cli, ["enn", "flat", str(num_obs)])

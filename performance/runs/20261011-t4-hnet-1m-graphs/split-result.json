@@ -1,0 +1,1244 @@
+{
+  "schema": "blckbaux.cuda.hnet-bo-round.v2",
+  "target": "sm_75",
+  "hardware": "Tesla T4",
+  "model_seed": 240105308887621659,
+  "checkpoint_format": "hnet-mhc4",
+  "execution_architecture": "hnet-mhc4",
+  "architecture_weights_match": true,
+  "phase": "initialization-candidate",
+  "bo": {
+    "rounds": 128,
+    "observations": [
+      {
+        "round": 0,
+        "radius": 0.1,
+        "reward": -12.537959,
+        "mean_nll": 12.537959,
+        "accepted": false,
+        "device_ms": 815.5319,
+        "wall_ms": 815.57715
+      },
+      {
+        "round": 1,
+        "radius": 0.07071068,
+        "reward": -12.51877,
+        "mean_nll": 12.51877,
+        "accepted": false,
+        "device_ms": 829.4019,
+        "wall_ms": 829.4437
+      },
+      {
+        "round": 2,
+        "radius": 0.05773503,
+        "reward": -12.510021,
+        "mean_nll": 12.510021,
+        "accepted": false,
+        "device_ms": 842.8652,
+        "wall_ms": 842.91
+      },
+      {
+        "round": 3,
+        "radius": 0.05,
+        "reward": -12.504917,
+        "mean_nll": 12.504917,
+        "accepted": false,
+        "device_ms": 861.6292,
+        "wall_ms": 861.66876
+      },
+      {
+        "round": 4,
+        "radius": 0.04472136,
+        "reward": -12.500519,
+        "mean_nll": 12.500519,
+        "accepted": false,
+        "device_ms": 882.05927,
+        "wall_ms": 882.10736
+      },
+      {
+        "round": 5,
+        "radius": 0.040824827,
+        "reward": -12.495986,
+        "mean_nll": 12.495986,
+        "accepted": false,
+        "device_ms": 902.15015,
+        "wall_ms": 902.1882
+      },
+      {
+        "round": 6,
+        "radius": 0.03779645,
+        "reward": -12.492367,
+        "mean_nll": 12.492367,
+        "accepted": false,
+        "device_ms": 914.5508,
+        "wall_ms": 914.5835
+      },
+      {
+        "round": 7,
+        "radius": 0.03535534,
+        "reward": -12.48865,
+        "mean_nll": 12.48865,
+        "accepted": false,
+        "device_ms": 915.98724,
+        "wall_ms": 916.0182
+      },
+      {
+        "round": 8,
+        "radius": 0.033333335,
+        "reward": -12.485394,
+        "mean_nll": 12.485394,
+        "accepted": false,
+        "device_ms": 919.2076,
+        "wall_ms": 919.2402
+      },
+      {
+        "round": 9,
+        "radius": 0.031622775,
+        "reward": -12.483431,
+        "mean_nll": 12.483431,
+        "accepted": false,
+        "device_ms": 922.29144,
+        "wall_ms": 922.31775
+      },
+      {
+        "round": 10,
+        "radius": 0.030151134,
+        "reward": -12.481957,
+        "mean_nll": 12.481957,
+        "accepted": false,
+        "device_ms": 923.71716,
+        "wall_ms": 923.7415
+      },
+      {
+        "round": 11,
+        "radius": 0.028867515,
+        "reward": -12.480963,
+        "mean_nll": 12.480963,
+        "accepted": false,
+        "device_ms": 923.57465,
+        "wall_ms": 923.6174
+      },
+      {
+        "round": 12,
+        "radius": 0.02773501,
+        "reward": -12.480402,
+        "mean_nll": 12.480402,
+        "accepted": false,
+        "device_ms": 926.09454,
+        "wall_ms": 926.12256
+      },
+      {
+        "round": 13,
+        "radius": 0.026726123,
+        "reward": -12.479979,
+        "mean_nll": 12.479979,
+        "accepted": false,
+        "device_ms": 927.08044,
+        "wall_ms": 927.1157
+      },
+      {
+        "round": 14,
+        "radius": 0.025819888,
+        "reward": -12.479462,
+        "mean_nll": 12.479462,
+        "accepted": false,
+        "device_ms": 928.9924,
+        "wall_ms": 929.02075
+      },
+      {
+        "round": 15,
+        "radius": 0.025,
+        "reward": -12.479115,
+        "mean_nll": 12.479115,
+        "accepted": false,
+        "device_ms": 927.9654,
+        "wall_ms": 928.01953
+      },
+      {
+        "round": 16,
+        "radius": 0.024253564,
+        "reward": -12.478807,
+        "mean_nll": 12.478807,
+        "accepted": false,
+        "device_ms": 934.4858,
+        "wall_ms": 934.52014
+      },
+      {
+        "round": 17,
+        "radius": 0.023570228,
+        "reward": -12.478586,
+        "mean_nll": 12.478586,
+        "accepted": false,
+        "device_ms": 934.1029,
+        "wall_ms": 934.13715
+      },
+      {
+        "round": 18,
+        "radius": 0.022941573,
+        "reward": -12.478336,
+        "mean_nll": 12.478336,
+        "accepted": false,
+        "device_ms": 935.211,
+        "wall_ms": 936.62683
+      },
+      {
+        "round": 19,
+        "radius": 0.02236068,
+        "reward": -12.478216,
+        "mean_nll": 12.478216,
+        "accepted": false,
+        "device_ms": 938.21844,
+        "wall_ms": 938.25586
+      },
+      {
+        "round": 20,
+        "radius": 0.02182179,
+        "reward": -12.478106,
+        "mean_nll": 12.478106,
+        "accepted": false,
+        "device_ms": 937.9052,
+        "wall_ms": 937.9415
+      },
+      {
+        "round": 21,
+        "radius": 0.021320071,
+        "reward": -12.477835,
+        "mean_nll": 12.477835,
+        "accepted": false,
+        "device_ms": 938.62317,
+        "wall_ms": 938.65594
+      },
+      {
+        "round": 22,
+        "radius": 0.02085144,
+        "reward": -12.4777775,
+        "mean_nll": 12.4777775,
+        "accepted": false,
+        "device_ms": 940.1072,
+        "wall_ms": 940.13983
+      },
+      {
+        "round": 23,
+        "radius": 0.020412413,
+        "reward": -12.477695,
+        "mean_nll": 12.477695,
+        "accepted": false,
+        "device_ms": 944.0357,
+        "wall_ms": 944.062
+      },
+      {
+        "round": 24,
+        "radius": 0.02,
+        "reward": -12.477512,
+        "mean_nll": 12.477512,
+        "accepted": false,
+        "device_ms": 942.0815,
+        "wall_ms": 942.11615
+      },
+      {
+        "round": 25,
+        "radius": 0.019611614,
+        "reward": -12.4773655,
+        "mean_nll": 12.4773655,
+        "accepted": false,
+        "device_ms": 946.5602,
+        "wall_ms": 946.5939
+      },
+      {
+        "round": 26,
+        "radius": 0.01924501,
+        "reward": -12.477348,
+        "mean_nll": 12.477348,
+        "accepted": false,
+        "device_ms": 946.5446,
+        "wall_ms": 946.57336
+      },
+      {
+        "round": 27,
+        "radius": 0.018898224,
+        "reward": -12.477304,
+        "mean_nll": 12.477304,
+        "accepted": false,
+        "device_ms": 946.1046,
+        "wall_ms": 946.13715
+      },
+      {
+        "round": 28,
+        "radius": 0.018569535,
+        "reward": -12.477121,
+        "mean_nll": 12.477121,
+        "accepted": false,
+        "device_ms": 949.2561,
+        "wall_ms": 949.2888
+      },
+      {
+        "round": 29,
+        "radius": 0.018257419,
+        "reward": -12.477137,
+        "mean_nll": 12.477137,
+        "accepted": false,
+        "device_ms": 950.0741,
+        "wall_ms": 950.109
+      },
+      {
+        "round": 30,
+        "radius": 0.017960532,
+        "reward": -12.4771385,
+        "mean_nll": 12.4771385,
+        "accepted": false,
+        "device_ms": 950.1371,
+        "wall_ms": 950.18054
+      },
+      {
+        "round": 31,
+        "radius": 0.01767767,
+        "reward": -12.477071,
+        "mean_nll": 12.477071,
+        "accepted": false,
+        "device_ms": 954.7715,
+        "wall_ms": 954.8135
+      },
+      {
+        "round": 32,
+        "radius": 0.017407766,
+        "reward": -12.4769335,
+        "mean_nll": 12.4769335,
+        "accepted": false,
+        "device_ms": 955.08417,
+        "wall_ms": 955.12134
+      },
+      {
+        "round": 33,
+        "radius": 0.01714986,
+        "reward": -12.476822,
+        "mean_nll": 12.476822,
+        "accepted": false,
+        "device_ms": 954.52936,
+        "wall_ms": 954.55835
+      },
+      {
+        "round": 34,
+        "radius": 0.016903086,
+        "reward": -12.476827,
+        "mean_nll": 12.476827,
+        "accepted": false,
+        "device_ms": 956.62897,
+        "wall_ms": 956.65533
+      },
+      {
+        "round": 35,
+        "radius": 0.016666668,
+        "reward": -12.476704,
+        "mean_nll": 12.476704,
+        "accepted": false,
+        "device_ms": 959.0524,
+        "wall_ms": 959.09094
+      },
+      {
+        "round": 36,
+        "radius": 0.016439898,
+        "reward": -12.476612,
+        "mean_nll": 12.476612,
+        "accepted": false,
+        "device_ms": 959.26874,
+        "wall_ms": 959.3012
+      },
+      {
+        "round": 37,
+        "radius": 0.016222142,
+        "reward": -12.476616,
+        "mean_nll": 12.476616,
+        "accepted": false,
+        "device_ms": 962.3714,
+        "wall_ms": 962.40326
+      },
+      {
+        "round": 38,
+        "radius": 0.016012816,
+        "reward": -12.476565,
+        "mean_nll": 12.476565,
+        "accepted": false,
+        "device_ms": 961.4869,
+        "wall_ms": 961.5101
+      },
+      {
+        "round": 39,
+        "radius": 0.015811387,
+        "reward": -12.476429,
+        "mean_nll": 12.476429,
+        "accepted": false,
+        "device_ms": 962.1033,
+        "wall_ms": 962.13116
+      },
+      {
+        "round": 40,
+        "radius": 0.015617376,
+        "reward": -12.476358,
+        "mean_nll": 12.476358,
+        "accepted": false,
+        "device_ms": 964.70013,
+        "wall_ms": 964.7266
+      },
+      {
+        "round": 41,
+        "radius": 0.015430336,
+        "reward": -12.476312,
+        "mean_nll": 12.476312,
+        "accepted": false,
+        "device_ms": 965.3146,
+        "wall_ms": 965.34326
+      },
+      {
+        "round": 42,
+        "radius": 0.015249858,
+        "reward": -12.476353,
+        "mean_nll": 12.476353,
+        "accepted": false,
+        "device_ms": 966.9084,
+        "wall_ms": 966.93945
+      },
+      {
+        "round": 43,
+        "radius": 0.015075567,
+        "reward": -12.476323,
+        "mean_nll": 12.476323,
+        "accepted": false,
+        "device_ms": 967.2372,
+        "wall_ms": 967.27234
+      },
+      {
+        "round": 44,
+        "radius": 0.014907121,
+        "reward": -12.476344,
+        "mean_nll": 12.476344,
+        "accepted": false,
+        "device_ms": 969.4255,
+        "wall_ms": 969.4621
+      },
+      {
+        "round": 45,
+        "radius": 0.014744196,
+        "reward": -12.476271,
+        "mean_nll": 12.476271,
+        "accepted": false,
+        "device_ms": 970.4821,
+        "wall_ms": 970.51917
+      },
+      {
+        "round": 46,
+        "radius": 0.014586499,
+        "reward": -12.476252,
+        "mean_nll": 12.476252,
+        "accepted": false,
+        "device_ms": 968.47925,
+        "wall_ms": 968.5198
+      },
+      {
+        "round": 47,
+        "radius": 0.014433757,
+        "reward": -12.476221,
+        "mean_nll": 12.476221,
+        "accepted": false,
+        "device_ms": 968.9615,
+        "wall_ms": 968.9942
+      },
+      {
+        "round": 48,
+        "radius": 0.014285714,
+        "reward": -12.476164,
+        "mean_nll": 12.476164,
+        "accepted": false,
+        "device_ms": 972.2925,
+        "wall_ms": 972.3243
+      },
+      {
+        "round": 49,
+        "radius": 0.014142136,
+        "reward": -12.476194,
+        "mean_nll": 12.476194,
+        "accepted": false,
+        "device_ms": 973.3632,
+        "wall_ms": 973.3976
+      },
+      {
+        "round": 50,
+        "radius": 0.014002801,
+        "reward": -12.47616,
+        "mean_nll": 12.47616,
+        "accepted": false,
+        "device_ms": 975.1817,
+        "wall_ms": 975.21344
+      },
+      {
+        "round": 51,
+        "radius": 0.013867505,
+        "reward": -12.476137,
+        "mean_nll": 12.476137,
+        "accepted": false,
+        "device_ms": 973.9412,
+        "wall_ms": 973.9884
+      },
+      {
+        "round": 52,
+        "radius": 0.013736056,
+        "reward": -12.47612,
+        "mean_nll": 12.47612,
+        "accepted": false,
+        "device_ms": 975.39404,
+        "wall_ms": 975.42926
+      },
+      {
+        "round": 53,
+        "radius": 0.013608277,
+        "reward": -12.476103,
+        "mean_nll": 12.476103,
+        "accepted": false,
+        "device_ms": 976.4954,
+        "wall_ms": 976.52563
+      },
+      {
+        "round": 54,
+        "radius": 0.013483997,
+        "reward": -12.476076,
+        "mean_nll": 12.476076,
+        "accepted": false,
+        "device_ms": 976.66003,
+        "wall_ms": 976.68243
+      },
+      {
+        "round": 55,
+        "radius": 0.0133630615,
+        "reward": -12.475908,
+        "mean_nll": 12.475908,
+        "accepted": false,
+        "device_ms": 978.4334,
+        "wall_ms": 978.46375
+      },
+      {
+        "round": 56,
+        "radius": 0.013245324,
+        "reward": -12.475899,
+        "mean_nll": 12.475899,
+        "accepted": false,
+        "device_ms": 980.0397,
+        "wall_ms": 980.0718
+      },
+      {
+        "round": 57,
+        "radius": 0.013130643,
+        "reward": -12.475836,
+        "mean_nll": 12.475836,
+        "accepted": false,
+        "device_ms": 981.81256,
+        "wall_ms": 981.84357
+      },
+      {
+        "round": 58,
+        "radius": 0.013018891,
+        "reward": -12.475844,
+        "mean_nll": 12.475844,
+        "accepted": false,
+        "device_ms": 981.8197,
+        "wall_ms": 981.8547
+      },
+      {
+        "round": 59,
+        "radius": 0.012909944,
+        "reward": -12.475746,
+        "mean_nll": 12.475746,
+        "accepted": false,
+        "device_ms": 986.01,
+        "wall_ms": 986.04834
+      },
+      {
+        "round": 60,
+        "radius": 0.012803688,
+        "reward": -12.475825,
+        "mean_nll": 12.475825,
+        "accepted": false,
+        "device_ms": 983.82996,
+        "wall_ms": 983.86163
+      },
+      {
+        "round": 61,
+        "radius": 0.012700013,
+        "reward": -12.475769,
+        "mean_nll": 12.475769,
+        "accepted": false,
+        "device_ms": 989.54034,
+        "wall_ms": 989.5737
+      },
+      {
+        "round": 62,
+        "radius": 0.012598816,
+        "reward": -12.475697,
+        "mean_nll": 12.475697,
+        "accepted": false,
+        "device_ms": 987.5828,
+        "wall_ms": 987.615
+      },
+      {
+        "round": 63,
+        "radius": 0.0125,
+        "reward": -12.475653,
+        "mean_nll": 12.475653,
+        "accepted": false,
+        "device_ms": 987.13947,
+        "wall_ms": 987.1717
+      },
+      {
+        "round": 64,
+        "radius": 0.012403473,
+        "reward": -12.475674,
+        "mean_nll": 12.475674,
+        "accepted": false,
+        "device_ms": 991.95667,
+        "wall_ms": 991.9867
+      },
+      {
+        "round": 65,
+        "radius": 0.012309149,
+        "reward": -12.475719,
+        "mean_nll": 12.475719,
+        "accepted": false,
+        "device_ms": 995.16974,
+        "wall_ms": 995.1945
+      },
+      {
+        "round": 66,
+        "radius": 0.012216945,
+        "reward": -12.47567,
+        "mean_nll": 12.47567,
+        "accepted": false,
+        "device_ms": 995.0006,
+        "wall_ms": 995.03076
+      },
+      {
+        "round": 67,
+        "radius": 0.012126782,
+        "reward": -12.475603,
+        "mean_nll": 12.475603,
+        "accepted": false,
+        "device_ms": 994.98224,
+        "wall_ms": 995.01953
+      },
+      {
+        "round": 68,
+        "radius": 0.012038586,
+        "reward": -12.475566,
+        "mean_nll": 12.475566,
+        "accepted": false,
+        "device_ms": 996.17,
+        "wall_ms": 996.20197
+      },
+      {
+        "round": 69,
+        "radius": 0.011952287,
+        "reward": -12.475536,
+        "mean_nll": 12.475536,
+        "accepted": false,
+        "device_ms": 1000.3128,
+        "wall_ms": 1000.34296
+      },
+      {
+        "round": 70,
+        "radius": 0.0118678175,
+        "reward": -12.475499,
+        "mean_nll": 12.475499,
+        "accepted": false,
+        "device_ms": 1000.5191,
+        "wall_ms": 1000.5504
+      },
+      {
+        "round": 71,
+        "radius": 0.011785114,
+        "reward": -12.475532,
+        "mean_nll": 12.475532,
+        "accepted": false,
+        "device_ms": 1001.5587,
+        "wall_ms": 1001.59155
+      },
+      {
+        "round": 72,
+        "radius": 0.011704115,
+        "reward": -12.47549,
+        "mean_nll": 12.47549,
+        "accepted": false,
+        "device_ms": 1004.20197,
+        "wall_ms": 1004.23944
+      },
+      {
+        "round": 73,
+        "radius": 0.011624764,
+        "reward": -12.475452,
+        "mean_nll": 12.475452,
+        "accepted": false,
+        "device_ms": 1003.8046,
+        "wall_ms": 1003.85406
+      },
+      {
+        "round": 74,
+        "radius": 0.011547005,
+        "reward": -12.475507,
+        "mean_nll": 12.475507,
+        "accepted": false,
+        "device_ms": 1004.7124,
+        "wall_ms": 1004.74097
+      },
+      {
+        "round": 75,
+        "radius": 0.011470786,
+        "reward": -12.475479,
+        "mean_nll": 12.475479,
+        "accepted": false,
+        "device_ms": 1008.2928,
+        "wall_ms": 1008.31976
+      },
+      {
+        "round": 76,
+        "radius": 0.011396058,
+        "reward": -12.475491,
+        "mean_nll": 12.475491,
+        "accepted": false,
+        "device_ms": 1008.109,
+        "wall_ms": 1008.1389
+      },
+      {
+        "round": 77,
+        "radius": 0.011322771,
+        "reward": -12.475445,
+        "mean_nll": 12.475445,
+        "accepted": false,
+        "device_ms": 1012.16315,
+        "wall_ms": 1012.20013
+      },
+      {
+        "round": 78,
+        "radius": 0.01125088,
+        "reward": -12.475416,
+        "mean_nll": 12.475416,
+        "accepted": false,
+        "device_ms": 1012.04175,
+        "wall_ms": 1012.07007
+      },
+      {
+        "round": 79,
+        "radius": 0.01118034,
+        "reward": -12.475342,
+        "mean_nll": 12.475342,
+        "accepted": false,
+        "device_ms": 1017.7355,
+        "wall_ms": 1017.764
+      },
+      {
+        "round": 80,
+        "radius": 0.011111111,
+        "reward": -12.475359,
+        "mean_nll": 12.475359,
+        "accepted": false,
+        "device_ms": 1019.87317,
+        "wall_ms": 1019.9022
+      },
+      {
+        "round": 81,
+        "radius": 0.011043152,
+        "reward": -12.475367,
+        "mean_nll": 12.475367,
+        "accepted": false,
+        "device_ms": 1019.1419,
+        "wall_ms": 1019.1699
+      },
+      {
+        "round": 82,
+        "radius": 0.010976426,
+        "reward": -12.475287,
+        "mean_nll": 12.475287,
+        "accepted": false,
+        "device_ms": 1021.2981,
+        "wall_ms": 1021.3249
+      },
+      {
+        "round": 83,
+        "radius": 0.010910895,
+        "reward": -12.475306,
+        "mean_nll": 12.475306,
+        "accepted": false,
+        "device_ms": 1026.4929,
+        "wall_ms": 1026.5331
+      },
+      {
+        "round": 84,
+        "radius": 0.010846524,
+        "reward": -12.475284,
+        "mean_nll": 12.475284,
+        "accepted": false,
+        "device_ms": 1024.5553,
+        "wall_ms": 1024.5917
+      },
+      {
+        "round": 85,
+        "radius": 0.010783277,
+        "reward": -12.475203,
+        "mean_nll": 12.475203,
+        "accepted": false,
+        "device_ms": 1030.4143,
+        "wall_ms": 1030.4515
+      },
+      {
+        "round": 86,
+        "radius": 0.010721126,
+        "reward": -12.475214,
+        "mean_nll": 12.475214,
+        "accepted": false,
+        "device_ms": 1031.8824,
+        "wall_ms": 1031.9214
+      },
+      {
+        "round": 87,
+        "radius": 0.010660036,
+        "reward": -12.4751835,
+        "mean_nll": 12.4751835,
+        "accepted": false,
+        "device_ms": 1031.5576,
+        "wall_ms": 1031.5808
+      },
+      {
+        "round": 88,
+        "radius": 0.010599979,
+        "reward": -12.475168,
+        "mean_nll": 12.475168,
+        "accepted": false,
+        "device_ms": 1035.821,
+        "wall_ms": 1035.8452
+      },
+      {
+        "round": 89,
+        "radius": 0.010540926,
+        "reward": -12.475159,
+        "mean_nll": 12.475159,
+        "accepted": false,
+        "device_ms": 1040.9866,
+        "wall_ms": 1041.0181
+      },
+      {
+        "round": 90,
+        "radius": 0.010482848,
+        "reward": -12.475169,
+        "mean_nll": 12.475169,
+        "accepted": false,
+        "device_ms": 1039.0671,
+        "wall_ms": 1039.0961
+      },
+      {
+        "round": 91,
+        "radius": 0.01042572,
+        "reward": -12.475171,
+        "mean_nll": 12.475171,
+        "accepted": false,
+        "device_ms": 1040.9636,
+        "wall_ms": 1040.9873
+      },
+      {
+        "round": 92,
+        "radius": 0.010369517,
+        "reward": -12.4751,
+        "mean_nll": 12.4751,
+        "accepted": false,
+        "device_ms": 1048.447,
+        "wall_ms": 1048.4906
+      },
+      {
+        "round": 93,
+        "radius": 0.010314212,
+        "reward": -12.475133,
+        "mean_nll": 12.475133,
+        "accepted": false,
+        "device_ms": 1046.1942,
+        "wall_ms": 1046.2147
+      },
+      {
+        "round": 94,
+        "radius": 0.010259783,
+        "reward": -12.4751425,
+        "mean_nll": 12.4751425,
+        "accepted": false,
+        "device_ms": 1048.0785,
+        "wall_ms": 1048.1005
+      },
+      {
+        "round": 95,
+        "radius": 0.010206207,
+        "reward": -12.475127,
+        "mean_nll": 12.475127,
+        "accepted": false,
+        "device_ms": 1046.212,
+        "wall_ms": 1046.2373
+      },
+      {
+        "round": 96,
+        "radius": 0.010153462,
+        "reward": -12.475142,
+        "mean_nll": 12.475142,
+        "accepted": false,
+        "device_ms": 1056.3538,
+        "wall_ms": 1056.387
+      },
+      {
+        "round": 97,
+        "radius": 0.010101525,
+        "reward": -12.4750595,
+        "mean_nll": 12.4750595,
+        "accepted": false,
+        "device_ms": 1058.9614,
+        "wall_ms": 1058.9977
+      },
+      {
+        "round": 98,
+        "radius": 0.010050379,
+        "reward": -12.4750805,
+        "mean_nll": 12.4750805,
+        "accepted": false,
+        "device_ms": 1058.5068,
+        "wall_ms": 1058.543
+      },
+      {
+        "round": 99,
+        "radius": 0.01,
+        "reward": -12.475103,
+        "mean_nll": 12.475103,
+        "accepted": false,
+        "device_ms": 1062.2999,
+        "wall_ms": 1062.3282
+      },
+      {
+        "round": 100,
+        "radius": 0.009950372,
+        "reward": -12.475133,
+        "mean_nll": 12.475133,
+        "accepted": false,
+        "device_ms": 1069.9382,
+        "wall_ms": 1069.9667
+      },
+      {
+        "round": 101,
+        "radius": 0.009901476,
+        "reward": -12.475098,
+        "mean_nll": 12.475098,
+        "accepted": false,
+        "device_ms": 1073.2847,
+        "wall_ms": 1073.3115
+      },
+      {
+        "round": 102,
+        "radius": 0.009853293,
+        "reward": -12.475067,
+        "mean_nll": 12.475067,
+        "accepted": false,
+        "device_ms": 1076.6357,
+        "wall_ms": 1076.6613
+      },
+      {
+        "round": 103,
+        "radius": 0.009805807,
+        "reward": -12.475021,
+        "mean_nll": 12.475021,
+        "accepted": false,
+        "device_ms": 1078.3594,
+        "wall_ms": 1078.4316
+      },
+      {
+        "round": 104,
+        "radius": 0.0097590005,
+        "reward": -12.475098,
+        "mean_nll": 12.475098,
+        "accepted": false,
+        "device_ms": 1078.4432,
+        "wall_ms": 1078.4706
+      },
+      {
+        "round": 105,
+        "radius": 0.009712858,
+        "reward": -12.475074,
+        "mean_nll": 12.475074,
+        "accepted": false,
+        "device_ms": 1085.2743,
+        "wall_ms": 1085.2987
+      },
+      {
+        "round": 106,
+        "radius": 0.009667366,
+        "reward": -12.47509,
+        "mean_nll": 12.47509,
+        "accepted": false,
+        "device_ms": 1090.1979,
+        "wall_ms": 1090.2245
+      },
+      {
+        "round": 107,
+        "radius": 0.009622505,
+        "reward": -12.475033,
+        "mean_nll": 12.475033,
+        "accepted": false,
+        "device_ms": 1093.0688,
+        "wall_ms": 1093.0905
+      },
+      {
+        "round": 108,
+        "radius": 0.009578262,
+        "reward": -12.475017,
+        "mean_nll": 12.475017,
+        "accepted": false,
+        "device_ms": 1097.0065,
+        "wall_ms": 1097.0297
+      },
+      {
+        "round": 109,
+        "radius": 0.009534626,
+        "reward": -12.475036,
+        "mean_nll": 12.475036,
+        "accepted": false,
+        "device_ms": 1100.2963,
+        "wall_ms": 1100.3245
+      },
+      {
+        "round": 110,
+        "radius": 0.00949158,
+        "reward": -12.475061,
+        "mean_nll": 12.475061,
+        "accepted": false,
+        "device_ms": 1099.972,
+        "wall_ms": 1100.0089
+      },
+      {
+        "round": 111,
+        "radius": 0.009449112,
+        "reward": -12.475073,
+        "mean_nll": 12.475073,
+        "accepted": false,
+        "device_ms": 1098.567,
+        "wall_ms": 1098.5977
+      },
+      {
+        "round": 112,
+        "radius": 0.009407208,
+        "reward": -12.4750805,
+        "mean_nll": 12.4750805,
+        "accepted": false,
+        "device_ms": 1107.9557,
+        "wall_ms": 1107.9797
+      },
+      {
+        "round": 113,
+        "radius": 0.0093658585,
+        "reward": -12.475061,
+        "mean_nll": 12.475061,
+        "accepted": false,
+        "device_ms": 1112.4655,
+        "wall_ms": 1112.493
+      },
+      {
+        "round": 114,
+        "radius": 0.009325048,
+        "reward": -12.475075,
+        "mean_nll": 12.475075,
+        "accepted": false,
+        "device_ms": 1113.1085,
+        "wall_ms": 1113.1279
+      },
+      {
+        "round": 115,
+        "radius": 0.009284767,
+        "reward": -12.475048,
+        "mean_nll": 12.475048,
+        "accepted": false,
+        "device_ms": 1113.3253,
+        "wall_ms": 1113.3452
+      },
+      {
+        "round": 116,
+        "radius": 0.009245003,
+        "reward": -12.475004,
+        "mean_nll": 12.475004,
+        "accepted": false,
+        "device_ms": 1114.2244,
+        "wall_ms": 1114.2463
+      },
+      {
+        "round": 117,
+        "radius": 0.009205746,
+        "reward": -12.474909,
+        "mean_nll": 12.474909,
+        "accepted": false,
+        "device_ms": 1111.9447,
+        "wall_ms": 1111.9655
+      },
+      {
+        "round": 118,
+        "radius": 0.009166985,
+        "reward": -12.474974,
+        "mean_nll": 12.474974,
+        "accepted": false,
+        "device_ms": 1110.7151,
+        "wall_ms": 1110.7389
+      },
+      {
+        "round": 119,
+        "radius": 0.009128709,
+        "reward": -12.475003,
+        "mean_nll": 12.475003,
+        "accepted": false,
+        "device_ms": 1108.8281,
+        "wall_ms": 1108.849
+      },
+      {
+        "round": 120,
+        "radius": 0.009090909,
+        "reward": -12.47497,
+        "mean_nll": 12.47497,
+        "accepted": false,
+        "device_ms": 1106.4586,
+        "wall_ms": 1106.4874
+      },
+      {
+        "round": 121,
+        "radius": 0.009053575,
+        "reward": -12.47496,
+        "mean_nll": 12.47496,
+        "accepted": false,
+        "device_ms": 1099.881,
+        "wall_ms": 1099.9135
+      },
+      {
+        "round": 122,
+        "radius": 0.009016696,
+        "reward": -12.474932,
+        "mean_nll": 12.474932,
+        "accepted": false,
+        "device_ms": 1096.9191,
+        "wall_ms": 1096.9509
+      },
+      {
+        "round": 123,
+        "radius": 0.008980266,
+        "reward": -12.474905,
+        "mean_nll": 12.474905,
+        "accepted": false,
+        "device_ms": 1088.5802,
+        "wall_ms": 1088.61
+      },
+      {
+        "round": 124,
+        "radius": 0.008944272,
+        "reward": -12.474938,
+        "mean_nll": 12.474938,
+        "accepted": false,
+        "device_ms": 1084.6836,
+        "wall_ms": 1084.7106
+      },
+      {
+        "round": 125,
+        "radius": 0.008908709,
+        "reward": -12.474958,
+        "mean_nll": 12.474958,
+        "accepted": false,
+        "device_ms": 1085.1339,
+        "wall_ms": 1085.1631
+      },
+      {
+        "round": 126,
+        "radius": 0.008873565,
+        "reward": -12.474959,
+        "mean_nll": 12.474959,
+        "accepted": false,
+        "device_ms": 1077.4484,
+        "wall_ms": 1077.4678
+      },
+      {
+        "round": 127,
+        "radius": 0.008838835,
+        "reward": -12.47483,
+        "mean_nll": 12.47483,
+        "accepted": false,
+        "device_ms": 1077.3154,
+        "wall_ms": 1077.3373
+      }
+    ],
+    "accepted_rounds": 0,
+    "best_reward": -12.474103,
+    "acquisition": "trust-region-arm-search"
+  },
+  "proposal": {
+    "method": "polynomial-threshold",
+    "basis": 0,
+    "distribution": "rademacher",
+    "candidates": 4,
+    "selected": 0,
+    "radius": 0.1,
+    "device_ms": 4403.1865,
+    "logical_parameter_coordinates": 1177756440,
+    "materialized_physical_elements": 1311974168
+  },
+  "context_window_tokens": 1048576,
+  "prompt_tokens": 524288,
+  "drafted_tokens": 0,
+  "core_context_positions": 16384,
+  "evaluated_core_positions": 16384,
+  "core_active_positions": 16384,
+  "evaluated_tokens": 524288,
+  "repaired_tokens": 0,
+  "generated_tokens": 524288,
+  "committed_tokens": 524288,
+  "scored_tokens": 524288,
+  "forward_passes": 1,
+  "temperature": 1.0,
+  "seed": 91614869253048103,
+  "readout_schedule": "split-global-logits",
+  "incumbent": {
+    "reward": -12.474103,
+    "mean_nll": 12.474103,
+    "core_device_ms": 832.05646,
+    "generation_device_ms": 154.70378,
+    "objective_device_ms": 5.139424,
+    "device_ms": 991.89966,
+    "evaluation_wall_ms": 991.9316,
+    "timed_in_round": false
+  },
+  "candidate": {
+    "reward": -12.537959,
+    "mean_nll": 12.537959,
+    "maximum_nll": 13.166432,
+    "positional_accuracy": 0.0000019073486,
+    "mismatches": 524287,
+    "patch_nll_octiles": [
+      12.524943,
+      12.5248165,
+      12.538677,
+      12.535969,
+      12.5506525,
+      12.530656,
+      12.540874,
+      12.557144
+    ],
+    "core_device_ms": 655.8514,
+    "generation_device_ms": 154.54465,
+    "objective_reduce_device_ms": 5.135904,
+    "evaluation_wall_ms": 815.57715,
+    "total_device_ms": 815.5319
+  },
+  "profile": null,
+  "index_audit": null,
+  "tell": {
+    "accepted": false,
+    "device_restore_ms": 0.0,
+    "wall_ms": 0.00008499999999999999,
+    "history_after": 2,
+    "trust_region_length": 0.1
+  },
+  "device_ms": 5218.7183,
+  "wall_ms": 135305.53597599998,
+  "rounds_per_device_second": 0.19161793180815564,
+  "full_generation_loop": true,
+  "full_scoring_loop": true,
+  "full_bo_loop": true,
+  "complete_candidate_transaction": true
+}

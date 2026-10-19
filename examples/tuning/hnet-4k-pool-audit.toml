@@ -1,0 +1,67 @@
+# Four-candidate counterfactual audit for the 4K BLCKBAUX pretraining baseline.
+# Every audited round evaluates all candidates against the same incumbent,
+# corpus condition, and sampling stream without updating between candidates.
+version = 4
+
+experiment = "pretrain"
+model = "fbt-pisa1-hnet-mhc4-v1"
+[data]
+recipe = "stack-v3-rust-go-v1"
+
+[objective]
+function = "cross-entropy"
+sampling = "natural"
+window-tokens = 4096
+
+[execution]
+rounds = 128
+round-target-ms = 200
+
+[evaluation]
+interval = 16
+
+[optimizer]
+algorithm = "operator-bo"
+
+[optimizer.candidate-generation]
+generator = "independent"
+arms = 4
+candidates = 4
+
+[optimizer.candidate-generation.perturbation]
+distribution = "gaussian"
+
+[optimizer.surrogate]
+estimator = "knn"
+scaling = "global"
+neighbors = 32
+neighbor-rule = "fixed"
+epistemic-scale = 0.05
+aleatoric-scale = 0.05
+
+fit = "leave-one-out"
+fit-candidates = 4
+fit-samples = 4
+
+[optimizer.acquisition]
+function = "upper-confidence-bound"
+
+[optimizer.acceptance]
+criterion = "positive-improvement"
+
+[optimizer.radius-control]
+policy = "reliability"
+initial = 0.001
+min = 0.0001
+max = 0.016
+
+[seeds]
+model = 240105308887621659
+reference = 150813718214252701
+proposal = 91614869253048103
+acquisition = 314159265358979323
+
+
+[diagnostics]
+stage-samples = 3
+pool-rank = 16

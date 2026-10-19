@@ -1,4 +1,4 @@
-use ennx::experimental::{
+use blckbaux::experimental::{
     ComputeDevice, DenseLeaf, DenseTerm, DenseView, apply_dense, dense_dist2, dense_linear,
 };
 

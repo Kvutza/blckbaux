@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from ennx.ennx.enn_util import (
+from blckbaux.enn.enn_util import (
     pareto_arms,
     sobol_indices,
     pareto2d_max,

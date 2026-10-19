@@ -3,15 +3,15 @@ import time
 import numpy as np
 import pandas as pd
 
-from ennx import (
-    CandidateRV,
+from blckbaux import (
+    CandidateSampler,
     ENN,
     create_optimizer,
     turbo_zero,
 )
 
 
-def _asktime(d, num_candidates, candidate_rv, seed=0):
+def _asktime(d, num_candidates, sampler, seed=0):
     rng = np.random.default_rng(seed)
     bounds = np.tile(np.array([[0.0, 1.0]]), (d, 1))
     opt = create_optimizer(
@@ -19,7 +19,7 @@ def _asktime(d, num_candidates, candidate_rv, seed=0):
         config=turbo_zero(
             num_init=1,
             num_candidates=num_candidates,
-            candidate_rv=candidate_rv,
+            sampler=sampler,
         ),
         rng=rng,
     )
@@ -61,13 +61,13 @@ def d_scaling(ds=None, n=1000, num_candidates=5000):
         row["Sobol optimizer ask (s)"] = _asktime(
             d,
             num_candidates,
-            CandidateRV.SOBOL,
+            CandidateSampler.SOBOL,
         )
 
         row["Uniform optimizer ask (s)"] = _asktime(
             d,
             num_candidates,
-            CandidateRV.UNIFORM,
+            CandidateSampler.UNIFORM,
         )
 
         results.append(row)

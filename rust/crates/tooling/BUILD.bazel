@@ -1,0 +1,38 @@
+load("@crates//:defs.bzl", "aliases", "crate_deps", "crate_edition")
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+load("//build:targets.bzl", "TOOLING_PROGRAMS")
+load("//rust/crates/blckbaux:defs.bzl", "blckbaux_program_targets")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["Cargo.toml"])
+
+rust_library(
+    name = "tooling",
+    srcs = [
+        "src/build.rs",
+        "src/lib.rs",
+        "src/names.rs",
+        "src/radar.rs",
+        "src/radar_scip.rs",
+        "src/terminal.rs",
+    ],
+    aliases = aliases(),
+    crate_name = "blckbaux_tooling",
+    crate_root = "src/lib.rs",
+    edition = crate_edition(),
+    deps = crate_deps(["clap"]) + [
+        "//rust/crates/artifact",
+    ],
+)
+
+rust_test(
+    name = "tooling_test",
+    aliases = aliases(normal_dev = True, proc_macro_dev = True),
+    crate = ":tooling",
+    deps = crate_deps(["clap"]) + [
+        "//rust/crates/artifact",
+    ],
+)
+
+[blckbaux_program_targets([program], [program["root"]]) for program in TOOLING_PROGRAMS]

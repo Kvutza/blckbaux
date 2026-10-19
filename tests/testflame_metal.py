@@ -49,12 +49,12 @@ def test_memory(monkeypatch, allocated):
 def test_uploadbits(monkeypatch):
     torch = pytest.importorskip("torch")
     captured = []
-    package = ModuleType("ennx")
-    experimental = ModuleType("ennx.experimental")
+    package = ModuleType("blckbaux")
+    experimental = ModuleType("blckbaux.experimental")
     experimental.MetalWeights = lambda bits: captured.append(bits.copy())
     package.experimental = experimental
-    monkeypatch.setitem(sys.modules, "ennx", package)
-    monkeypatch.setitem(sys.modules, "ennx.experimental", experimental)
+    monkeypatch.setitem(sys.modules, "blckbaux", package)
+    monkeypatch.setitem(sys.modules, "blckbaux.experimental", experimental)
     value = torch.tensor([1.0, -2.0, 0.0], dtype=torch.bfloat16)
     metal.upload_weights(value)
     np.testing.assert_array_equal(captured[0], [0x3F80, 0xC000, 0])
@@ -67,9 +67,9 @@ def test_uploadbits(monkeypatch):
 
 @pytest.fixture
 def gpu():
-    if os.environ.get("ENNX_TEST_METAL") != "1":
-        pytest.skip("Set ENNX_TEST_METAL=1 to exercise actual Metal bindings")
-    from ennx import experimental
+    if os.environ.get("BLCKBAUX_TEST_METAL") != "1":
+        pytest.skip("Set BLCKBAUX_TEST_METAL=1 to exercise actual Metal bindings")
+    from blckbaux import experimental
 
     assert "Apple" in experimental.MetalWeights.device_info()["name"]
     return experimental

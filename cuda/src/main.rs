@@ -2,12 +2,13 @@ use std::error::Error;
 use std::io;
 use std::time::Instant;
 
-use cuda_core::{CudaContext, CudaStream, DeviceBuffer, LaunchConfig1D, simt::LaunchConfig};
-use ennx_cuda::{
-    Ask as ResidentAsk, Bf16Leaf, Bf16SearchEngine, FbtPrefill, Leaf as ResidentLeaf, MAX_HISTORY,
-    Tile as ResidentTile, TrialEngine, embed_parity, feedback_parity,
+use blckbaux_cuda::{
+    Bf16Leaf, Bf16SearchEngine, FbtPrefill, Leaf as ResidentLeaf, MAX_HISTORY,
+    RoundConfig as ResidentAsk, Tile as ResidentTile, TrialEngine, device_target, embed_parity,
+    feedback_parity, target_name,
 };
-use ennx_cuda_kernels::{Bf16Score, SearchState, trials};
+use blckbaux_cuda_device::{Bf16Score, SearchState, trials};
+use cuda_core::{CudaContext, CudaStream, DeviceBuffer, LaunchConfig1D, simt::LaunchConfig};
 
 mod ptx_probe;
 
@@ -103,24 +104,37 @@ fn run() -> AppResult<()> {
         "bf16-bench" => bf16_benchmark(&args[2..]),
         "bf16-curve" => bf16_curve(&args[2..]),
         "prefill" => prefill(),
-        "model-check" => ennx_cuda::model_check().map_err(|e| io::Error::other(e).into()),
-        "diffusion" => ennx_cuda::model_diffusion(&args[2..]).map_err(|e| io::Error::other(e).into()),
-        "diffusion-check" => ennx_cuda::diffusion_check().map_err(|e| io::Error::other(e).into()),
-        "generate" => ennx_cuda::model_generate(&args[2..]).map_err(|e| io::Error::other(e).into()),
-        "generation-bench" => ennx_cuda::generation_bench(&args[2..]).map_err(|e| io::Error::other(e).into()),
-        "gemm-bench" => ennx_cuda::gemm::bench().map_err(|e| io::Error::other(e).into()),
+        "model-check" => {
+            let initialized = match &args[2..] {
+                [] => None,
+                [flag, path] if flag == "--initialized" => Some(std::path::Path::new(path)),
+                _ => return Err(io::Error::other("usage: model-check [--initialized OUTPUT]").into()),
+            };
+            blckbaux_cuda::model_check().map_err(io::Error::other)?;
+            if let Some(path) = initialized {
+                blckbaux_cuda::initialized_check(path).map_err(io::Error::other)?;
+            }
+            Ok(())
+        }
+        "diffusion" => blckbaux_cuda::model_diffusion(&args[2..]).map_err(|e| io::Error::other(e).into()),
+        "diffusion-check" => blckbaux_cuda::diffusion_check().map_err(|e| io::Error::other(e).into()),
+        "generate" => blckbaux_cuda::model_generate(&args[2..]).map_err(|e| io::Error::other(e).into()),
+        "generation-bench" => blckbaux_cuda::generation_bench(&args[2..]).map_err(|e| io::Error::other(e).into()),
+        "hnet-bench" => blckbaux_cuda::hnet_bench(&args[2..]).map_err(|e| io::Error::other(e).into()),
+        "hnet-bo-bench" => blckbaux_cuda::hnet_bo_bench(&args[2..]).map_err(|e| io::Error::other(e).into()),
+        "gemm-bench" => blckbaux_cuda::gemm::bench().map_err(|e| io::Error::other(e).into()),
         "ptx-probe" => ptx_probe::run(&args[2..]),
-        "model" => ennx_cuda::model_run(&args[2..]).map_err(|e| io::Error::other(e).into()),
-        "context" => ennx_cuda::context::run(&args[2..]).map_err(|e| io::Error::other(e).into()),
+        "model" => blckbaux_cuda::model_run(&args[2..]).map_err(|e| io::Error::other(e).into()),
+        "context" => blckbaux_cuda::context::run(&args[2..]).map_err(|e| io::Error::other(e).into()),
         command => Err(io::Error::other(format!(
-            "unknown command {command:?}; expected parity, resident, prefill, model-check, model, generate, generation-bench, diffusion, diffusion-check, context, ptx-probe, bench, trial-bench, bf16-bench, or bf16-curve"
+            "unknown command {command:?}; expected parity, resident, prefill, model-check, model, generate, generation-bench, hnet-bench, hnet-bo-bench, diffusion, diffusion-check, context, ptx-probe, bench, trial-bench, bf16-bench, or bf16-curve"
         ))
         .into()),
     }
 }
 
 fn prefill() -> AppResult<()> {
-    let embedding = vec![0x3c00_u16; 8192 * 512];
+    let embedding = vec![0x3c00_u16; blckbaux_cuda_device::VOCAB as usize * 512];
     let rms = vec![0x3c00_u16; 512];
     let qkv = vec![0x1800_u16; 512 * 640];
     let output_weight = vec![0x1800_u16; 512 * 512];
@@ -128,7 +142,7 @@ fn prefill() -> AppResult<()> {
     let mut executor = FbtPrefill::new(&embedding, &rms, &qkv, &output_weight, &router_weight)
         .map_err(|error| io::Error::other(format!("prefill init: {error}")))?;
     let tokens = (0..4096)
-        .map(|index| (index % 8192) as u32)
+        .map(|index| (index % blckbaux_cuda_device::VOCAB) as u32)
         .collect::<Vec<_>>();
     // Warm-up absorbs first-launch/module state. Keep all weights and scratch
     // buffers resident for the measured repetitions.
@@ -224,6 +238,7 @@ fn resident_parity() -> AppResult<()> {
             aleatoric_scale: 0.05,
             y_scale: 1.0,
             beta: 1.2,
+            adaptive_neighbors: false,
         };
         let expected_scores = seeds
             .iter()
@@ -330,12 +345,60 @@ fn resident_parity() -> AppResult<()> {
     }
 
     bf16_scoreparity()?;
+    let target = device_target().map_err(io::Error::other)?;
     println!(
-        "RESIDENT ok=true target=sm_75 history={} candidates={} choice=passed bf16=passed",
+        "RESIDENT ok=true target={target} history={} candidates={} choice=passed bf16=passed",
         history_rows.len(),
         seeds.len()
     );
     Ok(())
+}
+
+fn neighbor_reference(
+    params: Bf16Score,
+    outcomes: &[f32],
+    variances: &[f32],
+    draws: &[f32],
+) -> f64 {
+    let y2 = f64::from(params.y_scale).powi(2);
+    let mut sum = 0.0;
+    let mut noise_sum = 0.0;
+    let mut count = 1;
+    let mut risk = f64::INFINITY;
+    let points = [(1.0, 0), (2.0, 2)];
+    for (rank, &(distance, index)) in points.iter().enumerate() {
+        let noise = f64::from(params.aleatoric_scale) + f64::from(variances[index]) / y2;
+        let precision = 1.0 / (1.0e-9 + f64::from(params.epistemic_scale) * distance + noise);
+        sum += precision;
+        noise_sum += precision * precision * noise;
+        let next = f64::from(params.epistemic_scale) * distance + noise_sum / (sum * sum);
+        if next < risk {
+            risk = next;
+            count = rank + 1;
+        }
+    }
+    let mut sum = 0.0;
+    let mut mean = 0.0;
+    let mut aleatoric = 0.0;
+    let mut sample = 0.0;
+    let mut squared = 0.0;
+    for &(distance, index) in points.iter().take(count) {
+        let noise = f64::from(params.aleatoric_scale) + f64::from(variances[index]) / y2;
+        let precision = 1.0 / (1.0e-9 + f64::from(params.epistemic_scale) * distance + noise);
+        sum += precision;
+        mean += precision * f64::from(outcomes[index]);
+        aleatoric += precision * noise;
+        sample += precision * f64::from(draws[index]);
+        squared += precision * precision;
+    }
+    let error = ((1.0 + aleatoric) / sum).sqrt() * f64::from(params.y_scale);
+    mean / sum
+        + error
+            * match params.acquisition {
+                1 => sample / squared.sqrt(),
+                2 => 1.0,
+                _ => f64::from(params.beta),
+            }
 }
 
 fn bf16_scoreparity() -> AppResult<()> {
@@ -358,6 +421,7 @@ fn bf16_scoreparity() -> AppResult<()> {
         tiles: 1,
         resident: 0,
         correlated: 0,
+        adaptive_neighbors: 0,
     };
     let outcomes = [0.5_f32, 10.0, -0.25];
     let variances = [8.0_f32, 0.5, 0.125];
@@ -384,36 +448,72 @@ fn bf16_scoreparity() -> AppResult<()> {
         &mut scores,
         params,
     )?;
-    let scores = scores.to_host_vec(&stream)?;
+    let actual = scores.to_host_vec(&stream)?;
 
     let mut weight_sum = 0.0_f64;
     let mut weighted_value = 0.0_f64;
     let mut weighted_noise = 0.0_f64;
     let mut squared_weight_sum = 0.0_f64;
+    let mut weighted_aleatoric = 0.0_f64;
     for (distance, index) in [(1.0, 0), (2.0, 2)] {
         let weight = 1.0
             / (1.0e-9
                 + f64::from(params.epistemic_scale) * distance
                 + f64::from(params.aleatoric_scale)
-                + f64::from(variances[index]));
+                + f64::from(variances[index]) / f64::from(params.y_scale).powi(2));
         weight_sum += weight;
         weighted_value += weight * f64::from(outcomes[index]);
         weighted_noise += weight * f64::from(draws[index]);
         squared_weight_sum += weight * weight;
+        weighted_aleatoric += weight
+            * (f64::from(params.aleatoric_scale)
+                + f64::from(variances[index]) / f64::from(params.y_scale).powi(2));
     }
-    let se = f64::from(params.y_scale) / weight_sum.sqrt();
+    let se = f64::from(params.y_scale) * ((1.0 + weighted_aleatoric) / weight_sum).sqrt();
     let expected = weighted_value / weight_sum + se * weighted_noise / squared_weight_sum.sqrt();
-    if scores[0].to_bits() != scores[1].to_bits()
-        || scores.iter().any(|&score| {
+    if actual[0].to_bits() != actual[1].to_bits()
+        || actual.iter().any(|&score| {
             !score.is_finite()
                 || (f64::from(score) - expected).abs() > 2.0e-5 * expected.abs().max(1.0)
         })
     {
         return Err(io::Error::other(format!(
-            "BF16 Thompson score mismatch: expected {expected}, duplicate scores={scores:?}"
+            "BF16 Thompson score mismatch: expected {expected}, duplicate scores={actual:?}"
         ))
         .into());
     }
+
+    for acquisition in 0..3 {
+        let adaptive = Bf16Score {
+            acquisition,
+            adaptive_neighbors: 1,
+            ..params
+        };
+        module.score_bf16(
+            &stream,
+            &launch,
+            &partials,
+            &tile_status,
+            &outcomes_device,
+            &variances_device,
+            &state,
+            &draws_device,
+            &mut scores,
+            adaptive,
+        )?;
+        let actual = scores.to_host_vec(&stream)?;
+        let expected = neighbor_reference(adaptive, &outcomes, &variances, &draws);
+        if actual.iter().any(|&value| {
+            !value.is_finite()
+                || (f64::from(value) - expected).abs() > 2.0e-5 * expected.abs().max(1.0)
+        }) {
+            return Err(io::Error::other(format!(
+                "Adaptive ENN acquisition mismatch: {actual:?} vs {expected}"
+            ))
+            .into());
+        }
+    }
+    println!("NEIGHBOR_RULE parity=true acquisitions=ucb,thompson,pareto adaptive=true");
 
     let launch = module.prepare_draw_bf16(LaunchConfig1D::new(1, 256, 0))?;
     let mut sampled = DeviceBuffer::<f32>::zeroed(&stream, 3)?;
@@ -540,6 +640,8 @@ fn cpu_distance(
 }
 
 fn parity() -> AppResult<()> {
+    blckbaux_cuda::proposal_check().map_err(io::Error::other)?;
+    blckbaux_cuda::neighbors::parity().map_err(io::Error::other)?;
     let context = CudaContext::new(0)?;
     let stream = context.default_stream();
     // SAFETY: the generated bindings load the matching embedded kernel artifact.
@@ -564,11 +666,20 @@ fn parity() -> AppResult<()> {
     }
     embed_parity().map_err(io::Error::other)?;
     feedback_parity().map_err(io::Error::other)?;
-    println!("PARITY ok=true cases={cases} target=sm_75");
+    let target = target_name(&context).map_err(io::Error::other)?;
+    println!("PARITY ok=true cases={cases} target={target}");
     Ok(())
 }
 
 fn benchmark(args: &[String]) -> AppResult<()> {
+    if args.first().is_some_and(|value| value == "muon") {
+        if args.len() != 1 {
+            return Err(io::Error::other("bench muon accepts no additional arguments").into());
+        }
+        let record = blckbaux_cuda::muon::measure().map_err(io::Error::other)?;
+        println!("{}", blckbaux_artifact::json::pretty_string(&record)?);
+        return Ok(());
+    }
     let elements = parse_arg(args, 0, 16 * 1024 * 1024, "elements")?;
     let iterations = parse_arg(args, 1, 100, "iterations")?;
     let bits: u8 = parse_arg(args, 2, 4, "bits")?;
@@ -626,8 +737,9 @@ fn benchmark(args: &[String]) -> AppResult<()> {
     let kernel_ms = total_ms / iterations as f64;
     let bytes = (base.len() as f64) * 2.0 * iterations as f64;
     let gib_s = bytes / (total_ms / 1_000.0) / (1024.0 * 1024.0 * 1024.0);
+    let target = target_name(&context).map_err(io::Error::other)?;
     println!(
-        "BENCH ok=true target=sm_75 elements={elements} bits={bits} iterations={iterations} \
+        "BENCH ok=true target={target} elements={elements} bits={bits} iterations={iterations} \
          row_bytes={} kernel_ms={kernel_ms:.6} gib_s={gib_s:.3}",
         base.len()
     );
@@ -687,6 +799,7 @@ fn trial_benchmark(args: &[String]) -> AppResult<()> {
         aleatoric_scale: 0.05,
         y_scale: 1.0,
         beta: 1.2,
+        adaptive_neighbors: false,
     };
     engine.set_profiling(true);
 
@@ -743,8 +856,9 @@ fn trial_benchmark(args: &[String]) -> AppResult<()> {
     let count = iterations as f64;
     let asks_s = count / wall_seconds;
     let candidates_s = candidates as f64 * asks_s;
+    let target = device_target().map_err(io::Error::other)?;
     println!(
-        "{{\"schema\":\"ennx.cuda.packed-bo-ask.v1\",\"target\":\"sm_75\",\"storage\":\"packed-quantized\",\"candidates\":{candidates},\"history\":{history},\"parameter_elements\":{elements},\"iterations\":{iterations},\"proposal_score_ms\":{:.6},\"pick_ms\":{:.6},\"materialize_ms\":{:.6},\"gpu_ms\":{:.6},\"wall_ms\":{:.6},\"asks_per_second\":{asks_s:.3},\"candidates_per_second\":{candidates_s:.3},\"context_tokens\":0,\"drafted_tokens\":0,\"evaluated_tokens\":0,\"repaired_tokens\":0,\"generated_tokens\":0,\"committed_tokens\":0,\"full_generation_loop\":false}}",
+        "{{\"schema\":\"blckbaux.cuda.packed-bo-ask.v1\",\"target\":\"{target}\",\"storage\":\"packed-quantized\",\"candidates\":{candidates},\"history\":{history},\"parameter_elements\":{elements},\"iterations\":{iterations},\"proposal_score_ms\":{:.6},\"pick_ms\":{:.6},\"materialize_ms\":{:.6},\"gpu_ms\":{:.6},\"wall_ms\":{:.6},\"asks_per_second\":{asks_s:.3},\"candidates_per_second\":{candidates_s:.3},\"context_tokens\":0,\"drafted_tokens\":0,\"evaluated_tokens\":0,\"repaired_tokens\":0,\"generated_tokens\":0,\"committed_tokens\":0,\"full_generation_loop\":false}}",
         score_ms / count,
         pick_ms / count,
         materialize_ms / count,
@@ -799,8 +913,9 @@ fn bf16_benchmark(args: &[String]) -> AppResult<()> {
     let run = measure_bf16(candidates, history, elements, iterations)?;
     let mut point = String::new();
     run.write_json(&mut point);
+    let target = device_target().map_err(io::Error::other)?;
     println!(
-        "{{\"schema\":\"ennx.cuda.bf16-bo-ask.v1\",\"target\":\"sm_75\",\"storage\":\"bf16\",\"distance_fusion\":\"candidate-pairs\",\"fused_pair_parity\":true,\"measurement\":{point},\"context_tokens\":0,\"drafted_tokens\":0,\"evaluated_tokens\":0,\"repaired_tokens\":0,\"generated_tokens\":0,\"committed_tokens\":0,\"full_generation_loop\":false}}"
+        "{{\"schema\":\"blckbaux.cuda.bf16-bo-ask.v1\",\"target\":\"{target}\",\"storage\":\"bf16\",\"distance_fusion\":\"candidate-pairs\",\"fused_pair_parity\":true,\"measurement\":{point},\"context_tokens\":0,\"drafted_tokens\":0,\"evaluated_tokens\":0,\"repaired_tokens\":0,\"generated_tokens\":0,\"committed_tokens\":0,\"full_generation_loop\":false}}"
     );
     Ok(())
 }
@@ -821,8 +936,9 @@ fn bf16_curve(args: &[String]) -> AppResult<()> {
         }
         measure_bf16(candidates, history, elements, iterations)?.write_json(&mut points);
     }
+    let target = device_target().map_err(io::Error::other)?;
     println!(
-        "{{\"schema\":\"ennx.cuda.bf16-bo-curve.v1\",\"target\":\"sm_75\",\"storage\":\"bf16\",\"distance_fusion\":\"candidate-pairs\",\"fused_pair_parity\":true,\"points\":[{points}],\"context_tokens\":0,\"drafted_tokens\":0,\"evaluated_tokens\":0,\"repaired_tokens\":0,\"generated_tokens\":0,\"committed_tokens\":0,\"full_generation_loop\":false}}"
+        "{{\"schema\":\"blckbaux.cuda.bf16-bo-curve.v1\",\"target\":\"{target}\",\"storage\":\"bf16\",\"distance_fusion\":\"candidate-pairs\",\"fused_pair_parity\":true,\"points\":[{points}],\"context_tokens\":0,\"drafted_tokens\":0,\"evaluated_tokens\":0,\"repaired_tokens\":0,\"generated_tokens\":0,\"committed_tokens\":0,\"full_generation_loop\":false}}"
     );
     Ok(())
 }
@@ -878,6 +994,7 @@ fn measure_bf16(
         aleatoric_scale: 0.05,
         y_scale: 1.0,
         beta: 1.2,
+        adaptive_neighbors: true,
     };
     let make_seeds = |round: usize| {
         (0..candidates)
@@ -1025,6 +1142,7 @@ fn pair_parity() -> AppResult<()> {
             aleatoric_scale: 0.05,
             y_scale: 1.0,
             beta: 1.2,
+            adaptive_neighbors: false,
         };
         let baseline_selection = baseline
             .ask(

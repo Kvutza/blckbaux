@@ -1,0 +1,1947 @@
+[2026-10-09T00:18:54.258-04:00] Build ID: 1be7028c-faa3-4bea-809f-883069254cd2
+[2026-10-09T00:18:54.266-04:00] File changed: root//.git/lfs/tmp/1616496713
+[2026-10-09T00:18:54.266-04:00] File changed: root//.jj/working_copy/.tmpQgoKTS
+[2026-10-09T00:18:54.266-04:00] File changed: root//.jj/working_copy/working_copy.lock
+[2026-10-09T00:18:54.266-04:00] 14 additional file change events
+[2026-10-09T00:19:01.360-04:00] Waiting on root//rust/crates/blckbaux:blckbaux (prelude//platforms:default#9cddb5969014779c) -- rustc rlib [pic] [local_execute]
+[2026-10-09T00:19:08.460-04:00] Waiting on root//rust/crates/blckbaux:blckbaux (prelude//platforms:default#9cddb5969014779c) -- rustc rlib [pic] [local_execute]
+[2026-10-09T00:19:15.460-04:00] Waiting on root//rust/crates/blckbaux:blckbaux (prelude//platforms:default#9cddb5969014779c) -- rustc rlib [pic] [local_execute]
+[2026-10-09T00:19:22.460-04:00] Waiting on root//rust/crates/dev-cli:blckbaux (prelude//platforms:default#9cddb5969014779c) -- rustc link [pic] [local_execute]
+[2026-10-09T00:19:26.153-04:00] Cache hits: 0%
+[2026-10-09T00:19:26.153-04:00] Commands: 2 (cached: 0, remote: 0, local: 2)
+[2026-10-09T00:19:26.154-04:00] Network: up 0B  down 0B
+BUILD SUCCEEDED - starting your binary
+blckbaux: running affected test targets:
+  root//rust/crates/corpus:corpus-test
+  root//rust/crates/dev-cli:blckbaux-test
+  root//rust/crates/blckbaux:add_complexity_test
+  root//rust/crates/blckbaux:api_boundary_test
+  root//rust/crates/blckbaux:batchposttrainreg_test
+  root//rust/crates/blckbaux:bf16_metaltest_test
+  root//rust/crates/blckbaux:disk_observation_test
+  root//rust/crates/blckbaux:disksaveidx_test
+  root//rust/crates/blckbaux:diskstreamhelp_test
+  root//rust/crates/blckbaux:enn_backend_test
+  root//rust/crates/blckbaux:blckbaux-unit
+  root//rust/crates/blckbaux:fbt_metaltest_test
+  root//rust/crates/blckbaux:fit_cases_test
+  root//rust/crates/blckbaux:flame_metaltest_test
+  root//rust/crates/blckbaux:knn_metal_test
+  root//rust/crates/blckbaux:model_access_test
+  root//rust/crates/blckbaux:neighbor_dist_test
+  root//rust/crates/blckbaux:obs_access_test
+  root//rust/crates/blckbaux:region-opencl
+  root//rust/crates/blckbaux:surrogate_geometry_test
+  root//rust/crates/blckbaux:tdiskback_test
+  root//rust/crates/blckbaux:testinctrk_test
+  root//rust/crates/blckbaux:trainrowsat_test
+  root//rust/crates/blckbaux:trial_search_test
+  root//rust/crates/blckbaux:turbo-enn-test
+  root//rust/crates/blckbaux:weakmathgold_test
+[2026-10-09T00:19:32.065-04:00] Build ID: b67d0d0d-7539-4ac3-b84c-6da412b099ba
+[2026-10-09T00:19:39.167-04:00] Waiting on root//rust/crates/blckbaux:blckbaux-unit (prelude//platforms:default#9cddb5969014779c) -- rustc link [pic] [local_execute], and 25 other actions
+[2026-10-09T00:19:46.167-04:00] Waiting on root//rust/crates/blckbaux:blckbaux-unit (prelude//platforms:default#9cddb5969014779c) -- rustc link [pic] [local_execute], and 25 other actions
+[2026-10-09T00:19:53.267-04:00] Waiting on root//rust/crates/blckbaux:blckbaux-unit (prelude//platforms:default#9cddb5969014779c) -- rustc link [pic] [local_execute], and 25 other actions
+[2026-10-09T00:20:00.267-04:00] Waiting on root//rust/crates/blckbaux:blckbaux-unit (prelude//platforms:default#9cddb5969014779c) -- rustc link [pic] [local_execute], and 25 other actions
+[2026-10-09T00:20:07.367-04:00] Waiting on root//rust/crates/blckbaux:region-opencl (prelude//platforms:default#9cddb5969014779c) -- rustc link [pic] [local_execute], and 25 other actions
+[2026-10-09T00:20:14.467-04:00] Waiting on root//rust/crates/blckbaux:region-opencl (prelude//platforms:default#9cddb5969014779c) -- rustc link [pic] [local_execute], and 25 other actions
+[2026-10-09T00:20:21.566-04:00] Waiting on root//rust/crates/blckbaux:region-opencl (prelude//platforms:default#9cddb5969014779c) -- rustc link [pic] [local_execute], and 25 other actions
+[2026-10-09T00:20:28.667-04:00] Waiting on root//rust/crates/blckbaux:tdiskback_test (prelude//platforms:default#9cddb5969014779c) -- rustc link [pic] [local_execute], and 25 other actions
+[2026-10-09T00:20:35.767-04:00] Waiting on root//rust/crates/blckbaux:batchposttrainreg_test (prelude//platforms:default#9cddb5969014779c) -- rustc link [pic] [local_execute], and 25 other actions
+[2026-10-09T00:20:42.867-04:00] Waiting on root//rust/crates/blckbaux:fbt_metaltest_test (prelude//platforms:default#9cddb5969014779c) -- rustc link [pic] [local_execute], and 25 other actions
+[2026-10-09T00:20:49.966-04:00] Waiting on root//rust/crates/dev-cli:blckbaux-test (prelude//platforms:default#9cddb5969014779c) -- rustc link [pic] [local_execute], and 25 other actions
+[2026-10-09T00:20:55.354-04:00] ✓ Pass: root//rust/crates/corpus:corpus-test (0.0s)
+[2026-10-09T00:20:55.354-04:00] ---- STDOUT ----
+[2026-10-09T00:20:55.354-04:00]
+[2026-10-09T00:20:55.354-04:00] running 2 tests
+[2026-10-09T00:20:55.354-04:00] test tests::classification ... ok
+[2026-10-09T00:20:55.354-04:00] test tests::completion ... ok
+[2026-10-09T00:20:55.354-04:00]
+[2026-10-09T00:20:55.354-04:00] test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+[2026-10-09T00:20:55.354-04:00]
+[2026-10-09T00:20:55.354-04:00]
+[2026-10-09T00:20:55.354-04:00] ---- STDERR ----
+[2026-10-09T00:20:55.354-04:00]
+[2026-10-09T00:20:56.967-04:00] Waiting on Test blckbaux-unit --  [local_execute], and 24 other actions
+[2026-10-09T00:21:04.066-04:00] Waiting on Test blckbaux-unit --  [local_execute], and 24 other actions
+[2026-10-09T00:21:11.066-04:00] Waiting on Test blckbaux-unit --  [local_execute], and 24 other actions
+[2026-10-09T00:21:18.165-04:00] Waiting on Test blckbaux-unit --  [local_execute], and 24 other actions
+[2026-10-09T00:21:25.166-04:00] Waiting on Test blckbaux-unit --  [local_execute], and 24 other actions
+[2026-10-09T00:21:32.167-04:00] Waiting on Test blckbaux-unit --  [local_execute], and 24 other actions
+[2026-10-09T00:21:39.266-04:00] Waiting on Test blckbaux-unit --  [local_execute], and 24 other actions
+[2026-10-09T00:21:46.366-04:00] Waiting on Test blckbaux-unit --  [local_execute], and 24 other actions
+[2026-10-09T00:21:53.466-04:00] Waiting on Test blckbaux-unit --  [local_execute], and 24 other actions
+[2026-10-09T00:22:00.466-04:00] Waiting on Test blckbaux-unit --  [local_execute], and 24 other actions
+[2026-10-09T00:22:01.991-04:00] ✗ Fail: root//rust/crates/blckbaux:blckbaux-unit (1:06.6s)
+[2026-10-09T00:22:01.991-04:00] ---- STDOUT ----
+[2026-10-09T00:22:01.991-04:00]
+[2026-10-09T00:22:01.991-04:00] running 732 tests
+[2026-10-09T00:22:01.991-04:00] test acquisition::tests::test_001 ... ok
+[2026-10-09T00:22:01.991-04:00] test acquisition::tests::test_002 ... ok
+[2026-10-09T00:22:01.991-04:00] test acquisition::tests::test_003 ... ok
+[2026-10-09T00:22:01.991-04:00] test acquisition::tests::test_004 ... ok
+[2026-10-09T00:22:01.991-04:00] test acquisition::tests::test_005 ... ok
+[2026-10-09T00:22:01.991-04:00] test acquisition::tests::test_006 ... ok
+[2026-10-09T00:22:01.991-04:00] test acquisition::tests::test_007 ... ok
+[2026-10-09T00:22:01.991-04:00] test acquisition::tests::test_008 ... ok
+[2026-10-09T00:22:01.991-04:00] test acquisition::tests::test_009 ... ok
+[2026-10-09T00:22:01.991-04:00] test acquisition::tests::test_010 ... ok
+[2026-10-09T00:22:01.991-04:00] test agent_contract::tests::cancelled_stream ... ok
+[2026-10-09T00:22:01.991-04:00] test agent_contract::tests::invalid_tools ... ok
+[2026-10-09T00:22:01.991-04:00] test agent_contract::tests::unresolved_call ... ok
+[2026-10-09T00:22:01.991-04:00] test agent_contract::tests::valid_episode ... ok
+[2026-10-09T00:22:01.991-04:00] test apple_gpu::tests::maps_generations ... ok
+[2026-10-09T00:22:01.991-04:00] test apple_gpu::tests::shared_buffers ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::backend_dispatch::bpann_dispatch ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::backend_dispatch::bpann_errors ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::backend_dispatch::disk_used ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::backend_dispatch::enn_len ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::backend_dispatch::memory_view ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::disk_observation::behavior_tests::disk_called ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::disk_observation::disk_observation::bpann_disk ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::disk_observation::disk_observation::dim_above ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::disk_observation::disk_observation::dim_dim ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::disk_observation::disk_observation::load_cases ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::disk_observation::disk_observation::parse_branches ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::disk_observation::disk_observation::shared_direct ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::disk_observation::disk_observation::shared_wrappers ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::flush_controller::tests::append_add2 ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::flush_controller::tests::flush_wait ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::flush_controller::tests::fuzz_seeds4 ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::flush_controller::tests::persist_pages ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::flush_controller::tests::schedule_async ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::flush_controller::tests::schedule_flight ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::flush_controller::tests::schedule_noop ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::flush_controller::tests::schedule_synchronously ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::flush_controller::tests::search_deadlock ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::flush_controller::tests::search_flight ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::flush_controller::tests::soft_metamorphic ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::flush_controller::tests::wait_noop ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::in_memory::memory_unit::covers_search ... ok
+[2026-10-09T00:22:01.991-04:00] test backend::row_storage::row_storage::gather_vec ... ok
+[2026-10-09T00:22:01.991-04:00] test base_policy::tests::invalid_qualification ... ok
+[2026-10-09T00:22:01.991-04:00] test base_policy::tests::qualified_identity ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::audit::history_audit ... ignored, GPU geometry audit; emits measurements rather than asserting an optimization win
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::axis::tests::bounded_axis ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::family::tests::family_energy ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::family::tests::family_learning ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::family::tests::family_replay ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::family::tests::family_units ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::metric::tests::metric_agreement ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::metric::tests::metric_duplicates ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::metric::tests::metric_timing ... ignored, paired metric benchmark; requires Low Power Mode off
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::objective_acquisition::tests::morbo_chebyshev ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::objective_acquisition::tests::morbo_noise ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::objective_acquisition::tests::morbo_resample ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::objective_acquisition::tests::morbo_state ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::objective_acquisition::tests::parameter_layout ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::objective_acquisition::tests::pareto_control ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::objective_acquisition::tests::scalar_optout ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::objective_acquisition::tests::shared_geometry ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::objective_tests::retryable_schema ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::objective_tests::scalar_adapter ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::objective_tests::vector_history ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::procedural::tests::resident_layouts ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::controller_info ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::family_recovers ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::fifo_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::fp16_weights ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::gaussian_initial ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::host_guards ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::latent_history ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::paired_gain ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::pool_geometry ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::program_keys ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::program_overlap ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::rademacher ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::rademacher_initial ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::radial_select ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::replay_archived ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::restart_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::rewarm_threshold ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::round_memory ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::single_decision ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::startup_adaptation ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::tile_reference ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::unclear_history ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::unevidenced_radius ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::wide_history ... ok
+[2026-10-09T00:22:01.991-04:00] test bf16_metal::tests::ziggurat_moments ... ok
+[2026-10-09T00:22:01.991-04:00] test calibration::tests::past_only ... ok
+[2026-10-09T00:22:01.991-04:00] test candidates::tests::raasp_seed ... ok
+[2026-10-09T00:22:01.991-04:00] test candidates::tests::test_005 ... ok
+[2026-10-09T00:22:01.991-04:00] test candidates::tests::test_006 ... ok
+[2026-10-09T00:22:01.991-04:00] test candidates::tests::test_007 ... ok
+[2026-10-09T00:22:01.991-04:00] test candidates::tests::test_008 ... ok
+[2026-10-09T00:22:01.991-04:00] test candidates::tests::test_010 ... ok
+[2026-10-09T00:22:01.991-04:00] test candidates::tests::test_011 ... ok
+[2026-10-09T00:22:01.991-04:00] test candidates::tests::test_generatelhd ... ok
+[2026-10-09T00:22:01.991-04:00] test candidates::tests::test_generateuniform ... ok
+[2026-10-09T00:22:01.991-04:00] test candidates::tests::test_sobolengine ... ok
+[2026-10-09T00:22:01.991-04:00] test candidates::tests::test_tofromunit ... ok
+[2026-10-09T00:22:01.991-04:00] test capability::tests::accel_gaps ... ok
+[2026-10-09T00:22:01.991-04:00] test capability::tests::complete ... ok
+[2026-10-09T00:22:01.991-04:00] test capability::tests::cpu_direct ... ok
+[2026-10-09T00:22:01.991-04:00] test code_overlap::tests::contrast_controls ... ok
+[2026-10-09T00:22:01.991-04:00] test code_overlap::tests::exact_overlap ... ok
+[2026-10-09T00:22:01.991-04:00] test code_overlap::tests::finite_components ... ok
+[2026-10-09T00:22:01.991-04:00] test code_overlap::tests::whitespace_credit ... ok
+[2026-10-09T00:22:01.991-04:00] test coding_outcome::tests::correctness_priority ... ok
+[2026-10-09T00:22:01.991-04:00] test coding_outcome::tests::efficiency_tiebreak ... ok
+[2026-10-09T00:22:01.991-04:00] test coding_outcome::tests::ineligible_candidates ... ok
+[2026-10-09T00:22:01.991-04:00] test coding_outcome::tests::mismatched_budgets ... ok
+[2026-10-09T00:22:01.991-04:00] test coding_outcome::tests::regression_priority ... ok
+[2026-10-09T00:22:01.991-04:00] test config::generation::tests::temperature_bounds ... ok
+[2026-10-09T00:22:01.991-04:00] test config::generation::tests::vector_command ... ok
+[2026-10-09T00:22:01.991-04:00] test config::generation::tests::vector_policy ... ok
+[2026-10-09T00:22:01.991-04:00] test config::objectives::tests::explicit_vectors ... ok
+[2026-10-09T00:22:01.991-04:00] test config::objectives::tests::morbo_geometry ... ok
+[2026-10-09T00:22:01.991-04:00] test config::objectives::tests::morbo_preferences ... ok
+[2026-10-09T00:22:01.991-04:00] test config::procedural::tests::default_pool ... ok
+[2026-10-09T00:22:01.991-04:00] test config::procedural::tests::fixed_layouts ... ok
+[2026-10-09T00:22:01.991-04:00] test config::procedural::tests::invalid_pool ... ok
+[2026-10-09T00:22:01.991-04:00] test config::procedural::tests::unsupported_pool ... ok
+[2026-10-09T00:22:01.991-04:00] test config::serialization_tests::config_fields ... ok
+[2026-10-09T00:22:01.991-04:00] test config::serialization_tests::config_names ... ok
+[2026-10-09T00:22:01.991-04:00] test config::serialization_tests::fineweb_seeds ... ok
+[2026-10-09T00:22:01.991-04:00] test config::serialization_tests::generated_seeds ... ok
+[2026-10-09T00:22:01.991-04:00] test config::serialization_tests::shared_schema ... ok
+[2026-10-09T00:22:01.991-04:00] test config::spec_tests::budgets ... ok
+[2026-10-09T00:22:01.991-04:00] test config::spec_tests::closed ... ok
+[2026-10-09T00:22:01.991-04:00] test config::spec_tests::guards ... ok
+[2026-10-09T00:22:01.991-04:00] test config::spec_tests::models ... ok
+[2026-10-09T00:22:01.991-04:00] test config::spec_tests::paths ... ok
+[2026-10-09T00:22:01.991-04:00] test config::spec_tests::reliability ... ok
+[2026-10-09T00:22:01.991-04:00] test config::spec_tests::roundtrip ... ok
+[2026-10-09T00:22:01.991-04:00] test config::spec_tests::vectors ... ok
+[2026-10-09T00:22:01.991-04:00] test config::tests::candidate_arms ... ok
+[2026-10-09T00:22:01.991-04:00] test config::tests::config_pool ... ok
+[2026-10-09T00:22:01.991-04:00] test config::tests::enn_dir ... ok
+[2026-10-09T00:22:01.991-04:00] test config::tests::enn_fields ... ok
+[2026-10-09T00:22:01.991-04:00] test config::tests::morbo_metrics ... ok
+[2026-10-09T00:22:01.991-04:00] test config::tests::morbo_propose ... ok
+[2026-10-09T00:22:01.991-04:00] test config::tests::test_003 ... ok
+[2026-10-09T00:22:01.991-04:00] test config::tests::test_004 ... ok
+[2026-10-09T00:22:01.991-04:00] test config::tests::test_010 ... ok
+[2026-10-09T00:22:01.991-04:00] test config::tests::test_011 ... ok
+[2026-10-09T00:22:01.991-04:00] test config::tests::test_configdefaults ... ok
+[2026-10-09T00:22:01.991-04:00] test config::tests::test_initstrategyenum ... ok
+[2026-10-09T00:22:01.991-04:00] test config::tests::test_lhdonlyconfig ... ok
+[2026-10-09T00:22:01.991-04:00] test config::tests::test_turboennconfig ... ok
+[2026-10-09T00:22:01.991-04:00] test config::tests::test_turbozeroconfig ... ok
+[2026-10-09T00:22:01.991-04:00] test context::tests::bounds ... ok
+[2026-10-09T00:22:01.991-04:00] test context_metal::tests::block_visibility ... ok
+[2026-10-09T00:22:01.991-04:00] test dense::bf16::tests::auto_device ... ok
+[2026-10-09T00:22:01.991-04:00] test dense::bf16::tests::bf16_limits ... ok
+[2026-10-09T00:22:01.991-04:00] test dense::bf16::tests::candidate_base ... ok
+[2026-10-09T00:22:01.991-04:00] test dense::bf16::tests::rollback_overflow ... ok
+[2026-10-09T00:22:01.991-04:00] test dense::bf16::tests::sub_weight ... ok
+[2026-10-09T00:22:01.991-04:00] test dense::linear::tests::fused_weights ... ok
+[2026-10-09T00:22:01.991-04:00] test dense::tests::coefficient_work ... ok
+[2026-10-09T00:22:01.991-04:00] test dense::tests::cpu_pytree ... ok
+[2026-10-09T00:22:01.991-04:00] test dense::tests::dense_signs ... ok
+[2026-10-09T00:22:01.991-04:00] test dense::tests::tensor_keys ... ok
+[2026-10-09T00:22:01.991-04:00] test disk_bpann::enn_backend::tests::append_maps ... ok
+[2026-10-09T00:22:01.991-04:00] test disk_bpann::enn_backend::tests::bpann_driver ... ok
+[2026-10-09T00:22:01.991-04:00] test disk_bpann::enn_backend::tests::new_sync ... ok
+[2026-10-09T00:22:01.991-04:00] test disk_bpann::enn_backend::tests::pending_sync ... ok
+[2026-10-09T00:22:01.991-04:00] test disk_bpann::enn_backend::tests::reopen_dir ... ok
+[2026-10-09T00:22:01.991-04:00] test disk_bpann::enn_backend::tests::soft_pages2 ... ok
+[2026-10-09T00:22:01.991-04:00] test disk_bpann::enn_backend::tests::y_train ... ok
+[2026-10-09T00:22:01.991-04:00] test draw::tests::test_005 ... ok
+[2026-10-09T00:22:01.991-04:00] test draw::tests::test_candidates ... ok
+[2026-10-09T00:22:01.991-04:00] test draw::tests::test_candidateswithnoise ... ok
+[2026-10-09T00:22:01.991-04:00] test draw::tests::test_drawinternals2 ... ok
+[2026-10-09T00:22:01.991-04:00] test draw::tests::test_neighbordata2 ... ok
+[2026-10-09T00:22:01.991-04:00] test error::tests::test_002 ... ok
+[2026-10-09T00:22:01.991-04:00] test error::tests::test_003 ... ok
+[2026-10-09T00:22:01.991-04:00] test error::tests::test_ennerrordisplay ... ok
+[2026-10-09T00:22:01.991-04:00] test error::tests::test_epsvarconstant ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt::tests::feed_forwardlayout ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt::tests::layout_validation ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_attention::tests::attention_chunking ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_attention::tests::attention_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_attention::tests::context_indexing ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_attention::tests::rms_normparity ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_attention::tests::state_reset ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_jitter::tests::deterministic ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_jitter::tests::inactive ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_metal::tests::buffer_guards ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_metal::tests::feed_forwardparity ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_metal::tests::feedback_gpu ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_metal::tests::feedback_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_metal::tests::full_contexttiming ... ignored, full-context projection experiment, not complete model scoring
+[2026-10-09T00:22:01.991-04:00] test fbt_metal::tests::full_tiledtiming ... ignored, full-context tiled versus SIMD baseline experiment
+[2026-10-09T00:22:01.991-04:00] test fbt_metal::tests::gate_chain ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_metal::tests::grouped_projparity ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_metal::tests::grouped_projtiming ... ignored, manual timing experiment; run without Metal validation
+[2026-10-09T00:22:01.991-04:00] test fbt_metal::tests::linear_liveweights ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_metal::tests::projection_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_model::bo::tests::experiment_limits ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_model::prefill::boundtests::bound_audit ... ignored, full 4K paired bound audit; post-hoc ideal arithmetic, not a certificate
+[2026-10-09T00:22:01.991-04:00] test fbt_model::prefill::tests::cache_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_model::prefill::tests::gpu_attention96 ... ignored, GPU diagnostic; exercised by tools/fbt-bo --check
+[2026-10-09T00:22:01.991-04:00] test fbt_model::tests::batch_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_model::tests::bridge_restore ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_model::tests::fused_graphparity ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_model::tests::gpu_fullffn ... ignored, GPU diagnostic; exercised by tools/fbt-bo --check
+[2026-10-09T00:22:01.991-04:00] test fbt_model::tests::gpu_fusedgate ... ignored, full-width fused Metal gate/up parity; required before configured fused runs
+[2026-10-09T00:22:01.991-04:00] test fbt_model::tests::gpu_optimized ... ignored, GPU diagnostic; exercised by tools/fbt-bo --check
+[2026-10-09T00:22:01.991-04:00] test fbt_model::tests::gpu_readout ... ignored, GPU diagnostic; exercised by tools/fbt-bo --check
+[2026-10-09T00:22:01.991-04:00] test fbt_model::tests::gpu_scorer ... ignored, GPU diagnostic; exercised by tools/fbt-bo --check
+[2026-10-09T00:22:01.991-04:00] test fbt_model::tests::live_weights ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_model::tests::model_attention ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_model::tests::model_geometry ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_model::tests::model_resources ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_model::tests::model_targettiming ... ignored, whole 1B LocalV1 model, full-context two-pass scoring, several GB and minutes
+[2026-10-09T00:22:01.991-04:00] test fbt_model::tests::proposal_structure ... ignored, full-size GPU proposal structure diagnostic; no forward passes
+[2026-10-09T00:22:01.991-04:00] test fbt_model::tests::test_jitter ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_model::tests::whole_modelparity ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_model::tests::whole_modelupdates ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::ablation::pool_ablation ... ignored, billion-weight same-pool diagnostic; held-out scores never train the model
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::ablation::scaling_ablation ... ignored, billion-weight same-pool distance-scaling eval; requires fixed corpus
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::ablation::selection_ablation ... ignored, billion-weight GPU experiment; requires explicit config and output paths
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::architecture::tests::layer_sequences ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::block_decode::tests::context_chunks ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::block_decode::tests::generation_fixedpoint ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::block_decode::tests::parallel_repairs ... FAILED
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::block_decode::tests::target_windows ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::code_contrast::tests::control_failures ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::decode::tests::decode_gemv ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::decode::tests::decode_prefix ... FAILED
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::decode::tests::mhc_decode ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::decode::tests::mhc_predictor ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::decode::tests::mhc_rows ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::decode::tests::mhc_scorer ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::decode::tests::mhc_transition ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::decode::tests::pisa_prefix ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::decode::tests::rope_positions ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::decode::tests::router_logits ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::decode::tests::sampling_edges ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::diffusion::tests::draft_target ... FAILED
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::diffusion::tests::inputs ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::diffusion::tests::probability ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::draft::tests::feature_visits ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::gen_journal::tests::signal_dispersion ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::gen_metrics::tests::collapse_blocks ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::gen_metrics::tests::rank_inversions ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::gen_metrics::tests::short_metrics ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::gen_protocol::tests::explicit_control ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::gen_protocol::tests::native_objectives ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::gen_protocol::tests::protocol_guards ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::gen_protocol::tests::scalar_compatibility ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::generation::tests::causal_vector ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::generation::tests::checkpoint_shapes ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::generation::tests::validation_means ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::generation::tests::vector_routing ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::generation_reward::tests::audit_direction ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::generation_reward::tests::audit_invalid ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::initialization::tests::hnet_scales ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::initialization::tests::router_scale ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::loss_tests::vocabulary_loss ... FAILED
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::loss_tests::vocabulary_proposals ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::mhc_reference::base_equivalence ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::mhc_reference::extreme_coefficients ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::mhc_reference::manifold_composition ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::objective::objective_tests::paired_noise ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::objective::objective_tests::variance_contract ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::routing::tests::active_contract ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::routing::tests::expert_recombine ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::routing::tests::route_contract ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::routing::tests::varied_routes ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::target::tests::span_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_moe::updates::tests::update_metrics ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_mps::tests::batch_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_mps::tests::bench_layouts ... ignored, exact-shape diagnostic; exercised by tools/fbt-bo --gemm
+[2026-10-09T00:22:01.991-04:00] test fbt_mps::tests::gateup_feasibility ... ignored, exact production-shape gate/up feasibility probe
+[2026-10-09T00:22:01.991-04:00] test fbt_pisa1::certify::tests::fail_closed ... ok
+[2026-10-09T00:22:01.991-04:00] test fbt_pisa1::certify::tests::monopole_bound ... ok
+[2026-10-09T00:22:01.991-04:00] test file_config::tests::accessors_file ... ok
+[2026-10-09T00:22:01.991-04:00] test file_config::tests::accessors_seed ... ok
+[2026-10-09T00:22:01.991-04:00] test file_config::tests::active_override ... ok
+[2026-10-09T00:22:01.991-04:00] test file_config::tests::bpann_config2 ... ok
+[2026-10-09T00:22:01.991-04:00] test file_config::tests::creates_missing ... ok
+[2026-10-09T00:22:01.991-04:00] test file_config::tests::blckbaux_home ... ok
+[2026-10-09T00:22:01.991-04:00] test file_config::tests::install_overrides ... ok
+[2026-10-09T00:22:01.991-04:00] test file_config::tests::missing_hard ... ok
+[2026-10-09T00:22:01.991-04:00] test file_config::tests::missing_soft ... ok
+[2026-10-09T00:22:01.991-04:00] test file_config::tests::missing_soft2 ... ok
+[2026-10-09T00:22:01.991-04:00] test file_config::tests::rejects_file ... ok
+[2026-10-09T00:22:01.991-04:00] test file_config::tests::rejects_other ... ok
+[2026-10-09T00:22:01.991-04:00] test file_config::tests::save_parameters ... ok
+[2026-10-09T00:22:01.991-04:00] test file_config::tests::save_soft ... ok
+[2026-10-09T00:22:01.991-04:00] test file_config::tests::set_overrides ... ok
+[2026-10-09T00:22:01.991-04:00] test fit::tests::likelihood_limits ... ok
+[2026-10-09T00:22:01.991-04:00] test fit::tests::likelihood_rows ... ok
+[2026-10-09T00:22:01.991-04:00] test fit::tests::test_001 ... ok
+[2026-10-09T00:22:01.991-04:00] test fit::tests::test_002 ... ok
+[2026-10-09T00:22:01.991-04:00] test fit::tests::test_003 ... ok
+[2026-10-09T00:22:01.991-04:00] test fit::tests::test_005 ... ok
+[2026-10-09T00:22:01.991-04:00] test fit::tests::test_006 ... ok
+[2026-10-09T00:22:01.991-04:00] test fit::tests::test_007 ... ok
+[2026-10-09T00:22:01.991-04:00] test fit::tests::test_008 ... ok
+[2026-10-09T00:22:01.991-04:00] test fit::tests::test_009 ... ok
+[2026-10-09T00:22:01.991-04:00] test fit::tests::test_010 ... ok
+[2026-10-09T00:22:01.991-04:00] test fit::tests::test_011 ... ok
+[2026-10-09T00:22:01.991-04:00] test fit::tests::test_012 ... ok
+[2026-10-09T00:22:01.991-04:00] test fit::tests::test_013 ... ok
+[2026-10-09T00:22:01.991-04:00] test fit::tests::test_ennfitteraskbasic ... ok
+[2026-10-09T00:22:01.991-04:00] test fit::tests::tuned_geometry ... ok
+[2026-10-09T00:22:01.991-04:00] test fitter::tests::adaptive_fit ... ok
+[2026-10-09T00:22:01.991-04:00] test fitter::tests::ask_2 ... ok
+[2026-10-09T00:22:01.991-04:00] test fitter::tests::ask_inferred ... ok
+[2026-10-09T00:22:01.991-04:00] test fitter::tests::ask_start ... ok
+[2026-10-09T00:22:01.991-04:00] test fitter::tests::fitter_updates ... ok
+[2026-10-09T00:22:01.991-04:00] test fitter::tests::tell_yvar ... ok
+[2026-10-09T00:22:01.991-04:00] test fitter::tests::x_finite ... ok
+[2026-10-09T00:22:01.991-04:00] test fitter::tests::y_finite ... ok
+[2026-10-09T00:22:01.991-04:00] test fitter::tests::y_std ... ok
+[2026-10-09T00:22:01.991-04:00] test flame_metal::tests::checkpoint_reg ... ignored, Loads the original 2.6 GB BF16 checkpoint from BLCKBAUX_FLAME_CHECKPOINT or .cache/flame-290m
+[2026-10-09T00:22:01.991-04:00] test flame_metal::tests::layout_workspace ... ok
+[2026-10-09T00:22:01.991-04:00] test flame_metal::tests::logits_recovery ... ok
+[2026-10-09T00:22:01.991-04:00] test flame_metal::tests::logits_workspace ... ok
+[2026-10-09T00:22:01.991-04:00] test flame_metal::tests::overflow_guards ... ok
+[2026-10-09T00:22:01.991-04:00] test flame_metal::tests::router_ties ... ok
+[2026-10-09T00:22:01.991-04:00] test flame_metal::tests::scalar_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test flame_metal::tests::tiles_bf16 ... ok
+[2026-10-09T00:22:01.991-04:00] test forward_program::contract::tests::contract_constants ... ok
+[2026-10-09T00:22:01.991-04:00] test forward_program::diffusion::tests::corruptions ... ok
+[2026-10-09T00:22:01.991-04:00] test forward_program::schedule::tests::schedules ... ok
+[2026-10-09T00:22:01.991-04:00] test forward_program::tests::fbtprogram ... ok
+[2026-10-09T00:22:01.991-04:00] test forward_program::tests::kda_kernels ... ok
+[2026-10-09T00:22:01.991-04:00] test forward_program::tests::kda_layout ... ok
+[2026-10-09T00:22:01.991-04:00] test forward_program::tests::kda_program ... ok
+[2026-10-09T00:22:01.991-04:00] test forward_program::tests::kda_request ... ok
+[2026-10-09T00:22:01.991-04:00] test forward_program::tests::kda_schedule ... ok
+[2026-10-09T00:22:01.991-04:00] test forward_program::tests::resident_contract ... ok
+[2026-10-09T00:22:01.991-04:00] test forward_program::tests::resident_round ... ok
+[2026-10-09T00:22:01.991-04:00] test forward_weights::tests::opens_python ... ok
+[2026-10-09T00:22:01.991-04:00] test hash::tests::test_001 ... ok
+[2026-10-09T00:22:01.991-04:00] test hash::tests::test_009 ... ok
+[2026-10-09T00:22:01.991-04:00] test hash::tests::test_boxmullerfinite ... ok
+[2026-10-09T00:22:01.991-04:00] test hash::tests::test_hashdeterminism ... ok
+[2026-10-09T00:22:01.991-04:00] test hash::tests::test_hashseedsensitivity ... ok
+[2026-10-09T00:22:01.991-04:00] test hash::tests::test_invalidnummetrics ... ok
+[2026-10-09T00:22:01.991-04:00] test hash::tests::test_outputshape ... ok
+[2026-10-09T00:22:01.991-04:00] test hash::tests::test_u64tof53range ... ok
+[2026-10-09T00:22:01.991-04:00] test hypervolume::tests::test_emptyarray ... ok
+[2026-10-09T00:22:01.991-04:00] test hypervolume::tests::test_hypervolume2dmax1d ... ok
+[2026-10-09T00:22:01.991-04:00] test hypervolume::tests::test_invalidcolumncount ... ok
+[2026-10-09T00:22:01.991-04:00] test hypervolume::tests::test_invalidrefpoint ... ok
+[2026-10-09T00:22:01.991-04:00] test hypervolume::tests::test_nodominatingpoints ... ok
+[2026-10-09T00:22:01.991-04:00] test hypervolume::tests::test_simplehypervolume ... ok
+[2026-10-09T00:22:01.991-04:00] test hypervolume::tests::test_threepoints ... ok
+[2026-10-09T00:22:01.991-04:00] test hypervolume::tests::test_withnandoesnotpanic ... ok
+[2026-10-09T00:22:01.991-04:00] test hypervolume::tests::volume_3d ... ok
+[2026-10-09T00:22:01.991-04:00] test hypervolume::tests::volume_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test incumbent_tracker::tests::helpers_order ... ok
+[2026-10-09T00:22:01.991-04:00] test incumbent_tracker::tests::test_005 ... ok
+[2026-10-09T00:22:01.991-04:00] test incumbent_tracker::tests::test_006 ... ok
+[2026-10-09T00:22:01.991-04:00] test incumbent_tracker::tests::test_allcandidatesmode ... ok
+[2026-10-09T00:22:01.991-04:00] test incumbent_tracker::tests::test_multimetricunion ... ok
+[2026-10-09T00:22:01.991-04:00] test incumbent_tracker::tests::test_noiseawaretopm ... ok
+[2026-10-09T00:22:01.991-04:00] test incumbent_tracker::tests::test_noiselessmaxties ... ok
+[2026-10-09T00:22:01.991-04:00] test index::tests::helpers_preserve ... ok
+[2026-10-09T00:22:01.991-04:00] test index::tests::index_memory ... ok
+[2026-10-09T00:22:01.991-04:00] test index::tests::test_003 ... ok
+[2026-10-09T00:22:01.991-04:00] test index::tests::test_007 ... ok
+[2026-10-09T00:22:01.991-04:00] test index::tests::test_008 ... ok
+[2026-10-09T00:22:01.991-04:00] test index::tests::test_indexadd ... ok
+[2026-10-09T00:22:01.991-04:00] test index::tests::test_indexcreation ... ok
+[2026-10-09T00:22:01.991-04:00] test index::tests::test_indexsearch ... ok
+[2026-10-09T00:22:01.991-04:00] test index::tests::test_invaliddimensions ... ok
+[2026-10-09T00:22:01.991-04:00] test index::tests::test_invalidsearchk ... ok
+[2026-10-09T00:22:01.991-04:00] test index::tests::test_scaledsearch ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::knn_backend::cpu_search ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::knn_backend::cpu_search2 ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::knn_backend::knn_auto ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::knn_backend::knn_backend2 ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::knn_backend::knn_errors ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::knn_backend::knn_metal ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::knn_backend::knn_tails ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::knn_backend::knn_usearch ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::knn_backend::metal_index ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::knn_backend::pad_unpack ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::metal_plan::tests::graphs ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::mmap_store::mmap_store::MmapColumnStore ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::mmap_store::mmap_store::api_direct ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::mmap_store::mmap_store::capacity_bytes ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::mmap_store::mmap_store::ensure_capacity ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::mmap_store::mmap_store::mmap_churn ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::mmap_store::mmap_store::mmap_rows3 ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::mmap_store::mmap_store::row_bytes ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::usearch_backend::tests::add_keys ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::usearch_backend::tests::rejects_keys ... ok
+[2026-10-09T00:22:01.991-04:00] test knn::usearch_backend::tests::search_rows ... ok
+[2026-10-09T00:22:01.991-04:00] test mbtrregn::tests::morbo_2026 ... ok
+[2026-10-09T00:22:01.991-04:00] test mbtrregn::tests::morbo_initial ... ok
+[2026-10-09T00:22:01.991-04:00] test mbtrregn::tests::morbo_metrics2 ... ok
+[2026-10-09T00:22:01.991-04:00] test mbtrregn::tests::morbo_panic ... ok
+[2026-10-09T00:22:01.991-04:00] test mbtrregn::tests::morbo_range ... ok
+[2026-10-09T00:22:01.991-04:00] test metric_auto::checks::gate_fallback ... ok
+[2026-10-09T00:22:01.991-04:00] test metric_auto::checks::metric_validation ... ok
+[2026-10-09T00:22:01.991-04:00] test metric_auto::checks::tied_weights ... ok
+[2026-10-09T00:22:01.991-04:00] test metric_auto::checks::upstream_rng ... ok
+[2026-10-09T00:22:01.991-04:00] test metric_auto::tests::metric_config ... ok
+[2026-10-09T00:22:01.991-04:00] test metric_auto::tests::metric_defaults ... ok
+[2026-10-09T00:22:01.991-04:00] test metric_auto::tests::metric_neighbors ... ok
+[2026-10-09T00:22:01.991-04:00] test metric_loo::tests::partial_order ... ok
+[2026-10-09T00:22:01.991-04:00] test model::access::access_tests::neighbor_distance ... ok
+[2026-10-09T00:22:01.991-04:00] test model::metric_tests::disk_metric ... ok
+[2026-10-09T00:22:01.991-04:00] test model::metric_tests::metric_rejection ... ok
+[2026-10-09T00:22:01.991-04:00] test model::tests::accessors_report ... ok
+[2026-10-09T00:22:01.991-04:00] test model::tests::bounded_trip ... ok
+[2026-10-09T00:22:01.991-04:00] test model::tests::disk_reopen ... ok
+[2026-10-09T00:22:01.991-04:00] test model::tests::internal_index ... ok
+[2026-10-09T00:22:01.991-04:00] test model::tests::storage_helpers ... ok
+[2026-10-09T00:22:01.991-04:00] test model::tests::test_004 ... ok
+[2026-10-09T00:22:01.991-04:00] test model::tests::test_ennadd ... ok
+[2026-10-09T00:22:01.991-04:00] test model::tests::test_enncreation ... ok
+[2026-10-09T00:22:01.991-04:00] test neighbor_rule::tests::bias_noise ... ok
+[2026-10-09T00:22:01.991-04:00] test objective_observation::tests::checked_variances ... ok
+[2026-10-09T00:22:01.991-04:00] test objective_observation::tests::explicit_control ... ok
+[2026-10-09T00:22:01.991-04:00] test objective_observation::tests::fifo_retention ... ok
+[2026-10-09T00:22:01.991-04:00] test objective_observation::tests::scalar_bits ... ok
+[2026-10-09T00:22:01.991-04:00] test objective_observation::tests::schema_retention ... ok
+[2026-10-09T00:22:01.991-04:00] test objective_observation::tests::window_capacity ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::multi_tr::tests::allocation_budgets ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::multi_tr::tests::allocation_regions ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::multi_tr::tests::allocation_trajectory ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::multi_tr::tests::allocation_utility ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::multi_tr::tests::independent_region ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::multi_tr::tests::nearest_explicit ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::multi_tr::tests::selection_diverse ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::multi_tr::tests::test_001 ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::multi_tr::tests::test_002 ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::observation_delta::tests::observation_appends ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests::fallback_surrogate ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests::optimizer_reports ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests::reset_obs ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests::test_003 ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests::test_005 ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests::test_007 ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests::test_009 ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests::test_addobservations ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests::test_optimizerask ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests::test_optimizercreation ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests::test_tell ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests::turbo_synced ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests_incremental::enn_model ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests_incremental::enn_obs ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests_incremental::morbo_ranges ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests_incremental::observation_views ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests_incremental::tell_metrics ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests_incremental::x_add ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests_incremental::x_add2 ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tests_incremental::x_succeeds ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::testsmbinc::morbo_rng ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::testsmbnzawrinc::morbo_selection ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tr_state::tests::morbo_config ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tr_state::tests::morbo_propose2 ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tr_state::tests::morbo_restart ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer::tr_state::tests::turbo_max ... ok
+[2026-10-09T00:22:01.991-04:00] test optimizer_factory::tests::create_smoke ... ok
+[2026-10-09T00:22:01.991-04:00] test params::tests::test_003 ... ok
+[2026-10-09T00:22:01.991-04:00] test params::tests::test_004 ... ok
+[2026-10-09T00:22:01.991-04:00] test params::tests::test_005 ... ok
+[2026-10-09T00:22:01.991-04:00] test params::tests::test_006 ... ok
+[2026-10-09T00:22:01.991-04:00] test params::tests::test_ennnormal ... ok
+[2026-10-09T00:22:01.991-04:00] test params::tests::test_ennnormalempty ... ok
+[2026-10-09T00:22:01.991-04:00] test params::tests::test_ennnormalwithidx ... ok
+[2026-10-09T00:22:01.991-04:00] test params::tests::test_ennparamsinvalidk ... ok
+[2026-10-09T00:22:01.991-04:00] test params::tests::test_ennparamsvalid ... ok
+[2026-10-09T00:22:01.991-04:00] test perturb::tests::contract ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::light::tests::metal_cpu2 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::light::tests::search_rules ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::light::tests::test_001 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::light::tests::test_003 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::light::tests::test_004 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::light::tests::test_005 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::light::tests::test_006 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::light::tests::test_007 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::light::tests::test_008 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::apply_zeros ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::dist2s_block ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::f64_count ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::f64_cutoff ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::f64_cutoff2 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::f64_data ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::f64_empty ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::f64_search ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::f64_self ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::f64_ties ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::faiss_threshold ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::get_batch ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::index_distances ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::sq_cols ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::sq_each ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::sq_unscaled ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::sq_unscaled2 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor::tests::use_perf ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::neighbor_dist::tests::distances_match ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_conditional::posterior_batch ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_conditional::test_001 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_conditional::test_002 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_conditional::test_003 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_conditional::test_004 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_conditional::test_005 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_conditional::test_006 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_conditional::test_007 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_conditional::test_008 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_conditional::test_009 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_conditional::test_010 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_conditional::test_011 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_conditional::test_012 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_conditional::test_013 ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_core::aleatoric_components ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_core::batch_shape ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_core::deterministic_draw ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_core::draw_shape ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_core::empty_draw ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_core::empty_rejected ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_core::empty_state ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_core::internal_shape ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_core::neighbor_data ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_core::posterior_query ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_core::separate_batch ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_core::shared_batch ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_core::variance_floor ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tests_core::weighted_shape ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tie_break::tests::apply_index ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tie_break::tests::faiss_band ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tie_break::tests::faiss_cutoff ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tie_break::tests::faiss_tie ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tie_break::tests::finalize_paths ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tie_break::tests::resolve_band ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tie_break::tests::row_copy ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tie_break::tests::row_rows ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tie_break::tests::topk_k ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tie_break::tests::topk_plain ... ok
+[2026-10-09T00:22:01.991-04:00] test posterior::tie_break::tests::try_indices ... ok
+[2026-10-09T00:22:01.991-04:00] test pretrain_data::tests::fixed_batches ... ok
+[2026-10-09T00:22:01.991-04:00] test pretrain_data::tests::invalid_tokens ... ok
+[2026-10-09T00:22:01.991-04:00] test pretrain_data::tests::wide_batches ... ok
+[2026-10-09T00:22:01.991-04:00] test procedural_pool::tests::checked_counts ... ok
+[2026-10-09T00:22:01.991-04:00] test procedural_pool::tests::fixed_streams ... ok
+[2026-10-09T00:22:01.991-04:00] test procedural_pool::tests::legacy_streams ... ok
+[2026-10-09T00:22:01.991-04:00] test procedural_pool::tests::legacy_vectors ... ok
+[2026-10-09T00:22:01.991-04:00] test procedural_pool::tests::logical_ids ... ok
+[2026-10-09T00:22:01.991-04:00] test procedural_pool::tests::resident_requests ... ok
+[2026-10-09T00:22:01.991-04:00] test quantization::tests::clamp ... ok
+[2026-10-09T00:22:01.991-04:00] test quantization::tests::pack_odd ... ok
+[2026-10-09T00:22:01.991-04:00] test quantization::tests::round_even ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::readout::tests::readout_coverage ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::readout::tests::readout_numerics ... ignored, full-width numerical check without a performance claim
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::readout::tests::readout_timing ... ignored, full-width readout timing comparison; run explicitly
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::argmax_rows ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::argmax_tiebreak ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::attn_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::backend_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::cache_limit ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::cache_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::checkpoint_4k ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::decode_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::gemv_shapes ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::gqa_layout ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::loss_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::mask_alignment ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::mlp_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::mps_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::multi_decode ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::qkv_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::rank_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::rope_index ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::rope_rows ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::silu_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::simd_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::tile_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test qwen_metal::tests::vocab_row ... ok
+[2026-10-09T00:22:01.991-04:00] test reconstruction::tests::byte_boundaries ... ok
+[2026-10-09T00:22:01.991-04:00] test reconstruction::tests::byte_distance ... ok
+[2026-10-09T00:22:01.991-04:00] test reconstruction::tests::edit_alignment ... ok
+[2026-10-09T00:22:01.991-04:00] test reconstruction::tests::length_timing ... ignored, explicit CPU reward timing, not a full BO latency result
+[2026-10-09T00:22:01.991-04:00] test reconstruction::tests::repetition_control ... ok
+[2026-10-09T00:22:01.991-04:00] test reconstruction::tests::word_boundaries ... ok
+[2026-10-09T00:22:01.991-04:00] test reliability_region::tests::invalid_policy ... ok
+[2026-10-09T00:22:01.991-04:00] test reliability_region::tests::reliable_progress ... ok
+[2026-10-09T00:22:01.991-04:00] test reliability_region::tests::stagnant_escape ... ok
+[2026-10-09T00:22:01.991-04:00] test reliability_region::tests::unreliable_stagnation ... ok
+[2026-10-09T00:22:01.991-04:00] test search::device_tests::metal_residency ... ok
+[2026-10-09T00:22:01.991-04:00] test search::region_tests::metal_region ... ok
+[2026-10-09T00:22:01.991-04:00] test search::tests::adapts_length ... ok
+[2026-10-09T00:22:01.991-04:00] test search::tests::batches_trials ... ok
+[2026-10-09T00:22:01.991-04:00] test search::tests::cpu_trajectory ... ok
+[2026-10-09T00:22:01.991-04:00] test search::tests::metal_trajectory ... ok
+[2026-10-09T00:22:01.991-04:00] test search::tests::opencl_trajectory ... ok
+[2026-10-09T00:22:01.991-04:00] test search::tests::owns_state ... ok
+[2026-10-09T00:22:01.991-04:00] test search::tests::stream_batch ... ok
+[2026-10-09T00:22:01.991-04:00] test search::tests::stream_sparse ... ok
+[2026-10-09T00:22:01.991-04:00] test search::tests::tells_batch ... ok
+[2026-10-09T00:22:01.991-04:00] test search::tests::trial_identity ... ok
+[2026-10-09T00:22:01.991-04:00] test search::view_tests::metal_views ... ok
+[2026-10-09T00:22:01.991-04:00] test stats::tests::test_001 ... ok
+[2026-10-09T00:22:01.991-04:00] test stats::tests::test_002 ... ok
+[2026-10-09T00:22:01.991-04:00] test stats::tests::test_cloneequality ... ok
+[2026-10-09T00:22:01.991-04:00] test stats::tests::test_mismatchedlengths - should panic ... ok
+[2026-10-09T00:22:01.991-04:00] test stats::tests::test_weightedstatsempty ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::tests_init::test_002 ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::tests_init::test_003 ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::tests_init::test_004 ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::tests_init::test_006 ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::tests_init::test_selectbyindices ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::tests_init::test_strategyinitlhdpath ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::tests_selection::ask_pool ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::tests_selection::failed_state ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::tests_selection::segmented_acquisition ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::tests_selection::select_smoke ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::tests_selection::test_001 ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::tests_selection::test_002 ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::tests_selection::test_003 ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::tests_selection::test_005 ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::tests_selection::tr_trip ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::tests_selection::turbo_paths ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::testsmbacq::morbo_rng2 ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::testsmbacq::morbo_rng3 ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::testsmbacq::morbo_tell ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::testsmbacq::morbo_turbo ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::testsmbacq::morbo_turbo2 ... ok
+[2026-10-09T00:22:01.991-04:00] test strategy::testsmbacq::surrogate_predicts ... ok
+[2026-10-09T00:22:01.991-04:00] test surrogate::tests::default_neighbors ... ok
+[2026-10-09T00:22:01.991-04:00] test surrogate::tests::fit_exist ... ok
+[2026-10-09T00:22:01.991-04:00] test surrogate::tests::fit_search ... ok
+[2026-10-09T00:22:01.991-04:00] test surrogate::tests::regression_refit ... ok
+[2026-10-09T00:22:01.991-04:00] test surrogate::tests::test_001 ... ok
+[2026-10-09T00:22:01.991-04:00] test surrogate::tests::test_004 ... ok
+[2026-10-09T00:22:01.991-04:00] test surrogate::tests::y_append ... ok
+[2026-10-09T00:22:01.991-04:00] test tensor_store::tests::exact_versions ... ok
+[2026-10-09T00:22:01.991-04:00] test tensor_store::tests::logical_identity ... ok
+[2026-10-09T00:22:01.991-04:00] test tensor_store::tests::safetensors_bits ... ok
+[2026-10-09T00:22:01.991-04:00] test text::tests::bpe_bytes ... ok
+[2026-10-09T00:22:01.991-04:00] test text::tests::byte_pieces ... ok
+[2026-10-09T00:22:01.991-04:00] test text::tests::sentencepiece_decode ... ok
+[2026-10-09T00:22:01.991-04:00] test text::tests::utf8_join ... ok
+[2026-10-09T00:22:01.991-04:00] test threshold::tests::basis_cycles ... ok
+[2026-10-09T00:22:01.991-04:00] test threshold::tests::feature_layout ... ok
+[2026-10-09T00:22:01.991-04:00] test threshold::tests::interaction_threshold ... ok
+[2026-10-09T00:22:01.991-04:00] test threshold::tests::linear_threshold ... ok
+[2026-10-09T00:22:01.991-04:00] test threshold::tests::posterior_learns ... ok
+[2026-10-09T00:22:01.991-04:00] test threshold::tests::prefix_overlap ... ok
+[2026-10-09T00:22:01.991-04:00] test threshold::tests::prior_draws ... ok
+[2026-10-09T00:22:01.991-04:00] test threshold::tests::radius_scaling ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::bpann_history::tests::bpann_dedup ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::bpann_history::tests::bpann_reopen ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::bpann_history::tests::bpann_shapes ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::bpann_history::tests::bpann_values ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::layout::tests::steps ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::metal::posterior_tests::noise_slots ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::sparse::tests::changes_exact ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::sparse::tests::edits_unique ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::accepted_center ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::cpu_batch2 ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::cpu_centers ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::cpu_regions ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::cpu_search ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::cpu_sparse ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::cpu_sparse2 ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::cpu_stream ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::cpu_thompson ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::dense_thompson ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::history_score ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::history_state ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::indexed_row ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::indexed_search ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::lazy_history ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::metal_batch2 ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::metal_centers2 ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::metal_coherence ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::metal_history ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::metal_parity ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::metal_regions2 ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::metal_resident ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::metal_sparse ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::metal_sparse2 ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::metal_stream ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::rejected_center ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::sparse_rows ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::sparse_thompson ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::thompson_moments ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::thompson_reorder ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tests::tree_thompson ... ok
+[2026-10-09T00:22:01.991-04:00] test trials::tree::tests::valid_centers ... ok
+[2026-10-09T00:22:01.991-04:00] test trust_region::tests::effective_tolerance ... ok
+[2026-10-09T00:22:01.991-04:00] test trust_region::tests::inconclusive_evidence ... ok
+[2026-10-09T00:22:01.991-04:00] test trust_region::tests::negative_rewards ... ok
+[2026-10-09T00:22:01.991-04:00] test trust_region::tests::test_001 ... ok
+[2026-10-09T00:22:01.991-04:00] test trust_region::tests::test_008 ... ok
+[2026-10-09T00:22:01.991-04:00] test trust_region::tests::test_notrustregion ... ok
+[2026-10-09T00:22:01.991-04:00] test trust_region::tests::test_turbobounds ... ok
+[2026-10-09T00:22:01.991-04:00] test trust_region::tests::test_turborestart ... ok
+[2026-10-09T00:22:01.991-04:00] test trust_region::tests::test_turboupdatefailure ... ok
+[2026-10-09T00:22:01.991-04:00] test trust_region::tests::test_turboupdatesuccess ... ok
+[2026-10-09T00:22:01.991-04:00] test trust_region::tests::update_full ... ok
+[2026-10-09T00:22:01.991-04:00] test trust_region::tests::update_history ... ok
+[2026-10-09T00:22:01.991-04:00] test util::tests::test_002 ... ok
+[2026-10-09T00:22:01.991-04:00] test util::tests::test_006 ... ok
+[2026-10-09T00:22:01.991-04:00] test util::tests::test_007 ... ok
+[2026-10-09T00:22:01.991-04:00] test util::tests::test_009 ... ok
+[2026-10-09T00:22:01.991-04:00] test util::tests::test_011 ... ok
+[2026-10-09T00:22:01.991-04:00] test util::tests::test_012 ... ok
+[2026-10-09T00:22:01.991-04:00] test util::tests::test_013 ... ok
+[2026-10-09T00:22:01.991-04:00] test util::tests::test_014 ... ok
+[2026-10-09T00:22:01.991-04:00] test util::tests::test_armsfrompareto ... ok
+[2026-10-09T00:22:01.991-04:00] test util::tests::test_paretofrontempty ... ok
+[2026-10-09T00:22:01.991-04:00] test util::tests::test_paretofrontsimple ... ok
+[2026-10-09T00:22:01.991-04:00] test util::tests::test_sobolindicesshape ... ok
+[2026-10-09T00:22:01.991-04:00] test util::tests::test_standardizeyempty ... ok
+[2026-10-09T00:22:01.991-04:00] test util::tests::test_standardizeynormal ... ok
+[2026-10-09T00:22:01.991-04:00] test weights::tests::covariance ... ok
+[2026-10-09T00:22:01.991-04:00] test weights::tests::metal_ids ... ok
+[2026-10-09T00:22:01.991-04:00] test weights::tests::metal_match ... ok
+[2026-10-09T00:22:01.991-04:00] test weights::tests::order_batches ... ok
+[2026-10-09T00:22:01.991-04:00] test weights::tests::pareto_mean ... ok
+[2026-10-09T00:22:01.991-04:00] test weights::tests::posterior_noise ... ok
+[2026-10-09T00:22:01.991-04:00] test weights::tests::removed_rejected ... ok
+[2026-10-09T00:22:01.991-04:00] test weights::tests::thompson_moments ... ok
+[2026-10-09T00:22:01.991-04:00] test weights::tests::thompson_repeat ... ok
+[2026-10-09T00:22:01.991-04:00] test weights::tests::ucb_prefer ... ok
+[2026-10-09T00:22:01.991-04:00] test weights::tests::weight_norm ... ok
+[2026-10-09T00:22:01.991-04:00] test weights::tests::xor_cancel ... ok
+[2026-10-09T00:22:01.991-04:00] test y_bounds::tests::bounded_trip2 ... ok
+[2026-10-09T00:22:01.991-04:00] test y_bounds::tests::rejects_interval ... ok
+[2026-10-09T00:22:01.991-04:00]
+[2026-10-09T00:22:01.991-04:00] failures:
+[2026-10-09T00:22:01.991-04:00]
+[2026-10-09T00:22:01.991-04:00] ---- fbt_moe::block_decode::tests::parallel_repairs stdout ----
+[2026-10-09T00:22:01.991-04:00]
+[2026-10-09T00:22:01.991-04:00] thread 'fbt_moe::block_decode::tests::parallel_repairs' (6212280) panicked at rust/crates/blckbaux/src/fbt_block/tests.rs:216:9:
+[2026-10-09T00:22:01.991-04:00] assertion `left == right` failed
+[2026-10-09T00:22:01.991-04:00]   left: [4201, 4201, 4201, 4201, 4201, 4201, 4201, 4201]
+[2026-10-09T00:22:01.991-04:00]  right: [12511, 12511, 12511, 12511, 12511, 12511, 12511, 12511]
+[2026-10-09T00:22:01.991-04:00] note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+[2026-10-09T00:22:01.991-04:00]
+[2026-10-09T00:22:01.991-04:00] ---- fbt_moe::decode::tests::decode_prefix stdout ----
+[2026-10-09T00:22:01.991-04:00]
+[2026-10-09T00:22:01.991-04:00] thread 'fbt_moe::decode::tests::decode_prefix' (6213607) panicked at rust/crates/blckbaux/src/fbt_decodetests.rs:521:9:
+[2026-10-09T00:22:01.991-04:00] maximum NLL error=0.2774014973856467
+[2026-10-09T00:22:01.991-04:00]
+[2026-10-09T00:22:01.991-04:00] ---- fbt_moe::diffusion::tests::draft_target stdout ----
+[2026-10-09T00:22:01.991-04:00] BLCKBAUX_DIFFUSION_DRAFT generated=128 evaluated=256 visits=1 steps=1 index_reused=0 index_refreshed=320
+[2026-10-09T00:22:01.991-04:00]
+[2026-10-09T00:22:01.991-04:00] thread 'fbt_moe::diffusion::tests::draft_target' (6216110) panicked at rust/crates/blckbaux/src/fbt_diffusion.rs:397:13:
+[2026-10-09T00:22:01.991-04:00] assertion `left == right` failed
+[2026-10-09T00:22:01.991-04:00]   left: [5290, 337, 5489, 3880, 6480, 1186, 3800, 4547, 3761, 1195, 5794, 2345, 7995, 736, 6793, 6646, 3310, 3387, 7426, 4923, 779, 5016, 2015, 6019, 3409, 4272, 5348, 3551, 7419, 4843, 4812, 1986, 7180, 3296, 2912, 3800, 1303, 7848, 6143, 6905, 2362, 5330, 2750, 605, 4592, 2392, 6870, 4496, 2128, 5747, 4315, 6091, 6111, 1486, 4086, 7118, 6495, 5377, 12, 3011, 3421, 1361, 5038, 5010, 146, 7482, 2507, 283, 3671, 4442, 5648, 2496, 4406, 953, 7221, 680, 2702, 4782, 3705, 8030, 6895, 3780, 7867, 3940, 2669, 7637, 5773, 4413, 4156, 3146, 114, 3865, 1696, 7032, 2375, 1920, 2214, 4407, 1164, 3669, 3131, 6550, 4965, 6862, 2228, 4245, 3866, 7601, 3204, 5029, 7575, 4570, 1121, 1190, 5943, 7864, 6141, 4025, 2662, 7136, 4573, 4857, 7777, 2463, 1302, 7802, 3558, 176]
+[2026-10-09T00:22:01.991-04:00]  right: [257256, 19981, 67179, 48416, 106886, 227600, 30281, 247460, 164269, 223305, 167365, 106885, 234460, 57096, 49904, 149681, 59156, 159232, 254212, 224932, 162381, 84188, 176968, 81777, 110334, 37578, 229774, 11067, 210861, 258091, 149820, 71603, 232961, 172107, 60153, 250153, 218496, 205389, 201212, 140733, 213983, 118442, 126032, 74769, 28969, 64639, 219989, 75442, 189801, 112651, 75251, 144414, 131417, 27738, 36003, 65738, 6495, 67680, 20340, 186073, 198898, 253750, 215284, 200816, 256351, 15276, 20735, 207605, 55465, 113972, 132161, 227379, 202872, 10834, 113987, 221031, 221927, 11334, 137920, 166294, 132753, 88642, 151926, 217384, 128603, 141469, 215899, 4413, 170450, 77884, 232336, 3865, 234638, 45429, 155261, 144300, 159671, 73215, 260290, 76634, 235952, 116217, 249629, 172215, 35072, 61150, 71424, 240514, 109982, 151998, 146769, 68975, 114603, 106895, 172701, 150949, 254167, 254432, 194212, 163817, 213748, 171358, 246322, 131540, 159429, 122253, 3558, 98551]
+[2026-10-09T00:22:01.991-04:00]
+[2026-10-09T00:22:01.991-04:00] ---- fbt_moe::loss_tests::vocabulary_loss stdout ----
+[2026-10-09T00:22:01.991-04:00]
+[2026-10-09T00:22:01.991-04:00] thread 'fbt_moe::loss_tests::vocabulary_loss' (6217700) panicked at rust/crates/blckbaux/src/fbt_losstests.rs:88:13:
+[2026-10-09T00:22:01.991-04:00] row 0: loss 75.21891, expected 78.68487452194549
+[2026-10-09T00:22:01.991-04:00]
+[2026-10-09T00:22:01.991-04:00]
+[2026-10-09T00:22:01.991-04:00] failures:
+[2026-10-09T00:22:01.991-04:00]     fbt_moe::block_decode::tests::parallel_repairs
+[2026-10-09T00:22:01.991-04:00]     fbt_moe::decode::tests::decode_prefix
+[2026-10-09T00:22:01.991-04:00]     fbt_moe::diffusion::tests::draft_target
+[2026-10-09T00:22:01.991-04:00]     fbt_moe::loss_tests::vocabulary_loss
+[2026-10-09T00:22:01.991-04:00]
+[2026-10-09T00:22:01.991-04:00] test result: FAILED. 705 passed; 4 failed; 23 ignored; 0 measured; 0 filtered out; finished in 66.32s
+[2026-10-09T00:22:01.991-04:00]
+[2026-10-09T00:22:01.991-04:00]
+[2026-10-09T00:22:01.991-04:00] ---- STDERR ----
+[2026-10-09T00:22:01.991-04:00]
+[2026-10-09T00:22:07.467-04:00] Waiting on Test region-opencl --  [local_execute], and 23 other actions
+[2026-10-09T00:22:08.618-04:00] ✓ Pass: root//rust/crates/blckbaux:region-opencl (6.6s)
+[2026-10-09T00:22:08.618-04:00] ---- STDOUT ----
+[2026-10-09T00:22:08.618-04:00]
+[2026-10-09T00:22:08.618-04:00] running 548 tests
+[2026-10-09T00:22:08.618-04:00] test acquisition::tests::test_001 ... ok
+[2026-10-09T00:22:08.618-04:00] test acquisition::tests::test_002 ... ok
+[2026-10-09T00:22:08.618-04:00] test acquisition::tests::test_003 ... ok
+[2026-10-09T00:22:08.618-04:00] test acquisition::tests::test_004 ... ok
+[2026-10-09T00:22:08.618-04:00] test acquisition::tests::test_005 ... ok
+[2026-10-09T00:22:08.618-04:00] test acquisition::tests::test_006 ... ok
+[2026-10-09T00:22:08.618-04:00] test acquisition::tests::test_007 ... ok
+[2026-10-09T00:22:08.618-04:00] test acquisition::tests::test_008 ... ok
+[2026-10-09T00:22:08.618-04:00] test acquisition::tests::test_009 ... ok
+[2026-10-09T00:22:08.618-04:00] test acquisition::tests::test_010 ... ok
+[2026-10-09T00:22:08.618-04:00] test agent_contract::tests::cancelled_stream ... ok
+[2026-10-09T00:22:08.618-04:00] test agent_contract::tests::invalid_tools ... ok
+[2026-10-09T00:22:08.618-04:00] test agent_contract::tests::unresolved_call ... ok
+[2026-10-09T00:22:08.618-04:00] test agent_contract::tests::valid_episode ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::backend_dispatch::bpann_dispatch ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::backend_dispatch::bpann_errors ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::backend_dispatch::disk_used ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::backend_dispatch::enn_len ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::backend_dispatch::memory_view ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::disk_observation::behavior_tests::disk_called ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::disk_observation::disk_observation::bpann_disk ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::disk_observation::disk_observation::dim_above ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::disk_observation::disk_observation::dim_dim ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::disk_observation::disk_observation::load_cases ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::disk_observation::disk_observation::parse_branches ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::disk_observation::disk_observation::shared_direct ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::disk_observation::disk_observation::shared_wrappers ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::flush_controller::tests::append_add2 ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::flush_controller::tests::flush_wait ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::flush_controller::tests::fuzz_seeds4 ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::flush_controller::tests::persist_pages ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::flush_controller::tests::schedule_async ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::flush_controller::tests::schedule_flight ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::flush_controller::tests::schedule_noop ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::flush_controller::tests::schedule_synchronously ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::flush_controller::tests::search_deadlock ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::flush_controller::tests::search_flight ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::flush_controller::tests::soft_metamorphic ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::flush_controller::tests::wait_noop ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::in_memory::memory_unit::covers_search ... ok
+[2026-10-09T00:22:08.618-04:00] test backend::row_storage::row_storage::gather_vec ... ok
+[2026-10-09T00:22:08.618-04:00] test base_policy::tests::invalid_qualification ... ok
+[2026-10-09T00:22:08.618-04:00] test base_policy::tests::qualified_identity ... ok
+[2026-10-09T00:22:08.618-04:00] test calibration::tests::past_only ... ok
+[2026-10-09T00:22:08.618-04:00] test candidates::tests::raasp_seed ... ok
+[2026-10-09T00:22:08.618-04:00] test candidates::tests::test_005 ... ok
+[2026-10-09T00:22:08.618-04:00] test candidates::tests::test_006 ... ok
+[2026-10-09T00:22:08.618-04:00] test candidates::tests::test_007 ... ok
+[2026-10-09T00:22:08.618-04:00] test candidates::tests::test_008 ... ok
+[2026-10-09T00:22:08.618-04:00] test candidates::tests::test_010 ... ok
+[2026-10-09T00:22:08.618-04:00] test candidates::tests::test_011 ... ok
+[2026-10-09T00:22:08.618-04:00] test candidates::tests::test_generatelhd ... ok
+[2026-10-09T00:22:08.618-04:00] test candidates::tests::test_generateuniform ... ok
+[2026-10-09T00:22:08.618-04:00] test candidates::tests::test_sobolengine ... ok
+[2026-10-09T00:22:08.618-04:00] test candidates::tests::test_tofromunit ... ok
+[2026-10-09T00:22:08.618-04:00] test capability::tests::accel_gaps ... ok
+[2026-10-09T00:22:08.618-04:00] test capability::tests::complete ... ok
+[2026-10-09T00:22:08.618-04:00] test capability::tests::cpu_direct ... ok
+[2026-10-09T00:22:08.618-04:00] test code_overlap::tests::contrast_controls ... ok
+[2026-10-09T00:22:08.618-04:00] test code_overlap::tests::exact_overlap ... ok
+[2026-10-09T00:22:08.618-04:00] test code_overlap::tests::finite_components ... ok
+[2026-10-09T00:22:08.618-04:00] test code_overlap::tests::whitespace_credit ... ok
+[2026-10-09T00:22:08.618-04:00] test coding_outcome::tests::correctness_priority ... ok
+[2026-10-09T00:22:08.618-04:00] test coding_outcome::tests::efficiency_tiebreak ... ok
+[2026-10-09T00:22:08.618-04:00] test coding_outcome::tests::ineligible_candidates ... ok
+[2026-10-09T00:22:08.618-04:00] test coding_outcome::tests::mismatched_budgets ... ok
+[2026-10-09T00:22:08.618-04:00] test coding_outcome::tests::regression_priority ... ok
+[2026-10-09T00:22:08.618-04:00] test config::generation::tests::temperature_bounds ... ok
+[2026-10-09T00:22:08.618-04:00] test config::generation::tests::vector_command ... ok
+[2026-10-09T00:22:08.618-04:00] test config::generation::tests::vector_policy ... ok
+[2026-10-09T00:22:08.618-04:00] test config::objectives::tests::explicit_vectors ... ok
+[2026-10-09T00:22:08.618-04:00] test config::objectives::tests::morbo_geometry ... ok
+[2026-10-09T00:22:08.618-04:00] test config::objectives::tests::morbo_preferences ... ok
+[2026-10-09T00:22:08.618-04:00] test config::procedural::tests::default_pool ... ok
+[2026-10-09T00:22:08.618-04:00] test config::procedural::tests::fixed_layouts ... ok
+[2026-10-09T00:22:08.618-04:00] test config::procedural::tests::invalid_pool ... ok
+[2026-10-09T00:22:08.618-04:00] test config::procedural::tests::unsupported_pool ... ok
+[2026-10-09T00:22:08.618-04:00] test config::serialization_tests::config_fields ... ok
+[2026-10-09T00:22:08.618-04:00] test config::serialization_tests::config_names ... ok
+[2026-10-09T00:22:08.618-04:00] test config::serialization_tests::fineweb_seeds ... ok
+[2026-10-09T00:22:08.618-04:00] test config::serialization_tests::generated_seeds ... ok
+[2026-10-09T00:22:08.618-04:00] test config::serialization_tests::shared_schema ... ok
+[2026-10-09T00:22:08.618-04:00] test config::spec_tests::budgets ... ok
+[2026-10-09T00:22:08.618-04:00] test config::spec_tests::closed ... ok
+[2026-10-09T00:22:08.618-04:00] test config::spec_tests::guards ... ok
+[2026-10-09T00:22:08.618-04:00] test config::spec_tests::models ... ok
+[2026-10-09T00:22:08.618-04:00] test config::spec_tests::paths ... ok
+[2026-10-09T00:22:08.618-04:00] test config::spec_tests::reliability ... ok
+[2026-10-09T00:22:08.618-04:00] test config::spec_tests::roundtrip ... ok
+[2026-10-09T00:22:08.618-04:00] test config::spec_tests::vectors ... ok
+[2026-10-09T00:22:08.618-04:00] test config::tests::candidate_arms ... ok
+[2026-10-09T00:22:08.618-04:00] test config::tests::config_pool ... ok
+[2026-10-09T00:22:08.618-04:00] test config::tests::enn_dir ... ok
+[2026-10-09T00:22:08.618-04:00] test config::tests::enn_fields ... ok
+[2026-10-09T00:22:08.618-04:00] test config::tests::morbo_metrics ... ok
+[2026-10-09T00:22:08.618-04:00] test config::tests::morbo_propose ... ok
+[2026-10-09T00:22:08.618-04:00] test config::tests::test_003 ... ok
+[2026-10-09T00:22:08.618-04:00] test config::tests::test_004 ... ok
+[2026-10-09T00:22:08.618-04:00] test config::tests::test_010 ... ok
+[2026-10-09T00:22:08.618-04:00] test config::tests::test_011 ... ok
+[2026-10-09T00:22:08.618-04:00] test config::tests::test_configdefaults ... ok
+[2026-10-09T00:22:08.618-04:00] test config::tests::test_initstrategyenum ... ok
+[2026-10-09T00:22:08.618-04:00] test config::tests::test_lhdonlyconfig ... ok
+[2026-10-09T00:22:08.618-04:00] test config::tests::test_turboennconfig ... ok
+[2026-10-09T00:22:08.618-04:00] test config::tests::test_turbozeroconfig ... ok
+[2026-10-09T00:22:08.618-04:00] test context::tests::bounds ... ok
+[2026-10-09T00:22:08.618-04:00] test dense::bf16::tests::auto_device ... ok
+[2026-10-09T00:22:08.618-04:00] test dense::bf16::tests::bf16_limits ... ok
+[2026-10-09T00:22:08.618-04:00] test dense::bf16::tests::candidate_base ... ok
+[2026-10-09T00:22:08.618-04:00] test dense::bf16::tests::opencl_cpu ... ok
+[2026-10-09T00:22:08.618-04:00] test dense::bf16::tests::rollback_overflow ... ok
+[2026-10-09T00:22:08.618-04:00] test dense::bf16::tests::sub_weight ... ok
+[2026-10-09T00:22:08.618-04:00] test dense::linear::tests::fused_weights ... ok
+[2026-10-09T00:22:08.618-04:00] test dense::tests::coefficient_work ... ok
+[2026-10-09T00:22:08.618-04:00] test dense::tests::cpu_pytree ... ok
+[2026-10-09T00:22:08.618-04:00] test dense::tests::dense_signs ... ok
+[2026-10-09T00:22:08.618-04:00] test dense::tests::tensor_keys ... ok
+[2026-10-09T00:22:08.618-04:00] test disk_bpann::enn_backend::tests::append_maps ... ok
+[2026-10-09T00:22:08.618-04:00] test disk_bpann::enn_backend::tests::bpann_driver ... ok
+[2026-10-09T00:22:08.618-04:00] test disk_bpann::enn_backend::tests::new_sync ... ok
+[2026-10-09T00:22:08.618-04:00] test disk_bpann::enn_backend::tests::pending_sync ... ok
+[2026-10-09T00:22:08.618-04:00] test disk_bpann::enn_backend::tests::reopen_dir ... ok
+[2026-10-09T00:22:08.618-04:00] test disk_bpann::enn_backend::tests::soft_pages2 ... ok
+[2026-10-09T00:22:08.618-04:00] test disk_bpann::enn_backend::tests::y_train ... ok
+[2026-10-09T00:22:08.618-04:00] test draw::tests::test_005 ... ok
+[2026-10-09T00:22:08.618-04:00] test draw::tests::test_candidates ... ok
+[2026-10-09T00:22:08.618-04:00] test draw::tests::test_candidateswithnoise ... ok
+[2026-10-09T00:22:08.618-04:00] test draw::tests::test_drawinternals2 ... ok
+[2026-10-09T00:22:08.618-04:00] test draw::tests::test_neighbordata2 ... ok
+[2026-10-09T00:22:08.618-04:00] test error::tests::test_002 ... ok
+[2026-10-09T00:22:08.618-04:00] test error::tests::test_003 ... ok
+[2026-10-09T00:22:08.618-04:00] test error::tests::test_ennerrordisplay ... ok
+[2026-10-09T00:22:08.618-04:00] test error::tests::test_epsvarconstant ... ok
+[2026-10-09T00:22:08.618-04:00] test fbt::tests::feed_forwardlayout ... ok
+[2026-10-09T00:22:08.618-04:00] test fbt::tests::layout_validation ... ok
+[2026-10-09T00:22:08.618-04:00] test file_config::tests::accessors_file ... ok
+[2026-10-09T00:22:08.618-04:00] test file_config::tests::accessors_seed ... ok
+[2026-10-09T00:22:08.618-04:00] test file_config::tests::active_override ... ok
+[2026-10-09T00:22:08.618-04:00] test file_config::tests::bpann_config2 ... ok
+[2026-10-09T00:22:08.618-04:00] test file_config::tests::creates_missing ... ok
+[2026-10-09T00:22:08.618-04:00] test file_config::tests::blckbaux_home ... ok
+[2026-10-09T00:22:08.618-04:00] test file_config::tests::install_overrides ... ok
+[2026-10-09T00:22:08.618-04:00] test file_config::tests::missing_hard ... ok
+[2026-10-09T00:22:08.618-04:00] test file_config::tests::missing_soft ... ok
+[2026-10-09T00:22:08.618-04:00] test file_config::tests::missing_soft2 ... ok
+[2026-10-09T00:22:08.618-04:00] test file_config::tests::rejects_file ... ok
+[2026-10-09T00:22:08.618-04:00] test file_config::tests::rejects_other ... ok
+[2026-10-09T00:22:08.618-04:00] test file_config::tests::save_parameters ... ok
+[2026-10-09T00:22:08.618-04:00] test file_config::tests::save_soft ... ok
+[2026-10-09T00:22:08.618-04:00] test file_config::tests::set_overrides ... ok
+[2026-10-09T00:22:08.618-04:00] test fit::tests::likelihood_limits ... ok
+[2026-10-09T00:22:08.618-04:00] test fit::tests::likelihood_rows ... ok
+[2026-10-09T00:22:08.618-04:00] test fit::tests::test_001 ... ok
+[2026-10-09T00:22:08.618-04:00] test fit::tests::test_002 ... ok
+[2026-10-09T00:22:08.618-04:00] test fit::tests::test_003 ... ok
+[2026-10-09T00:22:08.618-04:00] test fit::tests::test_005 ... ok
+[2026-10-09T00:22:08.618-04:00] test fit::tests::test_006 ... ok
+[2026-10-09T00:22:08.618-04:00] test fit::tests::test_007 ... ok
+[2026-10-09T00:22:08.618-04:00] test fit::tests::test_008 ... ok
+[2026-10-09T00:22:08.618-04:00] test fit::tests::test_009 ... ok
+[2026-10-09T00:22:08.618-04:00] test fit::tests::test_010 ... ok
+[2026-10-09T00:22:08.618-04:00] test fit::tests::test_011 ... ok
+[2026-10-09T00:22:08.618-04:00] test fit::tests::test_012 ... ok
+[2026-10-09T00:22:08.618-04:00] test fit::tests::test_013 ... ok
+[2026-10-09T00:22:08.618-04:00] test fit::tests::test_ennfitteraskbasic ... ok
+[2026-10-09T00:22:08.618-04:00] test fit::tests::tuned_geometry ... ok
+[2026-10-09T00:22:08.618-04:00] test fitter::tests::adaptive_fit ... ok
+[2026-10-09T00:22:08.618-04:00] test fitter::tests::ask_2 ... ok
+[2026-10-09T00:22:08.618-04:00] test fitter::tests::ask_inferred ... ok
+[2026-10-09T00:22:08.618-04:00] test fitter::tests::ask_start ... ok
+[2026-10-09T00:22:08.618-04:00] test fitter::tests::fitter_updates ... ok
+[2026-10-09T00:22:08.618-04:00] test fitter::tests::tell_yvar ... ok
+[2026-10-09T00:22:08.618-04:00] test fitter::tests::x_finite ... ok
+[2026-10-09T00:22:08.618-04:00] test fitter::tests::y_finite ... ok
+[2026-10-09T00:22:08.618-04:00] test fitter::tests::y_std ... ok
+[2026-10-09T00:22:08.618-04:00] test forward_program::contract::tests::contract_constants ... ok
+[2026-10-09T00:22:08.618-04:00] test forward_program::diffusion::tests::corruptions ... ok
+[2026-10-09T00:22:08.618-04:00] test forward_program::schedule::tests::schedules ... ok
+[2026-10-09T00:22:08.618-04:00] test forward_program::tests::fbtprogram ... ok
+[2026-10-09T00:22:08.618-04:00] test forward_program::tests::kda_kernels ... ok
+[2026-10-09T00:22:08.618-04:00] test forward_program::tests::kda_layout ... ok
+[2026-10-09T00:22:08.618-04:00] test forward_program::tests::kda_program ... ok
+[2026-10-09T00:22:08.618-04:00] test forward_program::tests::kda_request ... ok
+[2026-10-09T00:22:08.618-04:00] test forward_program::tests::kda_schedule ... ok
+[2026-10-09T00:22:08.618-04:00] test forward_program::tests::opencl_binding ... ok
+[2026-10-09T00:22:08.618-04:00] test forward_program::tests::opencl_evaluator ... ok
+[2026-10-09T00:22:08.618-04:00] test forward_program::tests::resident_contract ... ok
+[2026-10-09T00:22:08.618-04:00] test forward_program::tests::resident_round ... ok
+[2026-10-09T00:22:08.618-04:00] test forward_weights::tests::opens_python ... ok
+[2026-10-09T00:22:08.618-04:00] test hash::tests::test_001 ... ok
+[2026-10-09T00:22:08.618-04:00] test hash::tests::test_009 ... ok
+[2026-10-09T00:22:08.618-04:00] test hash::tests::test_boxmullerfinite ... ok
+[2026-10-09T00:22:08.618-04:00] test hash::tests::test_hashdeterminism ... ok
+[2026-10-09T00:22:08.618-04:00] test hash::tests::test_hashseedsensitivity ... ok
+[2026-10-09T00:22:08.618-04:00] test hash::tests::test_invalidnummetrics ... ok
+[2026-10-09T00:22:08.618-04:00] test hash::tests::test_outputshape ... ok
+[2026-10-09T00:22:08.618-04:00] test hash::tests::test_u64tof53range ... ok
+[2026-10-09T00:22:08.618-04:00] test hypervolume::tests::test_emptyarray ... ok
+[2026-10-09T00:22:08.618-04:00] test hypervolume::tests::test_hypervolume2dmax1d ... ok
+[2026-10-09T00:22:08.618-04:00] test hypervolume::tests::test_invalidcolumncount ... ok
+[2026-10-09T00:22:08.618-04:00] test hypervolume::tests::test_invalidrefpoint ... ok
+[2026-10-09T00:22:08.618-04:00] test hypervolume::tests::test_nodominatingpoints ... ok
+[2026-10-09T00:22:08.618-04:00] test hypervolume::tests::test_simplehypervolume ... ok
+[2026-10-09T00:22:08.618-04:00] test hypervolume::tests::test_threepoints ... ok
+[2026-10-09T00:22:08.618-04:00] test hypervolume::tests::test_withnandoesnotpanic ... ok
+[2026-10-09T00:22:08.618-04:00] test hypervolume::tests::volume_3d ... ok
+[2026-10-09T00:22:08.618-04:00] test hypervolume::tests::volume_parity ... ok
+[2026-10-09T00:22:08.618-04:00] test incumbent_tracker::tests::helpers_order ... ok
+[2026-10-09T00:22:08.618-04:00] test incumbent_tracker::tests::test_005 ... ok
+[2026-10-09T00:22:08.618-04:00] test incumbent_tracker::tests::test_006 ... ok
+[2026-10-09T00:22:08.618-04:00] test incumbent_tracker::tests::test_allcandidatesmode ... ok
+[2026-10-09T00:22:08.618-04:00] test incumbent_tracker::tests::test_multimetricunion ... ok
+[2026-10-09T00:22:08.618-04:00] test incumbent_tracker::tests::test_noiseawaretopm ... ok
+[2026-10-09T00:22:08.618-04:00] test incumbent_tracker::tests::test_noiselessmaxties ... ok
+[2026-10-09T00:22:08.618-04:00] test index::tests::helpers_preserve ... ok
+[2026-10-09T00:22:08.618-04:00] test index::tests::index_memory ... ok
+[2026-10-09T00:22:08.618-04:00] test index::tests::test_003 ... ok
+[2026-10-09T00:22:08.618-04:00] test index::tests::test_007 ... ok
+[2026-10-09T00:22:08.618-04:00] test index::tests::test_008 ... ok
+[2026-10-09T00:22:08.618-04:00] test index::tests::test_indexadd ... ok
+[2026-10-09T00:22:08.618-04:00] test index::tests::test_indexcreation ... ok
+[2026-10-09T00:22:08.618-04:00] test index::tests::test_indexsearch ... ok
+[2026-10-09T00:22:08.618-04:00] test index::tests::test_invaliddimensions ... ok
+[2026-10-09T00:22:08.618-04:00] test index::tests::test_invalidsearchk ... ok
+[2026-10-09T00:22:08.618-04:00] test index::tests::test_scaledsearch ... ok
+[2026-10-09T00:22:08.618-04:00] test knn::knn_backend::knn_auto ... ok
+[2026-10-09T00:22:08.618-04:00] test knn::knn_backend::knn_backend2 ... ok
+[2026-10-09T00:22:08.618-04:00] test knn::knn_backend::knn_errors ... ok
+[2026-10-09T00:22:08.618-04:00] test knn::knn_backend::knn_usearch ... ok
+[2026-10-09T00:22:08.618-04:00] test knn::knn_backend::opencl_index ... ok
+[2026-10-09T00:22:08.618-04:00] test knn::knn_backend::pad_unpack ... ok
+[2026-10-09T00:22:08.618-04:00] test knn::mmap_store::mmap_store::MmapColumnStore ... ok
+[2026-10-09T00:22:08.618-04:00] test knn::mmap_store::mmap_store::api_direct ... ok
+[2026-10-09T00:22:08.618-04:00] test knn::mmap_store::mmap_store::capacity_bytes ... ok
+[2026-10-09T00:22:08.618-04:00] test knn::mmap_store::mmap_store::ensure_capacity ... ok
+[2026-10-09T00:22:08.618-04:00] test knn::mmap_store::mmap_store::mmap_churn ... ok
+[2026-10-09T00:22:08.618-04:00] test knn::mmap_store::mmap_store::mmap_rows3 ... ok
+[2026-10-09T00:22:08.618-04:00] test knn::mmap_store::mmap_store::row_bytes ... ok
+[2026-10-09T00:22:08.618-04:00] test knn::usearch_backend::tests::add_keys ... ok
+[2026-10-09T00:22:08.618-04:00] test knn::usearch_backend::tests::rejects_keys ... ok
+[2026-10-09T00:22:08.618-04:00] test knn::usearch_backend::tests::search_rows ... ok
+[2026-10-09T00:22:08.618-04:00] test mbtrregn::tests::morbo_2026 ... ok
+[2026-10-09T00:22:08.618-04:00] test mbtrregn::tests::morbo_initial ... ok
+[2026-10-09T00:22:08.618-04:00] test mbtrregn::tests::morbo_metrics2 ... ok
+[2026-10-09T00:22:08.618-04:00] test mbtrregn::tests::morbo_panic ... ok
+[2026-10-09T00:22:08.618-04:00] test mbtrregn::tests::morbo_range ... ok
+[2026-10-09T00:22:08.618-04:00] test metric_auto::checks::gate_fallback ... ok
+[2026-10-09T00:22:08.618-04:00] test metric_auto::checks::metric_validation ... ok
+[2026-10-09T00:22:08.618-04:00] test metric_auto::checks::tied_weights ... ok
+[2026-10-09T00:22:08.618-04:00] test metric_auto::checks::upstream_rng ... ok
+[2026-10-09T00:22:08.618-04:00] test metric_auto::tests::metric_config ... ok
+[2026-10-09T00:22:08.618-04:00] test metric_auto::tests::metric_defaults ... ok
+[2026-10-09T00:22:08.618-04:00] test metric_auto::tests::metric_neighbors ... ok
+[2026-10-09T00:22:08.618-04:00] test metric_loo::tests::partial_order ... ok
+[2026-10-09T00:22:08.618-04:00] test model::access::access_tests::neighbor_distance ... ok
+[2026-10-09T00:22:08.618-04:00] test model::metric_tests::disk_metric ... ok
+[2026-10-09T00:22:08.618-04:00] test model::metric_tests::metric_rejection ... ok
+[2026-10-09T00:22:08.618-04:00] test model::tests::accessors_report ... ok
+[2026-10-09T00:22:08.618-04:00] test model::tests::bounded_trip ... ok
+[2026-10-09T00:22:08.618-04:00] test model::tests::disk_reopen ... ok
+[2026-10-09T00:22:08.618-04:00] test model::tests::internal_index ... ok
+[2026-10-09T00:22:08.618-04:00] test model::tests::storage_helpers ... ok
+[2026-10-09T00:22:08.618-04:00] test model::tests::test_004 ... ok
+[2026-10-09T00:22:08.618-04:00] test model::tests::test_ennadd ... ok
+[2026-10-09T00:22:08.618-04:00] test model::tests::test_enncreation ... ok
+[2026-10-09T00:22:08.618-04:00] test neighbor_rule::tests::bias_noise ... ok
+[2026-10-09T00:22:08.618-04:00] test objective_observation::tests::checked_variances ... ok
+[2026-10-09T00:22:08.618-04:00] test objective_observation::tests::explicit_control ... ok
+[2026-10-09T00:22:08.618-04:00] test objective_observation::tests::fifo_retention ... ok
+[2026-10-09T00:22:08.618-04:00] test objective_observation::tests::scalar_bits ... ok
+[2026-10-09T00:22:08.618-04:00] test objective_observation::tests::schema_retention ... ok
+[2026-10-09T00:22:08.618-04:00] test objective_observation::tests::window_capacity ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::multi_tr::tests::allocation_budgets ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::multi_tr::tests::allocation_regions ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::multi_tr::tests::allocation_trajectory ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::multi_tr::tests::allocation_utility ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::multi_tr::tests::independent_region ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::multi_tr::tests::nearest_explicit ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::multi_tr::tests::selection_diverse ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::multi_tr::tests::test_001 ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::multi_tr::tests::test_002 ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::observation_delta::tests::observation_appends ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests::fallback_surrogate ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests::optimizer_reports ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests::reset_obs ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests::test_003 ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests::test_005 ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests::test_007 ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests::test_009 ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests::test_addobservations ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests::test_optimizerask ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests::test_optimizercreation ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests::test_tell ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests::turbo_synced ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests_incremental::enn_model ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests_incremental::enn_obs ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests_incremental::morbo_ranges ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests_incremental::observation_views ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests_incremental::tell_metrics ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests_incremental::x_add ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests_incremental::x_add2 ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tests_incremental::x_succeeds ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::testsmbinc::morbo_rng ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::testsmbnzawrinc::morbo_selection ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tr_state::tests::morbo_config ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tr_state::tests::morbo_propose2 ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tr_state::tests::morbo_restart ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer::tr_state::tests::turbo_max ... ok
+[2026-10-09T00:22:08.618-04:00] test optimizer_factory::tests::create_smoke ... ok
+[2026-10-09T00:22:08.618-04:00] test params::tests::test_003 ... ok
+[2026-10-09T00:22:08.618-04:00] test params::tests::test_004 ... ok
+[2026-10-09T00:22:08.618-04:00] test params::tests::test_005 ... ok
+[2026-10-09T00:22:08.618-04:00] test params::tests::test_006 ... ok
+[2026-10-09T00:22:08.618-04:00] test params::tests::test_ennnormal ... ok
+[2026-10-09T00:22:08.618-04:00] test params::tests::test_ennnormalempty ... ok
+[2026-10-09T00:22:08.618-04:00] test params::tests::test_ennnormalwithidx ... ok
+[2026-10-09T00:22:08.618-04:00] test params::tests::test_ennparamsinvalidk ... ok
+[2026-10-09T00:22:08.618-04:00] test params::tests::test_ennparamsvalid ... ok
+[2026-10-09T00:22:08.618-04:00] test perturb::tests::contract ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::light::tests::search_rules ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::light::tests::test_001 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::light::tests::test_003 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::light::tests::test_004 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::light::tests::test_005 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::light::tests::test_006 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::light::tests::test_007 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::light::tests::test_008 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::apply_zeros ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::dist2s_block ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::f64_count ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::f64_cutoff ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::f64_cutoff2 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::f64_data ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::f64_empty ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::f64_search ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::f64_self ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::f64_ties ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::faiss_threshold ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::get_batch ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::index_distances ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::sq_cols ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::sq_each ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::sq_unscaled ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::sq_unscaled2 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor::tests::use_perf ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::neighbor_dist::tests::distances_match ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_conditional::posterior_batch ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_conditional::test_001 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_conditional::test_002 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_conditional::test_003 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_conditional::test_004 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_conditional::test_005 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_conditional::test_006 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_conditional::test_007 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_conditional::test_008 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_conditional::test_009 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_conditional::test_010 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_conditional::test_011 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_conditional::test_012 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_conditional::test_013 ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_core::aleatoric_components ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_core::batch_shape ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_core::deterministic_draw ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_core::draw_shape ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_core::empty_draw ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_core::empty_rejected ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_core::empty_state ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_core::internal_shape ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_core::neighbor_data ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_core::posterior_query ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_core::separate_batch ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_core::shared_batch ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_core::variance_floor ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tests_core::weighted_shape ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tie_break::tests::apply_index ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tie_break::tests::faiss_band ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tie_break::tests::faiss_cutoff ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tie_break::tests::faiss_tie ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tie_break::tests::finalize_paths ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tie_break::tests::resolve_band ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tie_break::tests::row_copy ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tie_break::tests::row_rows ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tie_break::tests::topk_k ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tie_break::tests::topk_plain ... ok
+[2026-10-09T00:22:08.618-04:00] test posterior::tie_break::tests::try_indices ... ok
+[2026-10-09T00:22:08.618-04:00] test pretrain_data::tests::fixed_batches ... ok
+[2026-10-09T00:22:08.618-04:00] test pretrain_data::tests::invalid_tokens ... ok
+[2026-10-09T00:22:08.618-04:00] test pretrain_data::tests::wide_batches ... ok
+[2026-10-09T00:22:08.618-04:00] test procedural_pool::tests::checked_counts ... ok
+[2026-10-09T00:22:08.618-04:00] test procedural_pool::tests::fixed_streams ... ok
+[2026-10-09T00:22:08.618-04:00] test procedural_pool::tests::legacy_streams ... ok
+[2026-10-09T00:22:08.618-04:00] test procedural_pool::tests::legacy_vectors ... ok
+[2026-10-09T00:22:08.618-04:00] test procedural_pool::tests::logical_ids ... ok
+[2026-10-09T00:22:08.618-04:00] test procedural_pool::tests::resident_requests ... ok
+[2026-10-09T00:22:08.618-04:00] test quantization::tests::clamp ... ok
+[2026-10-09T00:22:08.618-04:00] test quantization::tests::pack_odd ... ok
+[2026-10-09T00:22:08.618-04:00] test quantization::tests::round_even ... ok
+[2026-10-09T00:22:08.618-04:00] test reconstruction::tests::byte_boundaries ... ok
+[2026-10-09T00:22:08.618-04:00] test reconstruction::tests::byte_distance ... ok
+[2026-10-09T00:22:08.618-04:00] test reconstruction::tests::edit_alignment ... ok
+[2026-10-09T00:22:08.618-04:00] test reconstruction::tests::length_timing ... ignored, explicit CPU reward timing, not a full BO latency result
+[2026-10-09T00:22:08.618-04:00] test reconstruction::tests::repetition_control ... ok
+[2026-10-09T00:22:08.618-04:00] test reconstruction::tests::word_boundaries ... ok
+[2026-10-09T00:22:08.618-04:00] test reliability_region::tests::invalid_policy ... ok
+[2026-10-09T00:22:08.618-04:00] test reliability_region::tests::reliable_progress ... ok
+[2026-10-09T00:22:08.618-04:00] test reliability_region::tests::stagnant_escape ... ok
+[2026-10-09T00:22:08.618-04:00] test reliability_region::tests::unreliable_stagnation ... ok
+[2026-10-09T00:22:08.618-04:00] test search::device_tests::opencl_residency ... ok
+[2026-10-09T00:22:08.618-04:00] test search::region_tests::opencl_region ... ok
+[2026-10-09T00:22:08.618-04:00] test search::tests::adapts_length ... ok
+[2026-10-09T00:22:08.618-04:00] test search::tests::batches_trials ... ok
+[2026-10-09T00:22:08.618-04:00] test search::tests::cpu_trajectory ... ok
+[2026-10-09T00:22:08.618-04:00] test search::tests::metal_trajectory ... ok
+[2026-10-09T00:22:08.618-04:00] test search::tests::opencl_trajectory ... ok
+[2026-10-09T00:22:08.618-04:00] test search::tests::owns_state ... ok
+[2026-10-09T00:22:08.618-04:00] test search::tests::stream_batch ... ok
+[2026-10-09T00:22:08.618-04:00] test search::tests::stream_sparse ... ok
+[2026-10-09T00:22:08.618-04:00] test search::tests::tells_batch ... ok
+[2026-10-09T00:22:08.618-04:00] test search::tests::trial_identity ... ok
+[2026-10-09T00:22:08.618-04:00] test search::view_tests::opencl_views ... ok
+[2026-10-09T00:22:08.618-04:00] test stats::tests::test_001 ... ok
+[2026-10-09T00:22:08.618-04:00] test stats::tests::test_002 ... ok
+[2026-10-09T00:22:08.618-04:00] test stats::tests::test_cloneequality ... ok
+[2026-10-09T00:22:08.618-04:00] test stats::tests::test_mismatchedlengths - should panic ... ok
+[2026-10-09T00:22:08.618-04:00] test stats::tests::test_weightedstatsempty ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::tests_init::test_002 ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::tests_init::test_003 ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::tests_init::test_004 ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::tests_init::test_006 ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::tests_init::test_selectbyindices ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::tests_init::test_strategyinitlhdpath ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::tests_selection::ask_pool ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::tests_selection::failed_state ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::tests_selection::segmented_acquisition ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::tests_selection::select_smoke ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::tests_selection::test_001 ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::tests_selection::test_002 ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::tests_selection::test_003 ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::tests_selection::test_005 ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::tests_selection::tr_trip ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::tests_selection::turbo_paths ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::testsmbacq::morbo_rng2 ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::testsmbacq::morbo_rng3 ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::testsmbacq::morbo_tell ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::testsmbacq::morbo_turbo ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::testsmbacq::morbo_turbo2 ... ok
+[2026-10-09T00:22:08.618-04:00] test strategy::testsmbacq::surrogate_predicts ... ok
+[2026-10-09T00:22:08.618-04:00] test surrogate::tests::default_neighbors ... ok
+[2026-10-09T00:22:08.618-04:00] test surrogate::tests::fit_exist ... ok
+[2026-10-09T00:22:08.618-04:00] test surrogate::tests::fit_search ... ok
+[2026-10-09T00:22:08.618-04:00] test surrogate::tests::regression_refit ... ok
+[2026-10-09T00:22:08.618-04:00] test surrogate::tests::test_001 ... ok
+[2026-10-09T00:22:08.618-04:00] test surrogate::tests::test_004 ... ok
+[2026-10-09T00:22:08.618-04:00] test surrogate::tests::y_append ... ok
+[2026-10-09T00:22:08.618-04:00] test tensor_store::tests::exact_versions ... ok
+[2026-10-09T00:22:08.618-04:00] test tensor_store::tests::logical_identity ... ok
+[2026-10-09T00:22:08.618-04:00] test tensor_store::tests::safetensors_bits ... ok
+[2026-10-09T00:22:08.618-04:00] test text::tests::bpe_bytes ... ok
+[2026-10-09T00:22:08.618-04:00] test text::tests::byte_pieces ... ok
+[2026-10-09T00:22:08.618-04:00] test text::tests::sentencepiece_decode ... ok
+[2026-10-09T00:22:08.618-04:00] test text::tests::utf8_join ... ok
+[2026-10-09T00:22:08.618-04:00] test threshold::tests::basis_cycles ... ok
+[2026-10-09T00:22:08.618-04:00] test threshold::tests::feature_layout ... ok
+[2026-10-09T00:22:08.618-04:00] test threshold::tests::interaction_threshold ... ok
+[2026-10-09T00:22:08.618-04:00] test threshold::tests::linear_threshold ... ok
+[2026-10-09T00:22:08.618-04:00] test threshold::tests::posterior_learns ... ok
+[2026-10-09T00:22:08.618-04:00] test threshold::tests::prefix_overlap ... ok
+[2026-10-09T00:22:08.618-04:00] test threshold::tests::prior_draws ... ok
+[2026-10-09T00:22:08.618-04:00] test threshold::tests::radius_scaling ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::bpann_history::tests::bpann_dedup ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::bpann_history::tests::bpann_reopen ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::bpann_history::tests::bpann_shapes ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::bpann_history::tests::bpann_values ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::layout::tests::steps ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::opencl::posterior_tests::noise_slots ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::sparse::tests::changes_exact ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::sparse::tests::edits_unique ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::accepted_center ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::cpu_batch2 ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::cpu_centers ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::cpu_regions ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::cpu_search ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::cpu_sparse ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::cpu_sparse2 ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::cpu_stream ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::cpu_thompson ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::dense_thompson ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::history_score ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::history_state ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::indexed_row ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::indexed_search ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::lazy_history ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::opencl_batch2 ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::opencl_centers2 ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::opencl_coherence ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::opencl_history ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::opencl_parity ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::opencl_regions2 ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::opencl_resident ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::opencl_sparse ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::opencl_sparse2 ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::opencl_stream ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::rejected_center ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::sparse_rows ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::sparse_thompson ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::thompson_moments ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::thompson_reorder ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tests::tree_thompson ... ok
+[2026-10-09T00:22:08.618-04:00] test trials::tree::tests::valid_centers ... ok
+[2026-10-09T00:22:08.618-04:00] test trust_region::tests::effective_tolerance ... ok
+[2026-10-09T00:22:08.618-04:00] test trust_region::tests::inconclusive_evidence ... ok
+[2026-10-09T00:22:08.618-04:00] test trust_region::tests::negative_rewards ... ok
+[2026-10-09T00:22:08.618-04:00] test trust_region::tests::test_001 ... ok
+[2026-10-09T00:22:08.618-04:00] test trust_region::tests::test_008 ... ok
+[2026-10-09T00:22:08.618-04:00] test trust_region::tests::test_notrustregion ... ok
+[2026-10-09T00:22:08.618-04:00] test trust_region::tests::test_turbobounds ... ok
+[2026-10-09T00:22:08.618-04:00] test trust_region::tests::test_turborestart ... ok
+[2026-10-09T00:22:08.618-04:00] test trust_region::tests::test_turboupdatefailure ... ok
+[2026-10-09T00:22:08.618-04:00] test trust_region::tests::test_turboupdatesuccess ... ok
+[2026-10-09T00:22:08.618-04:00] test trust_region::tests::update_full ... ok
+[2026-10-09T00:22:08.618-04:00] test trust_region::tests::update_history ... ok
+[2026-10-09T00:22:08.618-04:00] test util::tests::test_002 ... ok
+[2026-10-09T00:22:08.618-04:00] test util::tests::test_006 ... ok
+[2026-10-09T00:22:08.618-04:00] test util::tests::test_007 ... ok
+[2026-10-09T00:22:08.618-04:00] test util::tests::test_009 ... ok
+[2026-10-09T00:22:08.618-04:00] test util::tests::test_011 ... ok
+[2026-10-09T00:22:08.618-04:00] test util::tests::test_012 ... ok
+[2026-10-09T00:22:08.618-04:00] test util::tests::test_013 ... ok
+[2026-10-09T00:22:08.618-04:00] test util::tests::test_014 ... ok
+[2026-10-09T00:22:08.618-04:00] test util::tests::test_armsfrompareto ... ok
+[2026-10-09T00:22:08.618-04:00] test util::tests::test_paretofrontempty ... ok
+[2026-10-09T00:22:08.618-04:00] test util::tests::test_paretofrontsimple ... ok
+[2026-10-09T00:22:08.618-04:00] test util::tests::test_sobolindicesshape ... ok
+[2026-10-09T00:22:08.618-04:00] test util::tests::test_standardizeyempty ... ok
+[2026-10-09T00:22:08.618-04:00] test util::tests::test_standardizeynormal ... ok
+[2026-10-09T00:22:08.618-04:00] test weights::tests::covariance ... ok
+[2026-10-09T00:22:08.618-04:00] test weights::tests::opencl_ids ... ok
+[2026-10-09T00:22:08.618-04:00] test weights::tests::order_batches ... ok
+[2026-10-09T00:22:08.618-04:00] test weights::tests::pareto_mean ... ok
+[2026-10-09T00:22:08.618-04:00] test weights::tests::posterior_noise ... ok
+[2026-10-09T00:22:08.618-04:00] test weights::tests::removed_rejected ... ok
+[2026-10-09T00:22:08.618-04:00] test weights::tests::thompson_moments ... ok
+[2026-10-09T00:22:08.618-04:00] test weights::tests::thompson_repeat ... ok
+[2026-10-09T00:22:08.618-04:00] test weights::tests::ucb_prefer ... ok
+[2026-10-09T00:22:08.618-04:00] test weights::tests::weight_norm ... ok
+[2026-10-09T00:22:08.618-04:00] test weights::tests::xor_cancel ... ok
+[2026-10-09T00:22:08.618-04:00] test y_bounds::tests::bounded_trip2 ... ok
+[2026-10-09T00:22:08.618-04:00] test y_bounds::tests::rejects_interval ... ok
+[2026-10-09T00:22:08.618-04:00]
+[2026-10-09T00:22:08.618-04:00] test result: ok. 547 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 6.42s
+[2026-10-09T00:22:08.618-04:00]
+[2026-10-09T00:22:08.618-04:00]
+[2026-10-09T00:22:08.618-04:00] ---- STDERR ----
+[2026-10-09T00:22:08.618-04:00]
+[2026-10-09T00:22:08.767-04:00] ✓ Pass: root//rust/crates/blckbaux:enn_backend_test (0.1s)
+[2026-10-09T00:22:08.767-04:00] ---- STDOUT ----
+[2026-10-09T00:22:08.767-04:00]
+[2026-10-09T00:22:08.767-04:00] running 5 tests
+[2026-10-09T00:22:08.767-04:00] test disk_driver2 ... ok
+[2026-10-09T00:22:08.767-04:00] test disk_search ... ok
+[2026-10-09T00:22:08.767-04:00] test memory_accessors ... ok
+[2026-10-09T00:22:08.767-04:00] test new_add ... ok
+[2026-10-09T00:22:08.767-04:00] test x_disk ... ok
+[2026-10-09T00:22:08.767-04:00]
+[2026-10-09T00:22:08.767-04:00] test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+[2026-10-09T00:22:08.767-04:00]
+[2026-10-09T00:22:08.767-04:00]
+[2026-10-09T00:22:08.767-04:00] ---- STDERR ----
+[2026-10-09T00:22:08.767-04:00]
+[2026-10-09T00:22:09.120-04:00] ✓ Pass: root//rust/crates/blckbaux:knn_metal_test (0.4s)
+[2026-10-09T00:22:09.120-04:00] ---- STDOUT ----
+[2026-10-09T00:22:09.120-04:00]
+[2026-10-09T00:22:09.120-04:00] running 6 tests
+[2026-10-09T00:22:09.120-04:00] test gram ... ok
+[2026-10-09T00:22:09.120-04:00] test k_16 ... ok
+[2026-10-09T00:22:09.120-04:00] test k_2048 ... ok
+[2026-10-09T00:22:09.120-04:00] test q_1 ... ok
+[2026-10-09T00:22:09.120-04:00] test tree ... ok
+[2026-10-09T00:22:09.120-04:00] test wide ... ok
+[2026-10-09T00:22:09.120-04:00]
+[2026-10-09T00:22:09.120-04:00] test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+[2026-10-09T00:22:09.120-04:00]
+[2026-10-09T00:22:09.120-04:00]
+[2026-10-09T00:22:09.120-04:00] ---- STDERR ----
+[2026-10-09T00:22:09.120-04:00]
+[2026-10-09T00:22:09.198-04:00] ✓ Pass: root//rust/crates/blckbaux:disk_observation_test (0.1s)
+[2026-10-09T00:22:09.198-04:00] ---- STDOUT ----
+[2026-10-09T00:22:09.198-04:00]
+[2026-10-09T00:22:09.198-04:00] running 12 tests
+[2026-10-09T00:22:09.198-04:00] test append_yvar ... ok
+[2026-10-09T00:22:09.198-04:00] test check_backend ... ok
+[2026-10-09T00:22:09.198-04:00] test check_dims ... ok
+[2026-10-09T00:22:09.198-04:00] test check_rows ... ok
+[2026-10-09T00:22:09.198-04:00] test load_backend ... ok
+[2026-10-09T00:22:09.198-04:00] test load_rows ... ok
+[2026-10-09T00:22:09.198-04:00] test mark_dirty ... ok
+[2026-10-09T00:22:09.198-04:00] test open_yvar ... ok
+[2026-10-09T00:22:09.198-04:00] test parse_number ... ok
+[2026-10-09T00:22:09.198-04:00] test parse_string ... ok
+[2026-10-09T00:22:09.198-04:00] test read_stale ... ok
+[2026-10-09T00:22:09.198-04:00] test write_metadata ... ok
+[2026-10-09T00:22:09.198-04:00]
+[2026-10-09T00:22:09.198-04:00] test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+[2026-10-09T00:22:09.198-04:00]
+[2026-10-09T00:22:09.198-04:00]
+[2026-10-09T00:22:09.198-04:00] ---- STDERR ----
+[2026-10-09T00:22:09.198-04:00]
+[2026-10-09T00:22:09.279-04:00] ✓ Pass: root//rust/crates/blckbaux:neighbor_dist_test (0.1s)
+[2026-10-09T00:22:09.279-04:00] ---- STDOUT ----
+[2026-10-09T00:22:09.279-04:00]
+[2026-10-09T00:22:09.279-04:00] running 1 test
+[2026-10-09T00:22:09.279-04:00] test posterior_l2 ... ok
+[2026-10-09T00:22:09.279-04:00]
+[2026-10-09T00:22:09.279-04:00] test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+[2026-10-09T00:22:09.279-04:00]
+[2026-10-09T00:22:09.279-04:00]
+[2026-10-09T00:22:09.279-04:00] ---- STDERR ----
+[2026-10-09T00:22:09.279-04:00]
+[2026-10-09T00:22:09.351-04:00] ✓ Pass: root//rust/crates/blckbaux:testinctrk_test (0.1s)
+[2026-10-09T00:22:09.351-04:00] ---- STDOUT ----
+[2026-10-09T00:22:09.351-04:00]
+[2026-10-09T00:22:09.351-04:00] running 1 test
+[2026-10-09T00:22:09.351-04:00] test incumbent_paths ... ok
+[2026-10-09T00:22:09.351-04:00]
+[2026-10-09T00:22:09.351-04:00] test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+[2026-10-09T00:22:09.351-04:00]
+[2026-10-09T00:22:09.351-04:00]
+[2026-10-09T00:22:09.351-04:00] ---- STDERR ----
+[2026-10-09T00:22:09.351-04:00]
+[2026-10-09T00:22:09.511-04:00] ✓ Pass: root//rust/crates/blckbaux:surrogate_geometry_test (0.2s)
+[2026-10-09T00:22:09.511-04:00] ---- STDOUT ----
+[2026-10-09T00:22:09.511-04:00]
+[2026-10-09T00:22:09.511-04:00] running 12 tests
+[2026-10-09T00:22:09.511-04:00] test adaptive_bias ... ok
+[2026-10-09T00:22:09.511-04:00] test convex_mean ... ok
+[2026-10-09T00:22:09.511-04:00] test draw_conditioning ... ok
+[2026-10-09T00:22:09.511-04:00] test dup_precision ... ok
+[2026-10-09T00:22:09.511-04:00] test invalid_fit ... ok
+[2026-10-09T00:22:09.511-04:00] test label_permutation ... ok
+[2026-10-09T00:22:09.511-04:00] test loo_leak ... ok
+[2026-10-09T00:22:09.511-04:00] test neighbor_jump ... ok
+[2026-10-09T00:22:09.511-04:00] test reflection ... ok
+[2026-10-09T00:22:09.511-04:00] test shared_draw ... ok
+[2026-10-09T00:22:09.511-04:00] test spatial_bias ... ok
+[2026-10-09T00:22:09.511-04:00] test ucb_trap ... ok
+[2026-10-09T00:22:09.511-04:00]
+[2026-10-09T00:22:09.511-04:00] test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+[2026-10-09T00:22:09.511-04:00]
+[2026-10-09T00:22:09.511-04:00]
+[2026-10-09T00:22:09.511-04:00] ---- STDERR ----
+[2026-10-09T00:22:09.511-04:00]
+[2026-10-09T00:22:09.621-04:00] ✓ Pass: root//rust/crates/blckbaux:trainrowsat_test (0.1s)
+[2026-10-09T00:22:09.621-04:00] ---- STDOUT ----
+[2026-10-09T00:22:09.621-04:00]
+[2026-10-09T00:22:09.621-04:00] running 3 tests
+[2026-10-09T00:22:09.621-04:00] test single_gather ... ok
+[2026-10-09T00:22:09.621-04:00] test x_succeeds3 ... ok
+[2026-10-09T00:22:09.621-04:00] test x_views ... ok
+[2026-10-09T00:22:09.621-04:00]
+[2026-10-09T00:22:09.621-04:00] test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+[2026-10-09T00:22:09.621-04:00]
+[2026-10-09T00:22:09.621-04:00]
+[2026-10-09T00:22:09.621-04:00] ---- STDERR ----
+[2026-10-09T00:22:09.621-04:00]
+[2026-10-09T00:22:09.789-04:00] ✓ Pass: root//rust/crates/blckbaux:tdiskback_test (0.2s)
+[2026-10-09T00:22:09.789-04:00] ---- STDOUT ----
+[2026-10-09T00:22:09.789-04:00]
+[2026-10-09T00:22:09.789-04:00] running 1 test
+[2026-10-09T00:22:09.789-04:00] test turbo_incumbent ... ok
+[2026-10-09T00:22:09.789-04:00]
+[2026-10-09T00:22:09.789-04:00] test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+[2026-10-09T00:22:09.789-04:00]
+[2026-10-09T00:22:09.789-04:00]
+[2026-10-09T00:22:09.789-04:00] ---- STDERR ----
+[2026-10-09T00:22:09.789-04:00]
+[2026-10-09T00:22:14.565-04:00] Waiting on Test bf16_metaltest_test --  [local_execute], and 14 other actions
+[2026-10-09T00:22:21.566-04:00] Waiting on Test bf16_metaltest_test --  [local_execute], and 14 other actions
+[2026-10-09T00:22:23.562-04:00] ✓ Pass: root//rust/crates/blckbaux:bf16_metaltest_test (13.8s)
+[2026-10-09T00:22:23.562-04:00] ---- STDOUT ----
+[2026-10-09T00:22:23.562-04:00]
+[2026-10-09T00:22:23.562-04:00] running 54 tests
+[2026-10-09T00:22:23.562-04:00] test apple_gpu::tests::maps_generations ... ok
+[2026-10-09T00:22:23.562-04:00] test apple_gpu::tests::shared_buffers ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::audit::history_audit ... ignored, GPU geometry audit; emits measurements rather than asserting an optimization win
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::axis::tests::bounded_axis ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::family::tests::family_energy ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::family::tests::family_learning ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::family::tests::family_replay ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::family::tests::family_units ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::metric::tests::metric_agreement ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::metric::tests::metric_duplicates ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::metric::tests::metric_timing ... ignored, paired metric benchmark; requires Low Power Mode off
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::objective_acquisition::tests::morbo_chebyshev ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::objective_acquisition::tests::morbo_noise ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::objective_acquisition::tests::morbo_resample ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::objective_acquisition::tests::morbo_state ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::objective_acquisition::tests::parameter_layout ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::objective_acquisition::tests::pareto_control ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::objective_acquisition::tests::scalar_optout ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::objective_acquisition::tests::shared_geometry ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::objective_tests::retryable_schema ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::objective_tests::scalar_adapter ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::objective_tests::vector_history ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::procedural::tests::resident_layouts ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::controller_info ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::family_recovers ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::fifo_parity ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::fp16_weights ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::gaussian_initial ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::host_guards ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::latent_history ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::paired_gain ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::pool_geometry ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::program_keys ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::program_overlap ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::rademacher ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::rademacher_initial ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::radial_select ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::replay_archived ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::restart_parity ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::rewarm_threshold ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::round_memory ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::single_decision ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::startup_adaptation ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::tile_reference ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::unclear_history ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::unevidenced_radius ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::wide_history ... ok
+[2026-10-09T00:22:23.562-04:00] test bf16_metal::tests::ziggurat_moments ... ok
+[2026-10-09T00:22:23.562-04:00] test objective_observation::tests::checked_variances ... ok
+[2026-10-09T00:22:23.562-04:00] test objective_observation::tests::explicit_control ... ok
+[2026-10-09T00:22:23.562-04:00] test objective_observation::tests::fifo_retention ... ok
+[2026-10-09T00:22:23.562-04:00] test objective_observation::tests::scalar_bits ... ok
+[2026-10-09T00:22:23.562-04:00] test objective_observation::tests::schema_retention ... ok
+[2026-10-09T00:22:23.562-04:00] test objective_observation::tests::window_capacity ... ok
+[2026-10-09T00:22:23.562-04:00]
+[2026-10-09T00:22:23.562-04:00] test result: ok. 52 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 13.63s
+[2026-10-09T00:22:23.562-04:00]
+[2026-10-09T00:22:23.562-04:00]
+[2026-10-09T00:22:23.562-04:00] ---- STDERR ----
+[2026-10-09T00:22:23.562-04:00]
+[2026-10-09T00:22:23.676-04:00] ✓ Pass: root//rust/crates/blckbaux:fit_cases_test (0.1s)
+[2026-10-09T00:22:23.676-04:00] ---- STDOUT ----
+[2026-10-09T00:22:23.676-04:00]
+[2026-10-09T00:22:23.676-04:00] running 3 tests
+[2026-10-09T00:22:23.676-04:00] test bounded_loo ... ok
+[2026-10-09T00:22:23.676-04:00] test disk_loo ... ok
+[2026-10-09T00:22:23.676-04:00] test row_guards ... ok
+[2026-10-09T00:22:23.676-04:00]
+[2026-10-09T00:22:23.676-04:00] test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+[2026-10-09T00:22:23.676-04:00]
+[2026-10-09T00:22:23.676-04:00]
+[2026-10-09T00:22:23.676-04:00] ---- STDERR ----
+[2026-10-09T00:22:23.676-04:00]
+[2026-10-09T00:22:23.788-04:00] ✓ Pass: root//rust/crates/blckbaux:add_complexity_test (0.1s)
+[2026-10-09T00:22:23.788-04:00] ---- STDOUT ----
+[2026-10-09T00:22:23.788-04:00]
+[2026-10-09T00:22:23.788-04:00] running 3 tests
+[2026-10-09T00:22:23.788-04:00] test x_succeeds2 ... ok
+[2026-10-09T00:22:23.788-04:00] test x_yvar ... ok
+[2026-10-09T00:22:23.788-04:00] test x_yvar2 ... ok
+[2026-10-09T00:22:23.788-04:00]
+[2026-10-09T00:22:23.788-04:00] test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+[2026-10-09T00:22:23.788-04:00]
+[2026-10-09T00:22:23.788-04:00]
+[2026-10-09T00:22:23.788-04:00] ---- STDERR ----
+[2026-10-09T00:22:23.788-04:00]
+[2026-10-09T00:22:23.911-04:00] ✓ Pass: root//rust/crates/blckbaux:obs_access_test (0.1s)
+[2026-10-09T00:22:23.911-04:00] ---- STDOUT ----
+[2026-10-09T00:22:23.911-04:00]
+[2026-10-09T00:22:23.911-04:00] running 1 test
+[2026-10-09T00:22:23.911-04:00] test observation_access ... ok
+[2026-10-09T00:22:23.911-04:00]
+[2026-10-09T00:22:23.911-04:00] test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+[2026-10-09T00:22:23.911-04:00]
+[2026-10-09T00:22:23.911-04:00]
+[2026-10-09T00:22:23.911-04:00] ---- STDERR ----
+[2026-10-09T00:22:23.911-04:00]
+[2026-10-09T00:22:24.003-04:00] ✓ Pass: root//rust/crates/blckbaux:batchposttrainreg_test (0.1s)
+[2026-10-09T00:22:24.003-04:00] ---- STDOUT ----
+[2026-10-09T00:22:24.003-04:00]
+[2026-10-09T00:22:24.003-04:00] running 2 tests
+[2026-10-09T00:22:24.003-04:00] test batch_neighbors ... ok
+[2026-10-09T00:22:24.003-04:00] test batch_posterior ... ok
+[2026-10-09T00:22:24.003-04:00]
+[2026-10-09T00:22:24.003-04:00] test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+[2026-10-09T00:22:24.003-04:00]
+[2026-10-09T00:22:24.003-04:00]
+[2026-10-09T00:22:24.003-04:00] ---- STDERR ----
+[2026-10-09T00:22:24.003-04:00]
+[2026-10-09T00:22:24.119-04:00] ✓ Pass: root//rust/crates/blckbaux:diskstreamhelp_test (0.1s)
+[2026-10-09T00:22:24.119-04:00] ---- STDOUT ----
+[2026-10-09T00:22:24.119-04:00]
+[2026-10-09T00:22:24.119-04:00] running 2 tests
+[2026-10-09T00:22:24.119-04:00] test appended_sync ... ok
+[2026-10-09T00:22:24.119-04:00] test appending_rows ... ok
+[2026-10-09T00:22:24.119-04:00]
+[2026-10-09T00:22:24.119-04:00] test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+[2026-10-09T00:22:24.119-04:00]
+[2026-10-09T00:22:24.119-04:00]
+[2026-10-09T00:22:24.119-04:00] ---- STDERR ----
+[2026-10-09T00:22:24.119-04:00]
+[2026-10-09T00:22:24.184-04:00] ✓ Pass: root//rust/crates/blckbaux:api_boundary_test (0.1s)
+[2026-10-09T00:22:24.184-04:00] ---- STDOUT ----
+[2026-10-09T00:22:24.184-04:00]
+[2026-10-09T00:22:24.184-04:00] running 3 tests
+[2026-10-09T00:22:24.184-04:00] test frontier_experimental ... ok
+[2026-10-09T00:22:24.184-04:00] test prelude_core ... ok
+[2026-10-09T00:22:24.184-04:00] test test_002 ... ok
+[2026-10-09T00:22:24.184-04:00]
+[2026-10-09T00:22:24.184-04:00] test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+[2026-10-09T00:22:24.184-04:00]
+[2026-10-09T00:22:24.184-04:00]
+[2026-10-09T00:22:24.184-04:00] ---- STDERR ----
+[2026-10-09T00:22:24.184-04:00]
+[2026-10-09T00:22:28.666-04:00] Waiting on Test fbt_metaltest_test --  [local_execute], and 7 other actions
+[2026-10-09T00:22:32.546-04:00] ✓ Pass: root//rust/crates/blckbaux:fbt_metaltest_test (8.4s)
+[2026-10-09T00:22:32.546-04:00] ---- STDOUT ----
+[2026-10-09T00:22:32.546-04:00]
+[2026-10-09T00:22:32.546-04:00] running 98 tests
+[2026-10-09T00:22:32.546-04:00] test apple_gpu::tests::maps_generations ... ok
+[2026-10-09T00:22:32.546-04:00] test apple_gpu::tests::shared_buffers ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::audit::history_audit ... ignored, GPU geometry audit; emits measurements rather than asserting an optimization win
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::axis::tests::bounded_axis ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::family::tests::family_energy ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::family::tests::family_learning ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::family::tests::family_replay ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::family::tests::family_units ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::metric::tests::metric_agreement ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::metric::tests::metric_duplicates ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::metric::tests::metric_timing ... ignored, paired metric benchmark; requires Low Power Mode off
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::objective_acquisition::tests::morbo_chebyshev ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::objective_acquisition::tests::morbo_noise ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::objective_acquisition::tests::morbo_resample ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::objective_acquisition::tests::morbo_state ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::objective_acquisition::tests::parameter_layout ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::objective_acquisition::tests::pareto_control ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::objective_acquisition::tests::scalar_optout ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::objective_acquisition::tests::shared_geometry ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::objective_tests::retryable_schema ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::objective_tests::scalar_adapter ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::objective_tests::vector_history ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::procedural::tests::resident_layouts ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::controller_info ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::family_recovers ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::fifo_parity ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::fp16_weights ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::gaussian_initial ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::host_guards ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::latent_history ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::paired_gain ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::pool_geometry ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::program_keys ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::program_overlap ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::rademacher ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::rademacher_initial ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::radial_select ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::replay_archived ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::restart_parity ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::rewarm_threshold ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::round_memory ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::single_decision ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::startup_adaptation ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::tile_reference ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::unclear_history ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::unevidenced_radius ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::wide_history ... ok
+[2026-10-09T00:22:32.546-04:00] test bf16_metal::tests::ziggurat_moments ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt::tests::feed_forwardlayout ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt::tests::layout_validation ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_attention::tests::attention_chunking ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_attention::tests::attention_parity ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_attention::tests::context_indexing ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_attention::tests::rms_normparity ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_attention::tests::state_reset ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_jitter::tests::deterministic ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_jitter::tests::inactive ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_metal::tests::buffer_guards ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_metal::tests::feed_forwardparity ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_metal::tests::feedback_gpu ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_metal::tests::feedback_parity ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_metal::tests::full_contexttiming ... ignored, full-context projection experiment, not complete model scoring
+[2026-10-09T00:22:32.546-04:00] test fbt_metal::tests::full_tiledtiming ... ignored, full-context tiled versus SIMD baseline experiment
+[2026-10-09T00:22:32.546-04:00] test fbt_metal::tests::gate_chain ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_metal::tests::grouped_projparity ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_metal::tests::grouped_projtiming ... ignored, manual timing experiment; run without Metal validation
+[2026-10-09T00:22:32.546-04:00] test fbt_metal::tests::linear_liveweights ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_metal::tests::projection_parity ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_model::bo::tests::experiment_limits ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_model::prefill::boundtests::bound_audit ... ignored, full 4K paired bound audit; post-hoc ideal arithmetic, not a certificate
+[2026-10-09T00:22:32.546-04:00] test fbt_model::prefill::tests::cache_parity ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_model::prefill::tests::gpu_attention96 ... ignored, GPU diagnostic; exercised by tools/fbt-bo --check
+[2026-10-09T00:22:32.546-04:00] test fbt_model::tests::batch_parity ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_model::tests::bridge_restore ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_model::tests::fused_graphparity ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_model::tests::gpu_fullffn ... ignored, GPU diagnostic; exercised by tools/fbt-bo --check
+[2026-10-09T00:22:32.546-04:00] test fbt_model::tests::gpu_fusedgate ... ignored, full-width fused Metal gate/up parity; required before configured fused runs
+[2026-10-09T00:22:32.546-04:00] test fbt_model::tests::gpu_optimized ... ignored, GPU diagnostic; exercised by tools/fbt-bo --check
+[2026-10-09T00:22:32.546-04:00] test fbt_model::tests::gpu_readout ... ignored, GPU diagnostic; exercised by tools/fbt-bo --check
+[2026-10-09T00:22:32.546-04:00] test fbt_model::tests::gpu_scorer ... ignored, GPU diagnostic; exercised by tools/fbt-bo --check
+[2026-10-09T00:22:32.546-04:00] test fbt_model::tests::live_weights ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_model::tests::model_attention ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_model::tests::model_geometry ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_model::tests::model_resources ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_model::tests::model_targettiming ... ignored, whole 1B LocalV1 model, full-context two-pass scoring, several GB and minutes
+[2026-10-09T00:22:32.546-04:00] test fbt_model::tests::proposal_structure ... ignored, full-size GPU proposal structure diagnostic; no forward passes
+[2026-10-09T00:22:32.546-04:00] test fbt_model::tests::test_jitter ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_model::tests::whole_modelparity ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_model::tests::whole_modelupdates ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_mps::tests::batch_parity ... ok
+[2026-10-09T00:22:32.546-04:00] test fbt_mps::tests::bench_layouts ... ignored, exact-shape diagnostic; exercised by tools/fbt-bo --gemm
+[2026-10-09T00:22:32.546-04:00] test fbt_mps::tests::gateup_feasibility ... ignored, exact production-shape gate/up feasibility probe
+[2026-10-09T00:22:32.546-04:00] test objective_observation::tests::checked_variances ... ok
+[2026-10-09T00:22:32.546-04:00] test objective_observation::tests::explicit_control ... ok
+[2026-10-09T00:22:32.546-04:00] test objective_observation::tests::fifo_retention ... ok
+[2026-10-09T00:22:32.546-04:00] test objective_observation::tests::scalar_bits ... ok
+[2026-10-09T00:22:32.546-04:00] test objective_observation::tests::schema_retention ... ok
+[2026-10-09T00:22:32.546-04:00] test objective_observation::tests::window_capacity ... ok
+[2026-10-09T00:22:32.546-04:00]
+[2026-10-09T00:22:32.546-04:00] test result: ok. 82 passed; 0 failed; 16 ignored; 0 measured; 0 filtered out; finished in 8.24s
+[2026-10-09T00:22:32.546-04:00]
+[2026-10-09T00:22:32.546-04:00]
+[2026-10-09T00:22:32.546-04:00] ---- STDERR ----
+[2026-10-09T00:22:32.546-04:00]
+[2026-10-09T00:22:32.649-04:00] ✓ Pass: root//rust/crates/blckbaux:weakmathgold_test (0.1s)
+[2026-10-09T00:22:32.649-04:00] ---- STDOUT ----
+[2026-10-09T00:22:32.649-04:00]
+[2026-10-09T00:22:32.649-04:00] running 3 tests
+[2026-10-09T00:22:32.649-04:00] test weak_golden ... ok
+[2026-10-09T00:22:32.649-04:00] test weak_order ... ok
+[2026-10-09T00:22:32.649-04:00] test weak_whatif ... ok
+[2026-10-09T00:22:32.649-04:00]
+[2026-10-09T00:22:32.649-04:00] test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+[2026-10-09T00:22:32.649-04:00]
+[2026-10-09T00:22:32.649-04:00]
+[2026-10-09T00:22:32.649-04:00] ---- STDERR ----
+[2026-10-09T00:22:32.649-04:00]
+[2026-10-09T00:22:32.751-04:00] ✓ Pass: root//rust/crates/blckbaux:model_access_test (0.1s)
+[2026-10-09T00:22:32.751-04:00] ---- STDOUT ----
+[2026-10-09T00:22:32.751-04:00]
+[2026-10-09T00:22:32.751-04:00] running 1 test
+[2026-10-09T00:22:32.751-04:00] test model_access ... ok
+[2026-10-09T00:22:32.751-04:00]
+[2026-10-09T00:22:32.751-04:00] test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+[2026-10-09T00:22:32.751-04:00]
+[2026-10-09T00:22:32.751-04:00]
+[2026-10-09T00:22:32.751-04:00] ---- STDERR ----
+[2026-10-09T00:22:32.751-04:00]
+[2026-10-09T00:22:33.029-04:00] ✓ Pass: root//rust/crates/blckbaux:flame_metaltest_test (0.3s)
+[2026-10-09T00:22:33.029-04:00] ---- STDOUT ----
+[2026-10-09T00:22:33.029-04:00]
+[2026-10-09T00:22:33.029-04:00] running 10 tests
+[2026-10-09T00:22:33.029-04:00] test apple_gpu::tests::maps_generations ... ok
+[2026-10-09T00:22:33.029-04:00] test apple_gpu::tests::shared_buffers ... ok
+[2026-10-09T00:22:33.029-04:00] test flame_metal::tests::checkpoint_reg ... ignored, Loads the original 2.6 GB BF16 checkpoint from BLCKBAUX_FLAME_CHECKPOINT or .cache/flame-290m
+[2026-10-09T00:22:33.029-04:00] test flame_metal::tests::layout_workspace ... ok
+[2026-10-09T00:22:33.029-04:00] test flame_metal::tests::logits_recovery ... ok
+[2026-10-09T00:22:33.029-04:00] test flame_metal::tests::logits_workspace ... ok
+[2026-10-09T00:22:33.029-04:00] test flame_metal::tests::overflow_guards ... ok
+[2026-10-09T00:22:33.029-04:00] test flame_metal::tests::router_ties ... ok
+[2026-10-09T00:22:33.029-04:00] test flame_metal::tests::scalar_parity ... ok
+[2026-10-09T00:22:33.029-04:00] test flame_metal::tests::tiles_bf16 ... ok
+[2026-10-09T00:22:33.029-04:00]
+[2026-10-09T00:22:33.029-04:00] test result: ok. 9 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.21s
+[2026-10-09T00:22:33.029-04:00]
+[2026-10-09T00:22:33.029-04:00]
+[2026-10-09T00:22:33.029-04:00] ---- STDERR ----
+[2026-10-09T00:22:33.029-04:00]
+[2026-10-09T00:22:33.177-04:00] ✓ Pass: root//rust/crates/blckbaux:turbo-enn-test (0.1s)
+[2026-10-09T00:22:33.177-04:00] ---- STDOUT ----
+[2026-10-09T00:22:33.177-04:00]
+[2026-10-09T00:22:33.177-04:00] running 14 tests
+[2026-10-09T00:22:33.177-04:00] test tui_canvas::tests::test_clip ... ok
+[2026-10-09T00:22:33.177-04:00] test tui_canvas::tests::test_monotonic ... ok
+[2026-10-09T00:22:33.177-04:00] test tui_canvas::tests::test_sparkline ... ok
+[2026-10-09T00:22:33.177-04:00] test tui_canvas::tests::test_unicode ... ok
+[2026-10-09T00:22:33.177-04:00] test tui_canvas::tests::test_bounds ... ok
+[2026-10-09T00:22:33.177-04:00] test tests::round_display ... ok
+[2026-10-09T00:22:33.177-04:00] test tui_dashboard::tests::test_dashboard ... ok
+[2026-10-09T00:22:33.177-04:00] test tune_output::tests::legacy_records ... ok
+[2026-10-09T00:22:33.177-04:00] test tune_output::tests::native_label ... ok
+[2026-10-09T00:22:33.177-04:00] test tune_output::tests::test_generation ... ok
+[2026-10-09T00:22:33.177-04:00] test tests::closed_terminal ... ok
+[2026-10-09T00:22:33.177-04:00] test tests::streams ... ok
+[2026-10-09T00:22:33.177-04:00] test tests::slow_terminal ... ok
+[2026-10-09T00:22:33.177-04:00] test tests::live_output ... ok
+[2026-10-09T00:22:33.177-04:00]
+[2026-10-09T00:22:33.177-04:00] test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+[2026-10-09T00:22:33.177-04:00]
+[2026-10-09T00:22:33.177-04:00]
+[2026-10-09T00:22:33.177-04:00] ---- STDERR ----
+[2026-10-09T00:22:33.177-04:00]
+[2026-10-09T00:22:34.484-04:00] ✓ Pass: root//rust/crates/dev-cli:blckbaux-test (1.3s)
+[2026-10-09T00:22:34.484-04:00] ---- STDOUT ----
+[2026-10-09T00:22:34.484-04:00]
+[2026-10-09T00:22:34.484-04:00] running 48 tests
+[2026-10-09T00:22:34.484-04:00] test corpus::tests::branching_paths ... ok
+[2026-10-09T00:22:34.484-04:00] test corpus::tests::epsilon_output ... ok
+[2026-10-09T00:22:34.484-04:00] test corpus::tests::provenance ... ok
+[2026-10-09T00:22:34.484-04:00] test corpus::tests::seeds ... ok
+[2026-10-09T00:22:34.484-04:00] test eval::tests::deterministic_noise ... ok
+[2026-10-09T00:22:34.484-04:00] test eval::tests::median_edges ... ok
+[2026-10-09T00:22:34.484-04:00] test eval::tests::invalid_suites ... ok
+[2026-10-09T00:22:34.484-04:00] test catalog::tests::checkpoint_axis ... ok
+[2026-10-09T00:22:34.484-04:00] test eval::tests::task_optima ... ok
+[2026-10-09T00:22:34.484-04:00] test experiment::tests::experiment_dispatch ... ok
+[2026-10-09T00:22:34.484-04:00] test experiment::tests::knn_config2 ... ok
+[2026-10-09T00:22:34.484-04:00] test experiment::tests::array_names ... ok
+[2026-10-09T00:22:34.484-04:00] test experiment::tests::knn_running ... ok
+[2026-10-09T00:22:34.484-04:00] test experiment::tests::catalog_options ... ok
+[2026-10-09T00:22:34.484-04:00] test catalog::tests::export_paths ... ok
+[2026-10-09T00:22:34.484-04:00] test experiment::tests::menu_dispatch ... ok
+[2026-10-09T00:22:34.484-04:00] test experiment::tests::parses_budget ... ok
+[2026-10-09T00:22:34.484-04:00] test experiment::tests::parses_config ... ok
+[2026-10-09T00:22:34.484-04:00] test experiment::tests::opt_dispatch ... ok
+[2026-10-09T00:22:34.484-04:00] test experiment::tests::rejects_running ... ok
+[2026-10-09T00:22:34.484-04:00] test experiment::tests::prepare_flag ... ok
+[2026-10-09T00:22:34.484-04:00] test kernel_search::measure::tests::numerical_contract ... ok
+[2026-10-09T00:22:34.484-04:00] test kernel_search::measure::tests::threshold_gate ... ok
+[2026-10-09T00:22:34.484-04:00] test kernel_search::measure::tests::timing_edges ... ok
+[2026-10-09T00:22:34.484-04:00] test kernel_search::measure::tests::evidence_gate ... ok
+[2026-10-09T00:22:34.484-04:00] test kernel_search::measure::tests::trajectory_gate ... ok
+[2026-10-09T00:22:34.484-04:00] test kernel_search::measure::tests::wholeloop_gate ... ok
+[2026-10-09T00:22:34.484-04:00] test experiment::tests::malformed_work ... ok
+[2026-10-09T00:22:34.484-04:00] test kernel_search::tests::exclusive_dispatch ... ok
+[2026-10-09T00:22:34.484-04:00] test experiment::tests::ordinary_options ... ok
+[2026-10-09T00:22:34.484-04:00] test kernel_search::tests::manifest_guards ... ok
+[2026-10-09T00:22:34.484-04:00] test kernel_search::tests::shader_contract ... ok
+[2026-10-09T00:22:34.484-04:00] test kernel_search::tests::manifest_roundtrip ... ok
+[2026-10-09T00:22:34.484-04:00] test protocol::tests::corpus_files ... ok
+[2026-10-09T00:22:34.484-04:00] test protocol::tests::corpus_identity ... ok
+[2026-10-09T00:22:34.484-04:00] test protocol::tests::paired_reps ... ok
+[2026-10-09T00:22:34.484-04:00] test protocol::tests::threshold_arms ... ok
+[2026-10-09T00:22:34.484-04:00] test protocol_analysis::tests::curve_auc ... ok
+[2026-10-09T00:22:34.484-04:00] test radar::performance::tests::p95_tail ... ok
+[2026-10-09T00:22:34.484-04:00] test kernel_search::measure::tests::worker_coverage ... ok
+[2026-10-09T00:22:34.484-04:00] test kernel_search::tests::trial_roundtrip ... ok
+[2026-10-09T00:22:34.484-04:00] test kernel_search::tests::archive_replay ... ok
+[2026-10-09T00:22:34.484-04:00] test catalog::tests::actual_constraints ... ok
+[2026-10-09T00:22:34.484-04:00] test catalog::tests::coverage_counts ... ok
+[2026-10-09T00:22:34.484-04:00] test kernel_search::measure::tests::worker_timeout ... ok
+[2026-10-09T00:22:34.484-04:00] test catalog::tests::stable_unique ... ok
+[2026-10-09T00:22:34.484-04:00] test catalog::tests::vector_payloads ... ok
+[2026-10-09T00:22:34.484-04:00] test catalog::tests::purpose_gate ... ok
+[2026-10-09T00:22:34.484-04:00]
+[2026-10-09T00:22:34.484-04:00] test result: ok. 48 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.19s
+[2026-10-09T00:22:34.484-04:00]
+[2026-10-09T00:22:34.484-04:00]
+[2026-10-09T00:22:34.484-04:00] ---- STDERR ----
+[2026-10-09T00:22:34.484-04:00]
+[2026-10-09T00:22:34.610-04:00] ✓ Pass: root//rust/crates/blckbaux:disksaveidx_test (0.1s)
+[2026-10-09T00:22:34.610-04:00] ---- STDOUT ----
+[2026-10-09T00:22:34.610-04:00]
+[2026-10-09T00:22:34.610-04:00] running 3 tests
+[2026-10-09T00:22:34.610-04:00] test disk_correct ... ok
+[2026-10-09T00:22:34.610-04:00] test disk_index2 ... ok
+[2026-10-09T00:22:34.610-04:00] test schedule_persist ... ok
+[2026-10-09T00:22:34.610-04:00]
+[2026-10-09T00:22:34.610-04:00] test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+[2026-10-09T00:22:34.610-04:00]
+[2026-10-09T00:22:34.610-04:00]
+[2026-10-09T00:22:34.610-04:00] ---- STDERR ----
+[2026-10-09T00:22:34.610-04:00]
+[2026-10-09T00:22:34.786-04:00] ✓ Pass: root//rust/crates/blckbaux:trial_search_test (0.2s)
+[2026-10-09T00:22:34.786-04:00] ---- STDOUT ----
+[2026-10-09T00:22:34.786-04:00]
+[2026-10-09T00:22:34.786-04:00] running 11 tests
+[2026-10-09T00:22:34.786-04:00] test cpu_repeatable ... ok
+[2026-10-09T00:22:34.786-04:00] test dense_directions ... ok
+[2026-10-09T00:22:34.786-04:00] test linear_eval ... ok
+[2026-10-09T00:22:34.786-04:00] test metal_bpann ... ok
+[2026-10-09T00:22:34.786-04:00] test metal_bytes ... ok
+[2026-10-09T00:22:34.786-04:00] test metal_centers ... ok
+[2026-10-09T00:22:34.786-04:00] test metal_history ... ok
+[2026-10-09T00:22:34.786-04:00] test metal_reduction ... ok
+[2026-10-09T00:22:34.786-04:00] test metal_regions ... ok
+[2026-10-09T00:22:34.786-04:00] test metal_shortlist ... ok
+[2026-10-09T00:22:34.786-04:00] test metal_updates ... ok
+[2026-10-09T00:22:34.786-04:00]
+[2026-10-09T00:22:34.786-04:00] test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.09s
+[2026-10-09T00:22:34.786-04:00]
+[2026-10-09T00:22:34.786-04:00]
+[2026-10-09T00:22:34.786-04:00] ---- STDERR ----
+[2026-10-09T00:22:34.786-04:00]
+[2026-10-09T00:22:34.792-04:00] Cache hits: 0%
+[2026-10-09T00:22:34.792-04:00] Commands: 25 (cached: 0, remote: 0, local: 25)
+[2026-10-09T00:22:34.792-04:00] Network: up 0B  down 0B
+Tests finished: [mPass 25[m. [mFail 1[m. Timeout 0. Fatal 0. Skip 0. Omit 0. Infra Failure 0. Build failure 0
+1 TESTS FAILED
+  ✗ root//rust/crates/blckbaux:blckbaux-unit (prelude//platforms:default#9cddb5969014779c)
+blckbaux: command exited with exit status: 32

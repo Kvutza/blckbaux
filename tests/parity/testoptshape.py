@@ -3,10 +3,10 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from ennx import create_optimizer, turbo_zero
-from ennx.turbo.config.encode import supports
+from blckbaux import create_optimizer, turbo_zero
+from blckbaux.turbo.config.encode import supports
 
-pytest.importorskip("ennx._rust")
+pytest.importorskip("blckbaux._rust")
 
 
 def test_fixedcandidatecount():

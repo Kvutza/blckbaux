@@ -4,21 +4,39 @@ use std::os::unix::ffi::OsStrExt;
 use std::path::PathBuf;
 use std::sync::{Arc, OnceLock};
 
+use blckbaux_cuda_device::trials;
+pub use blckbaux_cuda_device::{
+    BatchValue, Bf16Change, Bf16Leaf, Bf16Score, CenterStep, DenseLeaf, DenseLinearParams,
+    DenseTerm, DenseTile, FbtShape, FeedbackShape, KNN_K, Leaf, MAX_DEPTH, MAX_HISTORY,
+    MatmulShape, MoeShape, ObjectiveShape, PisaShape, RouteShape, RoutedTile, ScoreStats,
+    SearchState, Seed, Selection, SparseEdit, THREADS, TellParams, TellSummary, Tile, fbt_model,
+};
 use cuda_core::{
     CudaContext, CudaEvent, CudaStream, DeviceBuffer, DeviceCopy, IntoResult, LaunchConfig1D,
     simt::LaunchConfig,
 };
 use cuda_host::embedded::{ArtifactPayloadKind, EmbeddedModuleError, OwnedArtifactBundle};
-use ennx_cuda_kernels::trials;
-pub use ennx_cuda_kernels::{
-    BatchValue, Bf16Change, Bf16Leaf, Bf16Score, CenterStep, DenseLeaf, DenseLinearParams,
-    DenseTerm, DenseTile, FbtShape, FeedbackShape, KNN_K, Leaf, MAX_DEPTH, MAX_HISTORY,
-    MatmulShape, MoeShape, PisaShape, RouteShape, RoutedTile, SearchState, Seed, Selection,
-    SparseEdit, THREADS, TellParams, TellSummary, Tile, fbt_model,
-};
 
 pub type CudaResult<T> = Result<T, String>;
+
+pub fn target_name(context: &CudaContext) -> CudaResult<&'static str> {
+    let (major, minor) = context.compute_capability().map_err(cuda_error)?;
+    ptx_synth::TargetArch::from_compute(major, minor)
+        .map(|target| target.ptx_target())
+        .ok_or_else(|| format!("unsupported compute capability {major}.{minor}"))
+}
+
+pub fn device_target() -> CudaResult<&'static str> {
+    let context = CudaContext::new(0).map_err(cuda_error)?;
+    target_name(&context)
+}
+
+pub use blckbaux_semantics::optimizer::calibration;
 pub mod gemm;
+mod graph;
+mod hnet_probe;
+pub mod muon;
+pub mod neighbors;
 mod precision;
 
 /// Verify column-major checkpoint packing and token-major device lookup with
@@ -161,9 +179,12 @@ pub use knn::{
     BatchOutput, BatchSpec, CudaIndex, DrawOutput, KnnProfile, PosteriorOutput, PosteriorSpec,
     WeightedOutput, WeightedSpec,
 };
+pub use model::run::initialized_check;
 pub use model::run::{
-    bench as generation_bench, check as model_check, generate as model_generate, run as model_run,
+    bench as generation_bench, check as model_check, generate as model_generate, hnet_bench,
+    hnet_bo_bench, run as model_run,
 };
+pub use model::weights::proposal_check;
 pub use model::{FbtModel, GenerationOutput, ModelOutput, WaveProfile};
 pub use prefill::{FbtPrefill, FbtPrefillProfile};
 
@@ -193,12 +214,12 @@ fn containing_binary() -> CudaResult<PathBuf> {
         )
     } == 0
     {
-        return Err("dladdr could not locate the ENNx CUDA host library".to_string());
+        return Err("dladdr could not locate the Blckbaux CUDA host library".to_string());
     }
     // SAFETY: a successful dladdr call initialized `info`.
     let info = unsafe { info.assume_init() };
     if info.filename.is_null() {
-        return Err("dladdr returned no ENNx CUDA host library path".to_string());
+        return Err("dladdr returned no Blckbaux CUDA host library path".to_string());
     }
     // SAFETY: dladdr owns a NUL-terminated filename for the loaded object.
     let bytes = unsafe { CStr::from_ptr(info.filename) }.to_bytes();
@@ -217,11 +238,11 @@ fn trial_bundle() -> CudaResult<&'static OwnedArtifactBundle> {
                     )
                 })?
                 .into_iter()
-                .find(|bundle| bundle.name == ennx_cuda_kernels::MODULE_NAME)
+                .find(|bundle| bundle.name == blckbaux_cuda_device::MODULE_NAME)
                 .ok_or_else(|| {
                     format!(
                         "embedded CUDA module {:?} was not found in {}",
-                        ennx_cuda_kernels::MODULE_NAME,
+                        blckbaux_cuda_device::MODULE_NAME,
                         path.display()
                     )
                 })
@@ -292,24 +313,25 @@ impl Runtime {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct Ask {
+pub struct RoundConfig {
     pub neighbors: usize,
     pub acquisition: u32,
     pub epistemic_scale: f32,
     pub aleatoric_scale: f32,
     pub y_scale: f32,
     pub beta: f32,
+    pub adaptive_neighbors: bool,
 }
 
 #[derive(Debug, Clone, Copy, Default)]
-pub struct AskProfile {
+pub struct ProposalProfile {
     pub score_ms: f32,
     pub pick_ms: f32,
     pub materialize_ms: f32,
     pub total_ms: f32,
 }
 
-struct AskEvents {
+struct ProposalEvents {
     score_start: CudaEvent,
     score_end: CudaEvent,
     pick_end: CudaEvent,
@@ -415,7 +437,7 @@ pub struct TrialEngine {
     slots: usize,
     scratch: Scratch,
     profiling: bool,
-    last_profile: Option<AskProfile>,
+    last_profile: Option<ProposalProfile>,
 }
 
 impl TrialEngine {
@@ -472,7 +494,7 @@ impl TrialEngine {
         seeds: &[u64],
         draws: &[f32],
         leaves: &[Leaf],
-        config: Ask,
+        config: RoundConfig,
         materialize_row: bool,
     ) -> CudaResult<(usize, f32)> {
         let (selections, _) = self.ask_impl(
@@ -505,7 +527,7 @@ impl TrialEngine {
         seeds: &[u64],
         draws: &[f32],
         leaves: &[Leaf],
-        config: Ask,
+        config: RoundConfig,
         materialize_row: bool,
     ) -> CudaResult<(usize, Vec<f32>)> {
         let (selections, scores) = self.ask_impl(
@@ -540,7 +562,7 @@ impl TrialEngine {
         edits: &[SparseEdit],
         num_pert: usize,
         leaves: &[Leaf],
-        config: Ask,
+        config: RoundConfig,
     ) -> CudaResult<(usize, f32)> {
         self.check_slot(base_slot)?;
         self.check_slot(trial_slot)?;
@@ -730,7 +752,7 @@ impl TrialEngine {
         centers: &[CenterStep],
         region_centers: &[u32],
         leaves: &[Leaf],
-        config: Ask,
+        config: RoundConfig,
     ) -> CudaResult<Vec<(usize, f32)>> {
         let (selections, _) = self.ask_impl(
             base_slot,
@@ -768,7 +790,7 @@ impl TrialEngine {
         centers: &[CenterStep],
         region_centers: &[u32],
         leaves: &[Leaf],
-        config: Ask,
+        config: RoundConfig,
         materialize_row: bool,
         read_scores: bool,
     ) -> CudaResult<(Vec<Selection>, Vec<f32>)> {
@@ -883,7 +905,7 @@ impl TrialEngine {
                 0,
             ))
             .map_err(cuda_error)?;
-        let profile = self.profiling || std::env::var_os("ENNX_CUDA_PROFILE").is_some();
+        let profile = self.profiling || std::env::var_os("BLCKBAUX_CUDA_PROFILE").is_some();
         let score_start = profile
             .then(|| timing_event(&self.runtime.stream))
             .transpose()?;
@@ -962,7 +984,7 @@ impl TrialEngine {
         };
         self.last_profile = match (score_start, score_end, pick_end) {
             (Some(score_start), Some(score_end), Some(pick_end)) => {
-                let events = AskEvents {
+                let events = ProposalEvents {
                     score_start,
                     score_end,
                     pick_end,
@@ -976,7 +998,7 @@ impl TrialEngine {
         Ok((selections, scores))
     }
 
-    pub fn last_profile(&self) -> Option<AskProfile> {
+    pub fn last_profile(&self) -> Option<ProposalProfile> {
         self.last_profile
     }
 
@@ -1114,10 +1136,10 @@ impl TrialEngine {
     }
 }
 
-impl AskEvents {
-    fn profile(&self) -> CudaResult<AskProfile> {
+impl ProposalEvents {
+    fn profile(&self) -> CudaResult<ProposalProfile> {
         let end = self.materialize_end.as_ref().unwrap_or(&self.pick_end);
-        Ok(AskProfile {
+        Ok(ProposalProfile {
             score_ms: self
                 .score_start
                 .elapsed_ms(&self.score_end)
@@ -1144,7 +1166,7 @@ fn timing_event(stream: &CudaStream) -> CudaResult<CudaEvent> {
         .map_err(cuda_error)
 }
 
-fn set_profile(enabled: bool, profiling: &mut bool, profile: &mut Option<AskProfile>) {
+fn set_profile(enabled: bool, profiling: &mut bool, profile: &mut Option<ProposalProfile>) {
     *profiling = enabled;
     if !enabled {
         *profile = None;
@@ -1219,7 +1241,7 @@ pub fn dense_apply(
         block_dim: (THREADS, 1, 1),
         shared_mem_bytes: 0,
     };
-    // SAFETY: validation in ENNx guarantees complete, disjoint leaves. Each
+    // SAFETY: validation in Blckbaux guarantees complete, disjoint leaves. Each
     // CUDA block owns one tile and each tile thread owns distinct outputs.
     unsafe {
         runtime
@@ -1276,7 +1298,7 @@ impl Bf16Engine {
         Ok(engine)
     }
 
-    /// Copy a contiguous BF16 CUDA allocation into persistent ENNx storage.
+    /// Copy a contiguous BF16 CUDA allocation into persistent Blckbaux storage.
     ///
     /// # Safety
     /// `pointer` must address at least `len * 2` readable bytes on CUDA device 0.
@@ -1546,6 +1568,9 @@ impl DenseLinearEngine {
     }
 }
 
+/// Upload a borrowed host slice. Completion precedes return, so callers may
+/// immediately mutate or drop the source; raw async copies do not provide
+/// that lifetime guarantee, even when pageable transfers often finish early.
 fn copy_prefix<T: DeviceCopy>(
     buffer: &DeviceBuffer<T>,
     values: &[T],
@@ -1561,15 +1586,23 @@ fn copy_prefix<T: DeviceCopy>(
     if values.is_empty() {
         return Ok(());
     }
-    unsafe {
+    if !std::sync::Arc::ptr_eq(buffer.context(), stream.context()) {
+        return Err("CUDA upload buffer and stream have different contexts".into());
+    }
+    stream.context().bind_to_thread().map_err(cuda_error)?;
+    // SAFETY: checked capacity/context, and the borrowed source remains alive
+    // through the stream synchronization below, including the enqueue-error path.
+    let enqueued = unsafe {
         cuda_core::simt::memory::memcpy_htod_async(
             buffer.cu_deviceptr(),
             values.as_ptr(),
             size_of_val(values),
             stream.cu_stream(),
         )
-        .map_err(cuda_error)
-    }
+    };
+    let completed = stream.synchronize();
+    enqueued.map_err(cuda_error)?;
+    completed.map_err(cuda_error)
 }
 
 fn read_prefix<T: DeviceCopy>(

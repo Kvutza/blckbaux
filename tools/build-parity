@@ -2,6 +2,6 @@
 set -eu
 cd "$(dirname "$0")/.."
 case "${1:-}" in
-    --sync) shift; exec cargo run --offline --quiet -p ennx-dev-cli --bin build-graph -- "$@" ;;
-    *) exec cargo run --offline --quiet -p ennx-dev-cli --bin build-graph -- --check --parity "$@" ;;
+    --sync) shift; exec cargo run --offline --quiet -p blckbaux-tooling --bin build-graph -- "$@" ;;
+    *) exec cargo run --offline --quiet -p blckbaux-tooling --bin build-graph -- --check --parity "$@" ;;
 esac

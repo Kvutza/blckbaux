@@ -1,0 +1,26 @@
+o|runtime · load experiment engine
+o|prepare · resolve configuration and corpus
+o|prepare · ready · 0.3s
+Working copy  (@) now at: wkpxokmv 6c961858 (empty) (no description set)
+Parent commit (@-)      : qvzyylow 251c4118 (no description set)
+o|snapshot · 251c41181b91
+o|build · experiment runner and worker
+o|build · ready · 2.2s
+o|launch · pretraining
+o|pretraining
+o|plan · fbt-pisa1-hnet-mhc4-v1 · turbo-enn · 128 rounds · 200ms target
+b| capacity · 1048576 context · allocation budget 524288 prompt / 524288 generation
+b| objective · conditional-cross-entropy · validation at powers of two and every 128 rounds
+o|compile and allocate · running
+o|compile and allocate · 1.0s
+o|load corpus · running
+o|load corpus · 0.0s
+o|initialize weights and search · running
+h|working · 2sh|working · 3sh|working · 4sh|working · 5sh|working · 6sh|working · 7sh|working · 8sh|working · 9sh|working · 10sh|working · 11sh|working · 13sh|working · 14sh|working · 15sh|working · 16sh|working · 17sh|working · 18sh|working · 19sh|working · 20sh|working · 21sh|working · 22sh|working · 23sh|working · 24sh|working · 25sh|working · 26sh|working · 27sh|working · 28sh|working · 29sh|working · 30sh|working · 31sh|working · 32sh|working · 33sh|working · 34sh|working · 35sh|working · 37sh|working · 38sh|working · 39sh|working · 40sh|working · 41sh|working · 42sh|working · 43sh|working · 44sh|working · 45sh|working · 46sh|working · 47sh|working · 48sh|working · 49sh|working · 50sh|working · 51sh|working · 52sh|working · 53sh|working · 54sh|working · 55sh|working · 56sh|working · 57sh|working · 58sh|working · 59sh|working · 61sh|working · 62sh|working · 63sh|working · 64sh|working · 65sh|working · 66sh|working · 67sh|working · 68sh|working · 69sh|working · 70sh|working · 71st| initialized fbt-pisa1-hnet-mhc4-v1; no checkpoint loaded
+h|working · 2sh|working · 3sh|working · 4sh|working · 5sh|working · 6sh|working · 7sh|working · 8sh|working · 9sh|working · 10so|initialize weights and search · 82.6s
+o|initial score and validation · running
+b| preview "Sequelږد acupuncture瓷 réfl मजबはや🥓 banda ल\u{947}सनAVY Widers intersecting紅白 ответствен vacancies caesar і"
+h|working · 2sh|working · 3sh|working · 4sh|working · 5sh|working · 6sh|working · 7sh|working · 8sh|working · 9sh|working · 10sh|working · 11sh|working · 12sh|working · 14sh|working · 15sh|working · 16sh|working · 17sh|working · 18sh|working · 19sh|working · 20sh|working · 21sh|working · 22sh|working · 23sh|working · 24sh|working · 25sh|working · 26sh|working · 27sh|working · 28sh|working · 29sh|working · 30sh|working · 31sh|working · 32sh|working · 33sh|working · 34sh|working · 35sh|working · 36sh|working · 37sh|working · 38sh|working · 40sm| validation initial · 32 tasks · bits_per_token 18.015818 · 40.6s
+o|initial score and validation · 42.1s
+o|optimization loop · running
+h|working · 2sh|working · 3sh|working · 4sh|working · 5sh|working · 6sh|working · 7sh|working · 8sh|working · 9sh|working · 10sh|working · 11sh|working · 12sh|working · 13sh|working · 15sh|working · 16sh|working · 17sh|working · 18sh|working · 19sh|working · 20sh|working · 21sh|working · 22sh|working · 23sh|working · 24sh|working · 25sh|working · 26sh|working · 27sh|working · 28sh|working · 29sh|working · 30sh|working · 31sh|working · 32sh|working · 33sh|working · 34sh|working · 35sh|working · 36sh|working · 37sh|working · 39sh|working · 40sh|working · 41sh|working · 42sh|working · 43sh|working · 44sh|working · 45sh|working · 46sh|working · 47sh|working · 48sh|working · 49sh|working · 50sh|working · 51sh|working · 52sh|working · 53sh|working · 54sh|working · 55sh|working · 56sh|working · 57s

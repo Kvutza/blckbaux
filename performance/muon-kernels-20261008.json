@@ -1,0 +1,563 @@
+{
+  "schema": "blckbaux.muon-baseline.v1",
+  "model": "fbt-pisa1-hnet-mhc4-v1",
+  "scope": "optimizer kernels on model-shaped arithmetic fixtures",
+  "full-training-loop": false,
+  "context-tokens": 0,
+  "generated-tokens": 0,
+  "evaluated-tokens": 0,
+  "committed-tokens": 0,
+  "metal": {
+    "schema": "blckbaux.muon-kernels.v1",
+    "hardware": "Apple M4",
+    "variant": "polar-express-5",
+    "full-training-loop": false,
+    "gradient": "fixed-arithmetic-fixture",
+    "records": [
+      {
+        "rows": 32,
+        "cols": 48,
+        "batch": 2,
+        "repeat": 0,
+        "warmup": true,
+        "encode-ms": 56.146665999999996,
+        "wall-ms": 56.977125,
+        "gpu-ms": 0.17366667452733964,
+        "state-bytes": 24576,
+        "workspace-bytes": 32784,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 32,
+        "cols": 48,
+        "batch": 2,
+        "repeat": 1,
+        "warmup": false,
+        "encode-ms": 0.6641670000000001,
+        "wall-ms": 1.241417,
+        "gpu-ms": 0.17025000124704093,
+        "state-bytes": 24576,
+        "workspace-bytes": 32784,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 32,
+        "cols": 48,
+        "batch": 2,
+        "repeat": 2,
+        "warmup": false,
+        "encode-ms": 0.577584,
+        "wall-ms": 1.1351250000000002,
+        "gpu-ms": 0.17025000124704093,
+        "state-bytes": 24576,
+        "workspace-bytes": 32784,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 32,
+        "cols": 48,
+        "batch": 2,
+        "repeat": 3,
+        "warmup": false,
+        "encode-ms": 0.623208,
+        "wall-ms": 1.187125,
+        "gpu-ms": 0.17050000315066427,
+        "state-bytes": 24576,
+        "workspace-bytes": 32784,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 512,
+        "cols": 640,
+        "batch": 5,
+        "repeat": 0,
+        "warmup": true,
+        "encode-ms": 1.8115830000000002,
+        "wall-ms": 21.660333,
+        "gpu-ms": 18.543541664257646,
+        "state-bytes": 13107200,
+        "workspace-bytes": 18350900,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 512,
+        "cols": 640,
+        "batch": 5,
+        "repeat": 1,
+        "warmup": false,
+        "encode-ms": 0.602458,
+        "wall-ms": 10.216958,
+        "gpu-ms": 8.977874997071922,
+        "state-bytes": 13107200,
+        "workspace-bytes": 18350900,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 512,
+        "cols": 640,
+        "batch": 5,
+        "repeat": 2,
+        "warmup": false,
+        "encode-ms": 0.663417,
+        "wall-ms": 10.451666999999999,
+        "gpu-ms": 9.024166662129574,
+        "state-bytes": 13107200,
+        "workspace-bytes": 18350900,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 512,
+        "cols": 640,
+        "batch": 5,
+        "repeat": 3,
+        "warmup": false,
+        "encode-ms": 0.579708,
+        "wall-ms": 10.339915999999999,
+        "gpu-ms": 9.014333336381242,
+        "state-bytes": 13107200,
+        "workspace-bytes": 18350900,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 512,
+        "cols": 432,
+        "batch": 626,
+        "repeat": 0,
+        "warmup": true,
+        "encode-ms": 3.030125,
+        "wall-ms": 1523.009042,
+        "gpu-ms": 1477.8039999946486,
+        "state-bytes": 1107689472,
+        "workspace-bytes": 1575066080,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 512,
+        "cols": 432,
+        "batch": 626,
+        "repeat": 1,
+        "warmup": false,
+        "encode-ms": 0.854916,
+        "wall-ms": 1588.387041,
+        "gpu-ms": 1585.8442499884404,
+        "state-bytes": 1107689472,
+        "workspace-bytes": 1575066080,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 512,
+        "cols": 432,
+        "batch": 626,
+        "repeat": 2,
+        "warmup": false,
+        "encode-ms": 0.700833,
+        "wall-ms": 1639.3649169999999,
+        "gpu-ms": 1637.1317083248869,
+        "state-bytes": 1107689472,
+        "workspace-bytes": 1575066080,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 512,
+        "cols": 432,
+        "batch": 626,
+        "repeat": 3,
+        "warmup": false,
+        "encode-ms": 0.906458,
+        "wall-ms": 1621.4847080000002,
+        "gpu-ms": 1619.019791658502,
+        "state-bytes": 1107689472,
+        "workspace-bytes": 1575066080,
+        "invalid-weights": 0
+      }
+    ],
+    "parity": {
+      "reference": "fp64",
+      "tolerance": 0.001,
+      "passed": true,
+      "records": [
+        {
+          "optimizer": "muon",
+          "rows": 3,
+          "cols": 5,
+          "round": 0,
+          "max-abs-error": 0.00025760508682060035
+        },
+        {
+          "optimizer": "muon",
+          "rows": 3,
+          "cols": 5,
+          "round": 1,
+          "max-abs-error": 0.00017504743018914581
+        },
+        {
+          "optimizer": "muon",
+          "rows": 3,
+          "cols": 5,
+          "round": 2,
+          "max-abs-error": 0.0002428669327738664
+        },
+        {
+          "optimizer": "muon",
+          "rows": 3,
+          "cols": 5,
+          "round": 3,
+          "max-abs-error": 0.00026397370884756466
+        },
+        {
+          "optimizer": "muon",
+          "rows": 5,
+          "cols": 3,
+          "round": 0,
+          "max-abs-error": 0.0002329639558011909
+        },
+        {
+          "optimizer": "muon",
+          "rows": 5,
+          "cols": 3,
+          "round": 1,
+          "max-abs-error": 0.00028059007922021095
+        },
+        {
+          "optimizer": "muon",
+          "rows": 5,
+          "cols": 3,
+          "round": 2,
+          "max-abs-error": 0.0002791145982005139
+        },
+        {
+          "optimizer": "muon",
+          "rows": 5,
+          "cols": 3,
+          "round": 3,
+          "max-abs-error": 0.0002820973393827808
+        },
+        {
+          "optimizer": "muon",
+          "rows": 8,
+          "cols": 8,
+          "round": 0,
+          "max-abs-error": 0.00022975342157993683
+        },
+        {
+          "optimizer": "muon",
+          "rows": 8,
+          "cols": 8,
+          "round": 1,
+          "max-abs-error": 0.00022970191406890272
+        },
+        {
+          "optimizer": "muon",
+          "rows": 8,
+          "cols": 8,
+          "round": 2,
+          "max-abs-error": 0.00023400403525186686
+        },
+        {
+          "optimizer": "muon",
+          "rows": 8,
+          "cols": 8,
+          "round": 3,
+          "max-abs-error": 0.0002592514283620284
+        },
+        {
+          "optimizer": "adamw",
+          "round": 0,
+          "max-abs-error": 0.000028437383413904005
+        },
+        {
+          "optimizer": "adamw",
+          "round": 1,
+          "max-abs-error": 0.00023722019930383365
+        },
+        {
+          "optimizer": "adamw",
+          "round": 2,
+          "max-abs-error": 0.0002342344445158684
+        },
+        {
+          "optimizer": "adamw",
+          "round": 3,
+          "max-abs-error": 0.00023643614139445823
+        }
+      ]
+    }
+  },
+  "cuda": {
+    "schema": "blckbaux.muon-kernels.v1",
+    "hardware": "Tesla T4",
+    "variant": "polar-express-5",
+    "full-training-loop": false,
+    "gradient": "fixed-arithmetic-fixture",
+    "records": [
+      {
+        "rows": 32,
+        "cols": 48,
+        "batch": 2,
+        "repeat": 0,
+        "warmup": true,
+        "encode-ms": 0.15234499999999998,
+        "wall-ms": 0.25963499999999995,
+        "gpu-ms": 0.246464,
+        "state-bytes": 24576,
+        "workspace-bytes": 38928,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 32,
+        "cols": 48,
+        "batch": 2,
+        "repeat": 1,
+        "warmup": false,
+        "encode-ms": 0.14617,
+        "wall-ms": 0.25252199999999997,
+        "gpu-ms": 0.24384,
+        "state-bytes": 24576,
+        "workspace-bytes": 38928,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 32,
+        "cols": 48,
+        "batch": 2,
+        "repeat": 2,
+        "warmup": false,
+        "encode-ms": 0.126743,
+        "wall-ms": 0.249178,
+        "gpu-ms": 0.240896,
+        "state-bytes": 24576,
+        "workspace-bytes": 38928,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 32,
+        "cols": 48,
+        "batch": 2,
+        "repeat": 3,
+        "warmup": false,
+        "encode-ms": 0.134567,
+        "wall-ms": 0.24998,
+        "gpu-ms": 0.241792,
+        "state-bytes": 24576,
+        "workspace-bytes": 38928,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 512,
+        "cols": 640,
+        "batch": 5,
+        "repeat": 0,
+        "warmup": true,
+        "encode-ms": 0.16325,
+        "wall-ms": 24.072921,
+        "gpu-ms": 24.0584,
+        "state-bytes": 13107200,
+        "workspace-bytes": 21627700,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 512,
+        "cols": 640,
+        "batch": 5,
+        "repeat": 1,
+        "warmup": false,
+        "encode-ms": 0.144616,
+        "wall-ms": 24.06854,
+        "gpu-ms": 24.055777,
+        "state-bytes": 13107200,
+        "workspace-bytes": 21627700,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 512,
+        "cols": 640,
+        "batch": 5,
+        "repeat": 2,
+        "warmup": false,
+        "encode-ms": 0.139074,
+        "wall-ms": 24.096252,
+        "gpu-ms": 24.083424,
+        "state-bytes": 13107200,
+        "workspace-bytes": 21627700,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 512,
+        "cols": 640,
+        "batch": 5,
+        "repeat": 3,
+        "warmup": false,
+        "encode-ms": 0.154124,
+        "wall-ms": 24.048507,
+        "gpu-ms": 24.036415,
+        "state-bytes": 13107200,
+        "workspace-bytes": 21627700,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 512,
+        "cols": 432,
+        "batch": 626,
+        "repeat": 0,
+        "warmup": true,
+        "encode-ms": 0.173936,
+        "wall-ms": 1078.98919,
+        "gpu-ms": 1078.9912,
+        "state-bytes": 1107689472,
+        "workspace-bytes": 1851988448,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 512,
+        "cols": 432,
+        "batch": 626,
+        "repeat": 1,
+        "warmup": false,
+        "encode-ms": 0.17913400000000002,
+        "wall-ms": 1023.613471,
+        "gpu-ms": 1023.6141,
+        "state-bytes": 1107689472,
+        "workspace-bytes": 1851988448,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 512,
+        "cols": 432,
+        "batch": 626,
+        "repeat": 2,
+        "warmup": false,
+        "encode-ms": 0.164998,
+        "wall-ms": 1027.195214,
+        "gpu-ms": 1027.1975,
+        "state-bytes": 1107689472,
+        "workspace-bytes": 1851988448,
+        "invalid-weights": 0
+      },
+      {
+        "rows": 512,
+        "cols": 432,
+        "batch": 626,
+        "repeat": 3,
+        "warmup": false,
+        "encode-ms": 0.17856799999999998,
+        "wall-ms": 1028.645786,
+        "gpu-ms": 1028.6469,
+        "state-bytes": 1107689472,
+        "workspace-bytes": 1851988448,
+        "invalid-weights": 0
+      }
+    ],
+    "parity": {
+      "reference": "fp64",
+      "tolerance": 0.001,
+      "passed": true,
+      "records": [
+        {
+          "optimizer": "muon",
+          "rows": 3,
+          "cols": 5,
+          "round": 0,
+          "max-abs-error": 0.00025760508682060035
+        },
+        {
+          "optimizer": "muon",
+          "rows": 3,
+          "cols": 5,
+          "round": 1,
+          "max-abs-error": 0.00017504743018914581
+        },
+        {
+          "optimizer": "muon",
+          "rows": 3,
+          "cols": 5,
+          "round": 2,
+          "max-abs-error": 0.0002428669327738664
+        },
+        {
+          "optimizer": "muon",
+          "rows": 3,
+          "cols": 5,
+          "round": 3,
+          "max-abs-error": 0.00026397370884756466
+        },
+        {
+          "optimizer": "muon",
+          "rows": 5,
+          "cols": 3,
+          "round": 0,
+          "max-abs-error": 0.0002329639558011909
+        },
+        {
+          "optimizer": "muon",
+          "rows": 5,
+          "cols": 3,
+          "round": 1,
+          "max-abs-error": 0.00028059007922021095
+        },
+        {
+          "optimizer": "muon",
+          "rows": 5,
+          "cols": 3,
+          "round": 2,
+          "max-abs-error": 0.0002791145982005139
+        },
+        {
+          "optimizer": "muon",
+          "rows": 5,
+          "cols": 3,
+          "round": 3,
+          "max-abs-error": 0.0002820973393827808
+        },
+        {
+          "optimizer": "muon",
+          "rows": 8,
+          "cols": 8,
+          "round": 0,
+          "max-abs-error": 0.00022975342157993683
+        },
+        {
+          "optimizer": "muon",
+          "rows": 8,
+          "cols": 8,
+          "round": 1,
+          "max-abs-error": 0.00022970191406890272
+        },
+        {
+          "optimizer": "muon",
+          "rows": 8,
+          "cols": 8,
+          "round": 2,
+          "max-abs-error": 0.00023400403525186686
+        },
+        {
+          "optimizer": "muon",
+          "rows": 8,
+          "cols": 8,
+          "round": 3,
+          "max-abs-error": 0.0002592514283620284
+        },
+        {
+          "optimizer": "adamw",
+          "round": 0,
+          "max-abs-error": 0.000028437383413904005
+        },
+        {
+          "optimizer": "adamw",
+          "round": 1,
+          "max-abs-error": 0.00023722019930383365
+        },
+        {
+          "optimizer": "adamw",
+          "round": 2,
+          "max-abs-error": 0.0002342344445158684
+        },
+        {
+          "optimizer": "adamw",
+          "round": 3,
+          "max-abs-error": 0.00023643614139445823
+        }
+      ]
+    }
+  },
+  "missing": "Full model analytic backward and training-loop integration"
+}

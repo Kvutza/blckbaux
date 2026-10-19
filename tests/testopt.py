@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from ennx import create_optimizer, turbo_enn, turbo_one, turbo_zero
+from blckbaux import create_optimizer, turbo_enn, turbo_one, turbo_zero
 
 
 def _score(x: np.ndarray) -> np.ndarray:

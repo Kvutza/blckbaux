@@ -2,7 +2,7 @@
 set -eu
 
 action=${1:-}
-[ -n "$action" ] || { echo "ennx cuda: missing action" >&2; exit 2; }
+[ -n "$action" ] || { echo "blckbaux cuda: missing action" >&2; exit 2; }
 shift
 
 repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
@@ -19,23 +19,39 @@ export LLVM_CONFIG_PATH=${LLVM_CONFIG_PATH:-/usr/bin/llvm-config-21}
 export CARGO_PROFILE_RELEASE_LTO=false
 export PATH="$cargo_home/bin:/usr/lib/llvm-21/bin:$CUDA_HOME/bin:$PATH"
 
+cuda_arch=${BLCKBAUX_CUDA_ARCH:-}
+if [ -z "$cuda_arch" ]; then
+    compute_cap=$(nvidia-smi --query-gpu=compute_cap --format=csv,noheader,nounits -i 0 | sed -n '1p')
+    case "$compute_cap" in
+        7.5) cuda_arch=sm_75 ;;
+        8.0) cuda_arch=sm_80 ;;
+        9.0) cuda_arch=sm_90a ;;
+        *) echo "blckbaux cuda: unsupported compute capability: $compute_cap" >&2; exit 2 ;;
+    esac
+fi
+case "$cuda_arch" in
+    sm_75|sm_80|sm_90a) ;;
+    *) echo "blckbaux cuda: BLCKBAUX_CUDA_ARCH must be sm_75, sm_80, or sm_90a" >&2; exit 2 ;;
+esac
+export BLCKBAUX_FLAME_CUDA_ARCH=${BLCKBAUX_FLAME_CUDA_ARCH:-$cuda_arch}
+
 cd "$repo_dir/cuda"
 case "$action" in
-    build) exec "$cargo_bin" oxide build --arch sm_75 "$@" ;;
+    build) exec "$cargo_bin" oxide build --arch "$cuda_arch" "$@" ;;
     context)
-        "$cargo_bin" oxide build --arch sm_75 >&2
-        exec ../target/release/ennx-cuda context "$@"
+        "$cargo_bin" oxide build --arch "$cuda_arch" >&2
+        exec ../target/release/blckbaux-cuda context "$@"
         ;;
-    parity|resident|prefill|model-check|model|generate|diffusion|diffusion-check|ptx-probe|bench) exec "$cargo_bin" oxide run --arch sm_75 -- "$action" "$@" ;;
+    parity|resident|prefill|model-check|model|generate|diffusion|diffusion-check|ptx-probe|bench) exec "$cargo_bin" oxide run --arch "$cuda_arch" -- "$action" "$@" ;;
     sanitize)
         if [ "$#" -gt 0 ]; then
             exec compute-sanitizer --tool memcheck --error-exitcode 99 \
-                ../target/release/ennx-cuda "$@"
+                ../target/release/blckbaux-cuda "$@"
         fi
         for command in parity resident prefill model-check diffusion-check context; do
             compute-sanitizer --tool memcheck --error-exitcode 99 \
-                ../target/release/ennx-cuda "$command" "$@"
+                ../target/release/blckbaux-cuda "$command" "$@"
         done
         ;;
-    *) echo "ennx cuda: unknown native action: $action" >&2; exit 2 ;;
+    *) echo "blckbaux cuda: unknown native action: $action" >&2; exit 2 ;;
 esac

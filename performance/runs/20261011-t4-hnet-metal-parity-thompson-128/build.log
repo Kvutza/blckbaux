@@ -1,0 +1,160 @@
+=========================================
+RUSTC-CODEGEN-CUDA BUILD: cuda
+=========================================
+
+Building cuda...
+
+warning: unused variable: `shape`
+    --> cuda/kernels/src/fbt.rs:1355:9
+     |
+1355 |         shape: WaveShape,
+     |         ^^^^^ help: if this is intentional, prefix it with an underscore: `_shape`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `blckbaux-cuda-kernels` (lib) generated 1 warning (run `cargo fix --lib -p blckbaux-cuda-kernels` to apply 1 suggestion)
+   Compiling blckbaux-cuda v0.2.0 (/content/blckbaux-t4-parity/cuda)
+warning: variable does not need to be mutable
+   --> cuda/src/model/readout.rs:251:17
+    |
+251 |             let mut shape = WaveShape {
+    |                 ----^^^^^
+    |                 |
+    |                 help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `tile_layout`
+   --> cuda/src/model/routing.rs:110:9
+    |
+110 |     let tile_layout = read_prefix(&tiles, &stream, capacity)?;
+    |         ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_tile_layout`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: type `model::Scratch` is more private than the item `model::FbtModel::scratch`
+   --> cuda/src/model.rs:112:5
+    |
+112 |     pub(crate) scratch: Scratch,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^ field `model::FbtModel::scratch` is reachable at visibility `pub(crate)`
+    |
+note: but type `model::Scratch` is only usable at visibility `pub(self)`
+   --> cuda/src/model.rs:131:1
+    |
+131 | struct Scratch {
+    | ^^^^^^^^^^^^^^
+    = note: `#[warn(private_interfaces)]` on by default
+
+warning: type `DiffusionState` is more private than the item `model::FbtModel::diffusion`
+   --> cuda/src/model.rs:115:5
+    |
+115 |     pub(crate) diffusion: Option<DiffusionState>,
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ field `model::FbtModel::diffusion` is reachable at visibility `pub(crate)`
+    |
+note: but type `DiffusionState` is only usable at visibility `pub(in crate::model)`
+   --> cuda/src/model/diffusion.rs:4:1
+    |
+  4 | pub(super) struct DiffusionState {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: type `model::Stage` is more private than the item `model::FbtModel::enqueue_core`
+   --> cuda/src/model.rs:509:5
+    |
+509 | /     pub(super) fn enqueue_core(
+510 | |         &mut self,
+511 | |         plan: &[recurrence::LayerVisit],
+512 | |         temperature: f32,
+...   |
+516 | |         readout: bool,
+517 | |     ) -> CudaResult<usize> {
+    | |__________________________^ method `model::FbtModel::enqueue_core` is reachable at visibility `pub(crate)`
+    |
+note: but type `model::Stage` is only usable at visibility `pub(self)`
+   --> cuda/src/model.rs:36:1
+    |
+ 36 | enum Stage {
+    | ^^^^^^^^^^
+
+warning: type `model::weights::Layer` is more private than the item `Weights::layers`
+  --> cuda/src/model/weights.rs:54:5
+   |
+54 |     pub layers: Vec<Layer>,
+   |     ^^^^^^^^^^^^^^^^^^^^^^ field `Weights::layers` is reachable at visibility `pub(crate)`
+   |
+note: but type `model::weights::Layer` is only usable at visibility `pub(in crate::model)`
+  --> cuda/src/model/weights.rs:28:1
+   |
+28 | pub(super) struct Layer {
+   | ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `EvaluationOutput` is never constructed
+  --> cuda/src/model.rs:71:19
+   |
+71 | pub(super) struct EvaluationOutput {
+   |                   ^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `evaluate` is never used
+   --> cuda/src/model.rs:384:19
+    |
+230 | impl FbtModel {
+    | ------------- method in this implementation
+...
+384 |     pub(super) fn evaluate(
+    |                   ^^^^^^^^
+
+warning: method `predict` is never used
+   --> cuda/src/../../rust/crates/blckbaux/src/hnet_optimizer.rs:193:8
+    |
+ 73 | impl EnnHistory {
+    | --------------- method in this implementation
+...
+193 |     fn predict(&self, distances: &[f32]) -> Prediction {
+    |        ^^^^^^^
+
+warning: function `response_sign` is never used
+   --> cuda/src/../../rust/crates/blckbaux/src/hnet_optimizer.rs:501:4
+    |
+501 | fn response_sign(seed: u64, key: u64, element: u64) -> f32 {
+    |    ^^^^^^^^^^^^^
+
+warning: variants `Init` and `Project` are never constructed
+  --> cuda/src/model/readout.rs:49:5
+   |
+48 | enum HnetGenerationStage {
+   |      ------------------- variants in this enum
+49 |     Init,
+   |     ^^^^
+50 |     Gemm,
+51 |     Project,
+   |     ^^^^^^^
+   |
+   = note: `HnetGenerationStage` has a derived impl for the trait `Clone`, but this is intentionally ignored during dead code analysis
+
+warning: methods `score_targets`, `expand_generated`, and `objective` are never used
+   --> cuda/src/model/readout.rs:449:19
+    |
+ 55 | impl FbtModel {
+    | ------------- methods in this implementation
+...
+449 |     pub(super) fn score_targets(&mut self, targets: &[u32]) -> CudaResult<()> {
+    |                   ^^^^^^^^^^^^^
+...
+478 |     pub(super) fn expand_generated(
+    |                   ^^^^^^^^^^^^^^^^
+...
+524 |     pub(super) fn objective(
+    |                   ^^^^^^^^^
+
+warning: method `materialize_basis0` is never used
+    --> cuda/src/model/weights.rs:1266:19
+     |
+ 923 | impl Weights {
+     | ------------ method in this implementation
+...
+1266 |     pub(super) fn materialize_basis0(
+     |                   ^^^^^^^^^^^^^^^^^^
+
+warning: `blckbaux-cuda` (lib) generated 13 warnings (run `cargo fix --lib -p blckbaux-cuda` to apply 2 suggestions)
+    Finished `release` profile [optimized] target(s) in 20.27s

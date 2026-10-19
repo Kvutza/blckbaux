@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 try:
-    from ennx._rust import ENN as RustENN
+    from blckbaux._rust import ENN as RustENN
 
     RUST_AVAILABLE = True
 except ImportError:
@@ -20,8 +20,8 @@ def test_001():
 
     Cross-language parity for the core ENN model used by ENNSurrogate.
     """
-    from ennx import ENN as PyENN
-    from ennx.ennx.enn_params import ENNParams, PosteriorFlags
+    from blckbaux import ENN as PyENN
+    from blckbaux.enn.enn_params import ENNParams, PosteriorFlags
 
     train_x = np.array(
         [[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [1.0, 1.0]],

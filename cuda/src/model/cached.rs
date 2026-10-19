@@ -14,6 +14,31 @@ pub(super) struct State {
 }
 
 impl FbtModel {
+    pub(super) fn prepare_hnet_cache(&mut self, visits: usize) -> CudaResult<()> {
+        if self.rows == self.sequence {
+            return Ok(());
+        }
+        if self.cache.is_some() {
+            return Ok(());
+        }
+        let mut states = Vec::with_capacity(visits);
+        for _ in 0..visits {
+            states.push(Visit {
+                kv: DeviceBuffer::zeroed(&self.stream, self.sequence * 128).map_err(cuda_error)?,
+                tree: DeviceBuffer::zeroed(&self.stream, (self.sequence / 32 - 1) * 64)
+                    .map_err(cuda_error)?,
+            });
+        }
+        self.cache = Some(State {
+            visits: states,
+            tokens: DeviceBuffer::zeroed(&self.stream, self.sequence).map_err(cuda_error)?,
+            queries: DeviceBuffer::zeroed(&self.stream, self.rows * WIDTH).map_err(cuda_error)?,
+            sample_from: 0,
+        });
+        self.first = 0;
+        Ok(())
+    }
+
     /// All KV is recomputed from position zero at the start of every invocation.
     /// Only accepted prefixes within that invocation may reuse cached states.
     pub fn generate_streamed(
@@ -80,7 +105,7 @@ impl FbtModel {
         let mut frontier = prompt.len();
         let mut frontiers = vec![frontier];
         let mut first_wave = None;
-        let profile = std::env::var_os("ENNX_CUDA_PROFILE").is_some();
+        let profile = std::env::var_os("BLCKBAUX_CUDA_PROFILE").is_some();
         let mut chunk_events = Vec::new();
         while frontier < self.sequence {
             // The token at frontier-1 may have just been corrected. Recompute
@@ -111,11 +136,11 @@ impl FbtModel {
                         && [0, self.sequence / 2, self.sequence - chunk].contains(&first)
                     {
                         let start = timing_event(&self.stream)?;
-                        let mut events = Vec::with_capacity(plan.len() * 9 + 2);
-                        self.enqueue_events(&plan, temperature, seed, Some(&mut events))?;
+                        let mut events = Vec::with_capacity(plan.len() * 12 + 2);
+                        self.enqueue_events(&plan, temperature, seed, Some(&mut events), None)?;
                         chunk_events.push((first, start, events));
                     } else {
-                        self.enqueue(&plan, temperature, seed)?;
+                        self.enqueue(&plan, temperature, seed, None)?;
                     }
                     evaluated += rows;
                 }
@@ -273,20 +298,62 @@ impl FbtModel {
                 end,
             )
             .map_err(cuda_error)?;
-        let launch = self
-            .module
-            .prepare_pisa_select(LaunchConfig1D::new(rows, 64, 0))
-            .map_err(cuda_error)?;
-        self.module
-            .pisa_select(
-                &self.stream,
-                &launch,
-                &cache.queries,
-                &state.tree,
-                &mut s.blocks,
-                shape,
-            )
-            .map_err(cuda_error)?;
+        let shadow = self.hnet.as_ref().is_some_and(|state| state.index_shadow);
+        if shadow {
+            let hnet = self.hnet.as_ref().ok_or("missing H-Net PISA state")?;
+            let visit_offset = u32::try_from(ordinal * self.rows * 8).map_err(cuda_error)?;
+            let launch = self
+                .module
+                .prepare_pisa_shadow_refine(LaunchConfig1D::new(rows, 64, 0))
+                .map_err(cuda_error)?;
+            self.module
+                .pisa_shadow_refine(
+                    &self.stream,
+                    &launch,
+                    &cache.queries,
+                    &state.tree,
+                    &hnet.index_incumbent,
+                    &mut s.blocks,
+                    visit_offset,
+                    shape,
+                )
+                .map_err(cuda_error)?;
+        } else {
+            let launch = self
+                .module
+                .prepare_pisa_select(LaunchConfig1D::new(rows, 64, 0))
+                .map_err(cuda_error)?;
+            self.module
+                .pisa_select(
+                    &self.stream,
+                    &launch,
+                    &cache.queries,
+                    &state.tree,
+                    &mut s.blocks,
+                    shape,
+                )
+                .map_err(cuda_error)?;
+        }
+        if let Some(hnet) = self.hnet.as_ref().filter(|state| state.index_enabled) {
+            let destination = if shadow {
+                &hnet.index_candidate
+            } else {
+                &hnet.index_incumbent
+            };
+            let bytes = self.rows * 8 * size_of::<u32>();
+            let offset = ordinal * bytes;
+            // SAFETY: evaluate_hnet bounds the recurrent ordinal and both
+            // buffers reserve the complete eleven-visit support schedule.
+            unsafe {
+                cuda_core::simt::memory::memcpy_dtod_async(
+                    destination.cu_deviceptr() + offset as u64,
+                    s.blocks.cu_deviceptr(),
+                    bytes,
+                    self.stream.cu_stream(),
+                )
+                .map_err(cuda_error)?;
+            }
+        }
         mark(events, &self.stream, Stage::Index)?;
         let launch = self
             .module
@@ -320,7 +387,7 @@ impl FbtModel {
 }
 
 pub(super) fn repair_chunk(chunk: usize) -> CudaResult<usize> {
-    let rows = std::env::var("ENNX_CUDA_REPAIR_CHUNK").map_or(Ok(chunk), |value| {
+    let rows = std::env::var("BLCKBAUX_CUDA_REPAIR_CHUNK").map_or(Ok(chunk), |value| {
         value
             .parse::<usize>()
             .map_err(|_| "invalid repair chunk".to_string())

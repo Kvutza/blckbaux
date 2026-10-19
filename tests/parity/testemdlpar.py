@@ -3,11 +3,11 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from ennx import ENN
-from ennx.ennx.enn_params import ENNParams, PosteriorFlags
+from blckbaux import ENN
+from blckbaux.enn.enn_params import ENNParams, PosteriorFlags
 
 try:
-    from ennx._rust import ENN as RustENN
+    from blckbaux._rust import ENN as RustENN
 
     RUST_AVAILABLE = True
 except ImportError:

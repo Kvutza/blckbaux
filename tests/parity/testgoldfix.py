@@ -13,15 +13,15 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from ennx.turbo.config import (
-    AcqType,
-    ENNFitConfig,
-    ENNSurrogateConfig,
+from blckbaux.turbo.config import (
+    AcquisitionKind,
+    SurrogateFit,
+    ENNSurrogate,
     turbo_enn,
 )
 
 try:
-    from ennx._rust import Optimizer  # noqa: F401
+    from blckbaux._rust import BayesOptimizer  # noqa: F401
 
     RUST_AVAILABLE = True
 except ImportError:
@@ -62,8 +62,8 @@ def test_001():
 
     bounds = np.array([[0.0, 1.0], [0.0, 1.0]], dtype=float)
     config = turbo_enn(
-        acq_type=AcqType.UCB,
-        enn=ENNSurrogateConfig(k=4, fit=ENNFitConfig(num_samples=10)),
+        acquisition=AcquisitionKind.UCB,
+        enn=ENNSurrogate(k=4, fit=SurrogateFit(num_samples=10)),
         num_init=8,
     )
     num_cycles = 5

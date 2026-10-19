@@ -20,7 +20,7 @@ def test_version():
     versions = {
         read_version(ROOT / "Cargo.toml", ("workspace", "package", "version")),
         read_version(ROOT / "cuda/Cargo.toml", ("package", "version")),
-        read_version(ROOT / "cuda/kernels/Cargo.toml", ("package", "version")),
-        config["ennx"]["release_version"],
+        read_version(ROOT / "cuda/device/Cargo.toml", ("package", "version")),
+        config["blckbaux"]["release_version"],
     }
     assert len(versions) == 1, versions

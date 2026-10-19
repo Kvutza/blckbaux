@@ -1,0 +1,15 @@
+[package]
+name = "blckbaux-semantics"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Backend-independent mathematical and execution semantics for BLCKBAUX"
+
+[features]
+cuda = ["dep:cuda-core"]
+
+[dependencies]
+cuda-core = { workspace = true, optional = true }
+deser.workspace = true
+rand.workspace = true

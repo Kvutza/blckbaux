@@ -1,7 +1,7 @@
 <!doctype html>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0a0a0a">
-<title>ENNX compute</title>
+<title>BLCKBAUX compute</title>
 <style>
   :root { color-scheme: dark; font: 17px/1.45 ui-monospace, SFMono-Regular, monospace; }
   body { margin: 0; min-height: 100svh; display: grid; place-items: center; background: #0a0a0a; color: #f4f4ef; }
@@ -11,7 +11,7 @@
   .dim { color: #8c8c84; }
 </style>
 <main>
-  <h1>ENNX / iPhone GPU</h1>
+  <h1>BLCKBAUX / iPhone GPU</h1>
   <output id="status">Connecting…</output>
 </main>
 <script type="module">
@@ -348,7 +348,7 @@ async function proposalProbe(job, adapter, device) {
 }
 
 run().catch(async error => {
-  const result = { ok: false, protocol: 'ennx.iphone.web.v2', error: String(error?.message || error) };
+  const result = { ok: false, protocol: 'blckbaux.iphone.web.v2', error: String(error?.message || error) };
   try { await fetch('/result', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(result) }); } catch {}
   show('Unable to run', result.error);
 });

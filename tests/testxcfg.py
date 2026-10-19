@@ -5,8 +5,8 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from ennx._rust import ENN as RustENN
-from ennx._rust import ensure_config_file, set_path
+from blckbaux._rust import ENN as RustENN
+from blckbaux._rust import ensure_config_file, set_path
 
 
 def _assertwritten(cfg: Path) -> None:

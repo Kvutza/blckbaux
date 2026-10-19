@@ -14,11 +14,11 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class BuildBootstrapTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory(prefix="ennx-bootstrap-")
+        self.temp = tempfile.TemporaryDirectory(prefix="blckbaux-bootstrap-")
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         for name in (
-            "ennx",
+            "blckbaux",
             "tools/build-wheels",
             "tools/dev-actions",
             "tools/pixiw",
@@ -47,14 +47,14 @@ class BuildBootstrapTests(unittest.TestCase):
             """
 mode=smoke
 [ "$#" -eq 0 ] || mode=$1
-echo "verify:$ENNX_PYTHON_VERSION:$mode" >> events
+echo "verify:$BLCKBAUX_PYTHON_VERSION:$mode" >> events
 """,
         )
-        # ./ennx always does `buck2w run //rust/crates/dev-cli:ennx -- …`.
+        # ./blckbaux always does `buck2w run //rust/crates/cli:blckbaux -- …`.
         # Bootstrap isolates that behind a stub CLI that matches clap enough for
         # build/--help, then falls through to the wheel-build stub for `build`.
         self.script(
-            "fake-ennx-cli",
+            "fake-blckbaux-cli",
             """
 cmd=${1:-}
 [ -n "$cmd" ] || exit 2
@@ -72,6 +72,9 @@ case "$cmd" in
                     tests=1
                     shift
                     ;;
+                --distribution)
+                    shift
+                    ;;
                 --out)
                     [ "$#" -ge 2 ] || exit 2
                     [ -n "$2" ] || exit 2
@@ -85,9 +88,9 @@ case "$cmd" in
             esac
         done
         if [ "$tests" -eq 1 ]; then
-            exec sh tools/dev-actions build full "$out"
+            exec sh tools/dev-actions build distribution full "$out"
         fi
-        exec sh tools/dev-actions build smoke "$out"
+        exec sh tools/dev-actions build distribution smoke "$out"
         ;;
     tune)
         case "${1:-}" in
@@ -95,7 +98,7 @@ case "$cmd" in
                 cat <<'EOF'
 Run a configured Bayesian optimization experiment [legacy alias: opt run]
 
-Usage: ./ennx tune [OPTIONS] <CONFIG>
+Usage: ./blckbaux tune [OPTIONS] <CONFIG>
 EOF
                 exit 0
                 ;;
@@ -120,15 +123,25 @@ if [ "${1:-}" = run ]; then
     done
     [ "${1:-}" = "--" ] || exit 2
     shift
-    exec ./fake-ennx-cli "$@"
+    exec ./fake-blckbaux-cli "$@"
 fi
+case " $* " in
+    *" --show-full-output "*)
+        case " $* " in
+            *" //rust/crates/cli:blckbaux "*)
+                echo "root//rust/crates/cli:blckbaux ./fake-blckbaux-cli"
+                exit 0
+                ;;
+        esac
+        ;;
+esac
 echo build >> events
 printf '%s\n' "$*" >> buck-invocations
 version=3.13
 report=
 while [ "$#" -gt 0 ]; do
     case "$1" in
-        --config) case "$2" in ennx.python_version=*) version=${2#*=};; esac; shift;;
+        --config) case "$2" in blckbaux.python_version=*) version=${2#*=};; esac; shift;;
         --build-report) report=$2; shift;;
     esac
     shift
@@ -141,13 +154,14 @@ case "$version" in
     3.12) abi=cp312;;
     3.13) abi=cp313;;
     3.14) abi=cp314;;
+    3.15) abi=cp315;;
 esac
 case "$(uname -s):$(uname -m)" in
     Darwin:arm64) tag=macosx_11_0_arm64;;
     Linux:x86_64) tag=manylinux_2_28_x86_64;;
     Linux:aarch64 | Linux:arm64) tag=manylinux_2_28_aarch64;;
 esac
-wheel="ennx-0.0.0-$abi-$abi-$tag.whl"
+wheel="blckbaux-0.0.0-$abi-$abi-$tag.whl"
 : > "$wheel"
 echo "$wheel" > "$report"
 """,
@@ -183,7 +197,9 @@ cp dotslash-stub .buck2-tools/bin/dotslash
 """,
         )
         self.script("dotslash-stub", 'shift\nexec ./fake-pixi "$@"')
-        self.env = {k: v for k, v in os.environ.items() if not k.startswith("ENNX_")}
+        self.env = {
+            k: v for k, v in os.environ.items() if not k.startswith("BLCKBAUX_")
+        }
         self.env["PATH"] = str(self.bin)
 
     def script(self, name, body):
@@ -193,14 +209,14 @@ cp dotslash-stub .buck2-tools/bin/dotslash
         path.chmod(0o755)
 
     def prepare_python(self):
-        for name in ("ennx-py312", "ennx-py314", "ennx"):
+        for name in ("blckbaux-py312", "blckbaux-py314", "blckbaux-py315", "blckbaux"):
             directory = self.root / ".pixi/envs" / name / "bin"
             directory.mkdir(parents=True, exist_ok=True)
             shutil.copy2(self.root / "python-stub", directory / "python")
 
     def run_build(self, *args):
         return subprocess.run(
-            [str(self.root / "ennx"), "build", *args],
+            [str(self.root / "blckbaux"), "build", "--distribution", *args],
             cwd=self.root,
             env=self.env,
             text=True,
@@ -225,19 +241,29 @@ cp dotslash-stub .buck2-tools/bin/dotslash
             installs,
             [
                 f"pixi:install --environment {name}"
-                for name in ("ennx-py312", "ennx-py314", "ennx")
+                for name in (
+                    "blckbaux-py312",
+                    "blckbaux-py314",
+                    "blckbaux-py315",
+                    "blckbaux",
+                )
             ],
         )
         self.assertLess(events.index(installs[-1]), events.index("build"))
-        self.assertEqual(events.count("build"), 3)
+        self.assertEqual(events.count("build"), 4)
         assert_builds(self, self.buck_invocations())
         self.assertEqual(
             [line for line in events if line.startswith("verify:")],
-            ["verify:3.12:smoke", "verify:3.14:smoke", "verify:3.13:smoke"],
+            [
+                "verify:3.12:smoke",
+                "verify:3.14:smoke",
+                "verify:3.15:smoke",
+                "verify:3.13:smoke",
+            ],
         )
         second = self.run_build()
         self.assertEqual(second.returncode, 0, second.stderr)
-        self.assertEqual(self.events()[len(events) :].count("build"), 3)
+        self.assertEqual(self.events()[len(events) :].count("build"), 4)
         self.assertFalse(
             any(
                 "pixi" in line or "dotslash" in line
@@ -249,7 +275,7 @@ cp dotslash-stub .buck2-tools/bin/dotslash
         (self.bin / "pixi").symlink_to(self.root / "fake-pixi")
         result = self.run_build()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertNotIn("dotslash", self.events())
+        self.assertIn("dotslash", self.events())
 
     def test_fullmatrix(self):
         result = self.run_build("--tests")
@@ -259,6 +285,7 @@ cp dotslash-stub .buck2-tools/bin/dotslash
             [
                 "verify:3.12:--tests",
                 "verify:3.14:--tests",
+                "verify:3.15:--tests",
                 "verify:3.13:--tests",
             ],
         )
@@ -271,27 +298,27 @@ cp dotslash-stub .buck2-tools/bin/dotslash
 
     def test_incompleteenv(self):
         self.prepare_python()
-        (self.root / ".pixi/envs/ennx-py314/bin/python.broken").touch()
+        (self.root / ".pixi/envs/blckbaux-py314/bin/python.broken").touch()
         result = self.run_build()
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(
             [x for x in self.events() if x.startswith("pixi:")],
-            ["pixi:install --environment ennx-py314"],
+            ["pixi:install --environment blckbaux-py314"],
         )
 
     def test_badenv(self):
         self.prepare_python()
-        self.env["ENNX_PYTHON_312"] = "missing-python"
+        self.env["BLCKBAUX_PYTHON_312"] = "missing-python"
         result = self.run_build()
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("ENNX_PYTHON_312", result.stderr)
+        self.assertIn("BLCKBAUX_PYTHON_312", result.stderr)
         self.assertEqual(self.events(), [])
 
     def test_missingdep(self):
         self.prepare_python()
         # Execute the real readiness probe with only requests unavailable.
         self.script(
-            ".pixi/envs/ennx-py312/bin/python",
+            ".pixi/envs/blckbaux-py312/bin/python",
             f"""
 case "$2" in
     3.*) exec "{sys.executable}" -c '
@@ -310,23 +337,23 @@ esac
         self.assertEqual(result.returncode, 0, result.stderr)
         events = self.events()
         installs = [line for line in events if line.startswith("pixi:")]
-        self.assertEqual(installs, ["pixi:install --environment ennx-py312"])
+        self.assertEqual(installs, ["pixi:install --environment blckbaux-py312"])
         self.assertLess(events.index(installs[0]), events.index("build"))
 
     def test_wrongpython(self):
         self.prepare_python()
         version = "312" if sys.version_info[:2] != (3, 12) else "314"
-        self.env[f"ENNX_PYTHON_{version}"] = sys.executable
+        self.env[f"BLCKBAUX_PYTHON_{version}"] = sys.executable
         self.env["PYTHONOPTIMIZE"] = "1"
         result = self.run_build()
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn(f"ENNX_PYTHON_{version}", result.stderr)
+        self.assertIn(f"BLCKBAUX_PYTHON_{version}", result.stderr)
         self.assertEqual(self.events(), [])
 
     def test_default(self):
         self.prepare_python()
-        self.env["ENNX_PYTHON_312"] = ".pixi/envs/ennx-py312/bin/python"
-        marker = self.root / ".pixi/envs/ennx-py312/bin/python.broken"
+        self.env["BLCKBAUX_PYTHON_312"] = ".pixi/envs/blckbaux-py312/bin/python"
+        marker = self.root / ".pixi/envs/blckbaux-py312/bin/python.broken"
         marker.touch()
         result = self.run_build()
         self.assertNotEqual(result.returncode, 0)
@@ -337,22 +364,22 @@ esac
         self.prepare_python()
         override = self.root / "custom python"
         shutil.copy2(self.root / "python-stub", override)
-        self.env["ENNX_PYTHON_312"] = str(override)
+        self.env["BLCKBAUX_PYTHON_312"] = str(override)
         result = self.run_build()
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertFalse(any(line.startswith("pixi:") for line in self.events()))
 
     def test_envpython(self):
-        self.env["ENNX_PYTHON"] = str(self.root / "python-stub")
+        self.env["BLCKBAUX_PYTHON"] = str(self.root / "python-stub")
         result = self.run_build()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(self.events().count("build"), 3)
+        self.assertEqual(self.events().count("build"), 4)
         self.assertFalse(any(line.startswith("pixi:") for line in self.events()))
 
     def test_linux(self):
         self.prepare_python()
         self.script("bin/uname", 'case "$1" in -s) echo Linux;; -m) echo x86_64;; esac')
-        for name in ("ennx-py312", "ennx-py314", "ennx"):
+        for name in ("blckbaux-py312", "blckbaux-py314", "blckbaux-py315", "blckbaux"):
             self.script(
                 f".pixi/envs/{name}/bin/auditwheel",
                 'echo "auditwheel:$0:$1" >> events',
@@ -371,7 +398,12 @@ esac
             ],
             [
                 event
-                for name in ("ennx-py312", "ennx-py314", "ennx")
+                for name in (
+                    "blckbaux-py312",
+                    "blckbaux-py314",
+                    "blckbaux-py315",
+                    "blckbaux",
+                )
                 for event in (
                     f"auditwheel:.pixi/envs/{name}/bin/auditwheel:repair",
                     f"auditwheel:.pixi/envs/{name}/bin/auditwheel:show",
@@ -382,11 +414,11 @@ esac
 
     def test_version(self):
         self.prepare_python()
-        self.env["ENNX_PYTHON"] = str(self.root / "python-stub")
-        self.env["ENNX_PYTHON_312"] = "missing-python"
+        self.env["BLCKBAUX_PYTHON"] = str(self.root / "python-stub")
+        self.env["BLCKBAUX_PYTHON_312"] = "missing-python"
         result = self.run_build()
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("ENNX_PYTHON_312", result.stderr)
+        self.assertIn("BLCKBAUX_PYTHON_312", result.stderr)
         self.assertEqual(self.events(), [])
 
     def test_helpoptions(self):
@@ -405,7 +437,7 @@ esac
 
     def test_help(self):
         result = subprocess.run(
-            [str(self.root / "ennx"), "tune", "--help"],
+            [str(self.root / "blckbaux"), "tune", "--help"],
             cwd=self.root,
             env=self.env,
             text=True,
@@ -418,11 +450,11 @@ esac
 
 
 def assert_builds(test, invocations):
-    test.assertEqual(len(invocations), 3)
+    test.assertEqual(len(invocations), 4)
     test.assertTrue(all("//:wheel" in command for command in invocations))
     test.assertEqual(sum("//buck2/tests:all" in command for command in invocations), 1)
     test.assertEqual(
-        sum("//rust/crates/dev-cli:ennx" in command for command in invocations),
+        sum("//rust/crates/cli:blckbaux" in command for command in invocations),
         1,
     )
 

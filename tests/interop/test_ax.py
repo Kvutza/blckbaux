@@ -6,7 +6,7 @@ from ax.api.client import Client
 from ax.api.configs import RangeParameterConfig
 from ax.generation_strategy.generation_strategy import GenerationStrategy
 
-from ennx.ax import Node
+from blckbaux.ax import Node
 
 
 def client(node, objective="-loss"):

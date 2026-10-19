@@ -15,7 +15,7 @@ import click
 import jax
 import jax.numpy as jnp
 
-from ennx.experimental import ParamBlock, turbo_enn
+from blckbaux.experimental import ParamBlock, turbo_enn
 
 
 def measure(dimensions, rounds, sampler):

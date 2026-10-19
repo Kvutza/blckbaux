@@ -10,8 +10,8 @@ from testefit import _fitmodel, _makedata, _ybatch
 def test_ennfitwithyvarnone():
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
-    from ennx.ennx.enn_params import ENNParams
+    from blckbaux.enn.enn_class import ENN
+    from blckbaux.enn.enn_params import ENNParams
 
     rng = np.random.default_rng(42)
     n = 30
@@ -34,8 +34,8 @@ def test_ennfitwithyvarnone():
 def test_ennfitwithwarmstart():
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
-    from ennx.ennx.enn_params import ENNParams
+    from blckbaux.enn.enn_class import ENN
+    from blckbaux.enn.enn_params import ENNParams
 
     rng = np.random.default_rng(42)
     n = 30
@@ -66,9 +66,9 @@ def test_ennfitwithwarmstart():
 def test_003():
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
-    from ennx.ennx.enn_fit import subsample_loglik
-    from ennx.ennx.enn_params import ENNParams
+    from blckbaux.enn.enn_class import ENN
+    from blckbaux.enn.enn_fit import subsample_loglik
+    from blckbaux.enn.enn_params import ENNParams
 
     rng = np.random.default_rng(123)
     x = rng.standard_normal((60, 3))
@@ -93,8 +93,8 @@ def test_003():
 def test_004():
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
-    from ennx.ennx.enn_params import ENNParams
+    from blckbaux.enn.enn_class import ENN
+    from blckbaux.enn.enn_params import ENNParams
 
     rng = np.random.default_rng(42)
     x, y, yvar = _makedata(rng=rng, n=40, d=3, noise_std=0.2, yvar=0.01)
@@ -122,9 +122,9 @@ def test_005():
     import numpy as np
     import pytest
 
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
+    from blckbaux.enn.enn_fitter import ENNFitter
 
-    fitter = ENNStatefulFitter(k=2, rng=np.random.default_rng(0))
+    fitter = ENNFitter(k=2, rng=np.random.default_rng(0))
     with pytest.raises(ValueError, match="finite"):
         fitter.tell([[float("nan"), 0.0]], [[0.0]])
 
@@ -132,19 +132,19 @@ def test_005():
 def test_006():
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
+    from blckbaux.enn.enn_class import ENN
+    from blckbaux.enn.enn_fitter import ENNFitter
 
     rng = np.random.default_rng(2020)
     x = rng.standard_normal((12, 2))
     y = (10.0 * rng.standard_normal((12, 1))).astype(float)
     model = ENN(x, y)
 
-    fitter_batch = ENNStatefulFitter(k=3, rng=np.random.default_rng(100))
+    fitter_batch = ENNFitter(k=3, rng=np.random.default_rng(100))
     fitter_batch.tell(x, y)
     p_batch = fitter_batch.ask(model, num_candidates=8, num_samples=6)
 
-    fitter_inc = ENNStatefulFitter(k=3, rng=np.random.default_rng(100))
+    fitter_inc = ENNFitter(k=3, rng=np.random.default_rng(100))
     for row_x, row_y in zip(x, y):
         fitter_inc.tell(row_x.reshape(1, -1), row_y.reshape(1, -1))
     p_inc = fitter_inc.ask(model, num_candidates=8, num_samples=6)
@@ -157,9 +157,9 @@ def test_006():
 def test_007():
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
-    from ennx.ennx.enn_params import ENNParams
+    from blckbaux.enn.enn_class import ENN
+    from blckbaux.enn.enn_fitter import ENNFitter
+    from blckbaux.enn.enn_params import ENNParams
 
     x = np.array(
         [[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [1.0, 1.0], [0.5, 0.5]],
@@ -169,7 +169,7 @@ def test_007():
     model = ENN(x, y)
     warm = ENNParams(k_neighbors=2, epistemic_scale=0.01, aleatoric_scale=0.01)
 
-    fitter = ENNStatefulFitter(k=2, rng=np.random.default_rng(55))
+    fitter = ENNFitter(k=2, rng=np.random.default_rng(55))
     fitter.tell(x, y)
     p_cold = fitter.ask(model, num_candidates=6, num_samples=4)
     p_warm = fitter.ask(
@@ -189,14 +189,14 @@ def test_007():
 def test_008():
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
+    from blckbaux.enn.enn_class import ENN
+    from blckbaux.enn.enn_fitter import ENNFitter
 
     rng = np.random.default_rng(88)
     x_all = rng.standard_normal((8, 2))
     y_all = rng.standard_normal((8, 1))
     model = ENN(np.empty((0, 2)), np.empty((0, 1)))
-    fitter = ENNStatefulFitter(k=2, rng=np.random.default_rng(88))
+    fitter = ENNFitter(k=2, rng=np.random.default_rng(88))
     for row_x, row_y in zip(x_all, y_all):
         model.add(row_x.reshape(1, -1), row_y.reshape(1, -1))
         fitter.tell(row_x.reshape(1, -1), row_y.reshape(1, -1))
@@ -209,9 +209,9 @@ def test_009():
     import numpy as np
     import pytest
 
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
+    from blckbaux.enn.enn_fitter import ENNFitter
 
-    fitter = ENNStatefulFitter(k=2, rng=np.random.default_rng(0))
+    fitter = ENNFitter(k=2, rng=np.random.default_rng(0))
     with pytest.raises(ValueError, match="finite"):
         fitter.tell([[0.0]], [[float("nan")]])
 
@@ -220,13 +220,13 @@ def test_010():
     import numpy as np
     import pytest
 
-    from ennx.ennx.enn_class import ENN
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
+    from blckbaux.enn.enn_class import ENN
+    from blckbaux.enn.enn_fitter import ENNFitter
 
     x = np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [1.0, 1.0]], dtype=float)
     y = np.array([[0.0], [100.0], [200.0], [300.0]], dtype=float)
     model = ENN(x, y)
-    fitter = ENNStatefulFitter(k=2, rng=np.random.default_rng(77))
+    fitter = ENNFitter(k=2, rng=np.random.default_rng(77))
 
     with pytest.raises(ValueError, match="tell"):
         fitter.ask(model, num_candidates=5, num_samples=5)
@@ -235,8 +235,8 @@ def test_010():
 def test_011():
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
+    from blckbaux.enn.enn_class import ENN
+    from blckbaux.enn.enn_fitter import ENNFitter
 
     x = np.array(
         [[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [1.0, 1.0], [0.5, 0.5]],
@@ -244,7 +244,7 @@ def test_011():
     )
     y = np.array([[0.0], [1.0], [1.0], [2.0], [1.5]], dtype=float)
     ENN(x, y)
-    fitter = ENNStatefulFitter(k=2, rng=np.random.default_rng(0))
+    fitter = ENNFitter(k=2, rng=np.random.default_rng(0))
     for i in range(y.shape[0]):
         fitter.tell(x[i : i + 1], y[i : i + 1])
         _ybatch(fitter.y_std(), y[: i + 1].std(axis=0))
@@ -253,8 +253,8 @@ def test_011():
 def test_012():
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
+    from blckbaux.enn.enn_class import ENN
+    from blckbaux.enn.enn_fitter import ENNFitter
 
     x = np.array(
         [[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [1.0, 1.0], [0.5, 0.5]],
@@ -265,7 +265,7 @@ def test_012():
         dtype=float,
     )
     ENN(x, y)
-    fitter = ENNStatefulFitter(k=2, rng=np.random.default_rng(0))
+    fitter = ENNFitter(k=2, rng=np.random.default_rng(0))
     for i in range(y.shape[0]):
         fitter.tell(x[i : i + 1], y[i : i + 1])
         _ybatch(fitter.y_std(), y[: i + 1].std(axis=0))
@@ -275,9 +275,9 @@ def test_013():
     import numpy as np
     import pytest
 
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
+    from blckbaux.enn.enn_fitter import ENNFitter
 
-    fitter = ENNStatefulFitter(k=2, rng=np.random.default_rng(0))
+    fitter = ENNFitter(k=2, rng=np.random.default_rng(0))
     with pytest.raises(ValueError, match="finite"):
         fitter.tell([[0.0, 0.0]], [[0.0]], [[float("nan")]])
     fitter.tell([[0.0, 0.0]], [[0.0]], [[0.1]])
@@ -286,9 +286,9 @@ def test_013():
 def test_014():
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
-    from ennx.ennx.enn_params import ENNParams
+    from blckbaux.enn.enn_class import ENN
+    from blckbaux.enn.enn_fitter import ENNFitter
+    from blckbaux.enn.enn_params import ENNParams
 
     x = np.array(
         [[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [1.0, 1.0]],
@@ -298,7 +298,7 @@ def test_014():
     model = ENN(x, y)
     warm = ENNParams(k_neighbors=2, epistemic_scale=2.5, aleatoric_scale=0.3)
 
-    fitter = ENNStatefulFitter(k=2, rng=np.random.default_rng(7))
+    fitter = ENNFitter(k=2, rng=np.random.default_rng(7))
     fitter.tell(x, y)
     params = fitter.ask(
         model,
@@ -313,8 +313,8 @@ def test_014():
 def test_015():
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
+    from blckbaux.enn.enn_class import ENN
+    from blckbaux.enn.enn_fitter import ENNFitter
 
     x = np.array(
         [
@@ -330,12 +330,12 @@ def test_015():
     y = np.array([[0.0], [0.0], [0.0], [100.0], [100.0], [100.0]], dtype=float)
     model = ENN(x, y)
 
-    fitter_sync = ENNStatefulFitter(k=2, rng=np.random.default_rng(99))
+    fitter_sync = ENNFitter(k=2, rng=np.random.default_rng(99))
     fitter_sync.tell(x, y)
     _, y_all, _ = enn_rows(model)
     model_std = y_all.std(axis=0)
 
-    fitter_desync = ENNStatefulFitter(k=2, rng=np.random.default_rng(99))
+    fitter_desync = ENNFitter(k=2, rng=np.random.default_rng(99))
     fitter_desync.tell(x[:3], y[:3])
     assert abs(fitter_desync.y_std()[0] - model_std[0]) > 1.0
     assert abs(fitter_sync.y_std()[0] - model_std[0]) < 1e-6
@@ -347,14 +347,14 @@ def test_015():
 def test_016():
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
+    from blckbaux.enn.enn_class import ENN
+    from blckbaux.enn.enn_fitter import ENNFitter
 
     model = ENN(
         np.array([[0.0, 0.0]]),
         np.array([[0.0]]),
     )
-    fitter = ENNStatefulFitter(k=7, rng=np.random.default_rng(1))
+    fitter = ENNFitter(k=7, rng=np.random.default_rng(1))
     x_all, y_all, yvar_all = enn_rows(model)
     fitter.tell(x_all, y_all, yvar_all)
     params = fitter.ask(model, num_candidates=5, num_samples=3)

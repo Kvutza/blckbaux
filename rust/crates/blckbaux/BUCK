@@ -1,0 +1,236 @@
+load("//buck2:reindeer_rules.bzl", "app_rust_binary", "app_rust_library")
+load("//buck2:blckbaux_targets.bzl", "blckbaux_program_targets")
+load("//buck2/tests:suite.bzl", "test_suite")
+load("//build:targets.bzl", "BLCKBAUX_CRATES", "BLCKBAUX_PROGRAMS", "BLCKBAUX_TEST_CRATES", "RUST_EDITION")
+
+BLCKBAUX_BUCK_DEPS = ["//rust:" + crate for crate in BLCKBAUX_CRATES] + [
+    "//rust/crates/semantics:semantics",
+    "//rust/crates/neighbor-index:neighbor-index",
+    "//rust/crates/artifact:artifact",
+]
+
+BLCKBAUX_BUCK_TEST_DEPS = ["//rust:" + crate for crate in BLCKBAUX_TEST_CRATES] + [
+    "//rust/crates/semantics:semantics",
+    "//rust/crates/neighbor-index:neighbor-index",
+    "//rust/crates/artifact:artifact",
+]
+
+cxx_binary(
+    name = "region-arithmetic",
+    srcs = ["tests/region_math.cpp"],
+    headers = {"arithmetic.cl": "src/search/arithmetic.cl"},
+    header_namespace = "",
+    compiler_flags = ["-std=c++17", "-ffp-contract=off"],
+)
+
+sh_test(
+    name = "region-math",
+    test = ":region-arithmetic",
+    visibility = ["PUBLIC"],
+)
+
+rust_test(
+    name = "region-opencl",
+    srcs = glob([
+        "src/**/*.cl",
+        "src/**/*.metal",
+        "src/**/*.rs",
+    ]) + ["//examples/tuning:turbo-enn.toml"],
+    crate = "blckbaux",
+    crate_root = "src/lib.rs",
+    edition = RUST_EDITION,
+    features = ["buck2-test-data", "opencl", "usearch-native"],
+    visibility = ["PUBLIC"],
+    deps = BLCKBAUX_BUCK_TEST_DEPS + [
+        "//rust:opencl3",
+        ":usearch-bridge",
+    ] + select({
+        "//:linux-arm64": [],
+        "//:linux-x86_64": [],
+        "//:macos-arm64": [
+            "//buck2/native:openmp-macos",
+            "//rust:metal",
+        ],
+    }),
+    rpath = True,
+    run_env = {"RUST_TEST_THREADS": "1"},
+    runtime_dependency_handling = "symlink",
+)
+
+filegroup(
+    name = "blckbaux-source",
+    srcs = glob([
+        "examples/**/*.rs",
+        "src/**/*.cl",
+        "src/**/*.h",
+        "src/**/*.metal",
+        "src/**/*.rs",
+    ]) + [
+        "Cargo.toml",
+        "LICENSE",
+        "NOTICE",
+        "README.md",
+    ],
+    visibility = ["PUBLIC"],
+)
+
+cxx_library(
+    name = "usearch-bridge",
+    srcs = ["src/usearch_bridge.cpp"],
+    compiler_flags = [
+        "-std=c++17",
+        "-Wno-unknown-pragmas",
+    ],
+    deps = ["//buck2/native:usearch"],
+    exported_linker_flags = select({
+        "//:linux-arm64": ["-lstdc++"],
+        "//:linux-x86_64": ["-lstdc++"],
+        "//:macos-arm64": ["-lc++"],
+    }),
+    visibility = ["PUBLIC"],
+)
+
+app_rust_library(
+    name = "blckbaux",
+    srcs = glob([
+        "src/**/*.cl",
+        "src/**/*.metal",
+        "src/**/*.rs",
+    ]),
+    crate = "blckbaux",
+    crate_root = "src/lib.rs",
+    edition = RUST_EDITION,
+    features = select({
+        "//:linux-arm64": ["opencl", "usearch-native"],
+        "//:linux-x86_64": ["opencl", "usearch-native"],
+        "//:macos-arm64": ["metal", "usearch-native"],
+    }),
+    visibility = ["PUBLIC"],
+    deps = BLCKBAUX_BUCK_DEPS + [
+        ":usearch-bridge",
+    ] + select({
+        "//:linux-arm64": ["//rust:opencl3"],
+        "//:linux-x86_64": ["//rust:opencl3"],
+        "//:macos-arm64": ["//rust:metal"],
+    }),
+)
+
+rust_test(
+    name = "blckbaux-unit",
+    srcs = glob([
+        "src/**/*.cl",
+        "src/**/*.metal",
+        "src/**/*.rs",
+    ]) + ["//examples/tuning:turbo-enn.toml"],
+    crate = "blckbaux",
+    crate_root = "src/lib.rs",
+    edition = RUST_EDITION,
+    features = select({
+        "//:linux-arm64": ["buck2-test-data", "opencl", "usearch-native"],
+        "//:linux-x86_64": ["buck2-test-data", "opencl", "usearch-native"],
+        "//:macos-arm64": ["buck2-test-data", "metal", "usearch-native"],
+    }),
+    visibility = ["//buck2/tests:all"],
+    deps = BLCKBAUX_BUCK_TEST_DEPS + [
+        ":usearch-bridge",
+    ] + select({
+        "//:linux-arm64": ["//rust:opencl3"],
+        "//:linux-x86_64": ["//rust:opencl3"],
+        "//:macos-arm64": [
+            "//buck2/native:openmp-macos",
+            "//rust:metal",
+        ],
+    }),
+    rpath = True,
+    # Two workers overlap CPU tests without saturating the shared Metal queue.
+    # Higher counts regress this mixed CPU/GPU suite through device contention.
+    run_env = {"RUST_TEST_THREADS": "2"},
+    runtime_dependency_handling = "symlink",
+)
+
+app_rust_library(
+    name = "blckbaux_bench",
+    srcs = glob([
+        "src/**/*.cl",
+        "src/**/*.metal",
+        "src/**/*.rs",
+    ]),
+    crate = "blckbaux",
+    crate_root = "src/lib.rs",
+    edition = RUST_EDITION,
+    features = [
+        "metal",
+        "usearch-native",
+    ],
+    deps = BLCKBAUX_BUCK_DEPS + [
+        ":usearch-bridge",
+        "//rust:metal",
+    ],
+    target_compatible_with = ["prelude//os/constraints:macos"],
+)
+
+blckbaux_program_targets(BLCKBAUX_PROGRAMS, RUST_EDITION, glob(["src/**/*.rs", "examples/**/*.rs"]))
+
+# Each integration crate receives the same platform features as the library.
+[
+    rust_test(
+        name = source.removeprefix("tests/").removesuffix(".rs") + "_test",
+        srcs = [source] + glob([
+            "src/**/*.cl",
+            "src/**/*.metal",
+            "src/**/*.rs",
+        ]),
+        crate_root = source,
+        edition = RUST_EDITION,
+        features = select({
+            "//:macos-arm64": ["metal", "usearch-native"],
+            "DEFAULT": ["opencl", "usearch-native"],
+        }),
+        deps = [
+            ":blckbaux",
+            "//rust:ndarray",
+            "//rust:rand",
+            "//rust:rand_chacha",
+            "//rust/crates/semantics:semantics",
+            "//rust/crates/artifact:artifact",
+            "//rust:tempfile",
+            "//rust/vendor/hegel:hegel",
+        ] + select({
+            "//:macos-arm64": [
+                "//buck2/native:openmp-macos",
+                "//rust:metal",
+            ],
+            "DEFAULT": [],
+        }),
+        visibility = ["PUBLIC"],
+        rpath = True,
+        runtime_dependency_handling = "symlink",
+        run_env = {"RUST_TEST_THREADS": "1"},
+        target_compatible_with = ["prelude//os/constraints:macos"] if source == "tests/knn_metal.rs" else [],
+    )
+    for source in glob(["tests/*.rs"])
+]
+
+_TESTS = [
+    ":" + source.removeprefix("tests/").removesuffix(".rs") + "_test"
+    for source in glob(["tests/*.rs"], exclude = ["tests/knn_metal.rs"])
+] + select({
+    "//:macos-arm64": [":knn_metal_test"],
+    "DEFAULT": [],
+})
+
+test_suite(
+    name = "integration",
+    tests = _TESTS,
+    visibility = ["//buck2/tests:all"],
+)
+
+rust_test(
+    name = "turbo-enn-test",
+    srcs = glob(["src/bin/turbo-enn/**/*.rs"]),
+    crate = "turbo_enn_test",
+    crate_root = [program["root"] for program in BLCKBAUX_PROGRAMS if program["name"] == "turbo-enn"][0],
+    edition = RUST_EDITION,
+    deps = [":blckbaux", "//rust:anstream", "//rust/crates/tooling:tooling", "//rust:tempfile"],
+    visibility = ["//buck2/tests:all"],
+)

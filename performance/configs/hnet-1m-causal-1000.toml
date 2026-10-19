@@ -1,0 +1,74 @@
+# One-million-token H-Net experiment with one candidate evaluation per round.
+version = 4
+
+experiment = "pretrain"
+model = "fbt-pisa1-hnet-mhc4-v1"
+[data]
+recipe = "stack-v3-rust-go-v1"
+
+[objective]
+function = "cross-entropy"
+sampling = "natural"
+window-tokens = 1048576
+
+[execution]
+rounds = 1000
+repetitions = 1
+round-target-ms = 1000
+
+[evaluation]
+interval = 25
+
+[optimizer]
+algorithm = "turbo-enn"
+
+[optimizer.candidate-generation]
+generator = "independent"
+arms = 1
+candidates = 1
+
+[optimizer.candidate-generation.perturbation]
+distribution = "gaussian"
+
+[optimizer.surrogate]
+estimator = "enn"
+scaling = "global"
+neighbors = 10
+neighbor-rule = "fixed"
+epistemic-scale = 0.05
+aleatoric-scale = 0.05
+y-scale = 1.0
+geometry = "latent"
+
+fit = "leave-one-out"
+fit-candidates = 30
+fit-samples = 10
+
+[optimizer.acquisition]
+function = "thompson"
+
+[optimizer.trust-region]
+policy = "reliability"
+shape = "tensor-family-static"
+initial = 0.02
+min = 0.01
+max = 0.2
+failure-tolerance = 4
+evidence-decay = 0.9
+confidence-z = 2.0
+reliability-threshold = 0.6
+minimum-evidence = 4.0
+acceptance-ratio = 0.1
+boundary-fraction = 0.8
+expand-factor = 2.0
+shrink-factor = 0.5
+
+[seeds]
+model = 240105308887621659
+reference = 150813718214252701
+proposal = 91614869253048103
+acquisition = 314159265358979323
+
+[diagnostics]
+trace = false
+stage-samples = 3

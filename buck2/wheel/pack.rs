@@ -247,7 +247,7 @@ fn collect_payloads(args: &Args) -> io::Result<(BTreeMap<String, Vec<u8>>, Strin
         .iter()
         .filter(|path| {
             let name = path.file_name().unwrap().to_string_lossy();
-            name.starts_with("librust") && name.contains("ennx-py") && name.ends_with(".so")
+            name.starts_with("librust") && name.contains("blckbaux-py") && name.ends_with(".so")
         })
         .collect();
     assert_eq!(
@@ -274,7 +274,7 @@ fn collect_payloads(args: &Args) -> io::Result<(BTreeMap<String, Vec<u8>>, Strin
     }
     add_optimizer(&args, &mut wheel_files)?;
     wheel_files.insert(
-        format!("{}/ennx_rust{}", args.package, args.extension_suffix),
+        format!("{}/blckbaux_rust{}", args.package, args.extension_suffix),
         fs::read(extensions[0])?,
     );
     if let Some(openmp) = all_files
@@ -291,7 +291,9 @@ fn collect_payloads(args: &Args) -> io::Result<(BTreeMap<String, Vec<u8>>, Strin
             path.file_name()
                 .and_then(|name| name.to_str())
                 .is_some_and(|name| {
-                    name.contains(".so") && !name.contains("ennx-py") && !name.contains("ennx_py")
+                    name.contains(".so")
+                        && !name.contains("blckbaux-py")
+                        && !name.contains("blckbaux_py")
                 })
         }) {
             let name = library.file_name().unwrap().to_string_lossy();

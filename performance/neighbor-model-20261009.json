@@ -1,0 +1,289 @@
+{
+  "schema": "blckbaux.neighbor-model-measurements.v1",
+  "date": "2026-10-09",
+  "hardware": {
+    "metal": "Apple M4, 24 GB unified memory",
+    "cuda": "Modal NVIDIA Tesla T4, sm_75"
+  },
+  "model_parameters": 1177756440,
+  "target_ms": 200,
+  "method": {
+    "geometry": "stratified coordinate quadrature of realized FP16 model states",
+    "samples": 51437,
+    "geometry_bytes": 14410552,
+    "dense_proposals": true,
+    "exact_history_distances": false,
+    "neighborhood": "query-local fitted bias/noise prefix criterion",
+    "calibration": "rolling empirical prequential residual quantile",
+    "formal_coverage_guarantee": false,
+    "gradient_estimation": false
+  },
+  "metal": [
+    {
+      "rounds": 64,
+      "mean_round_ms": 1546.6973229062498,
+      "max_round_ms": 1779.864667,
+      "accepted_updates": 4,
+      "acquisition_rounds": 33,
+      "accepted_acquisition_updates": 0,
+      "context_tokens": [
+        1048576
+      ],
+      "generated_tokens": 57447552,
+      "candidate_choices": [
+        {
+          "candidate": 0,
+          "count": 9
+        },
+        {
+          "candidate": 1,
+          "count": 12
+        },
+        {
+          "candidate": 2,
+          "count": 8
+        },
+        {
+          "candidate": 3,
+          "count": 4
+        }
+      ],
+      "distance_profiles": [
+        4
+      ],
+      "neighbor_range": {
+        "min": 1,
+        "max": 61
+      },
+      "calibration": {
+        "kind": "empirical-prequential",
+        "observations": 33,
+        "multiplier": 2.6066492,
+        "observed_coverage": 0.9696969696969697,
+        "coverage_guarantee": false
+      },
+      "validation_initial": [
+        -12.490815
+      ],
+      "validation_final": [
+        -12.49067
+      ],
+      "target_met": false,
+      "causal_output_verification": false,
+      "run": ".cache/blckbaux/runs/pretrain/254891a463e4f5cf37f0/run-1791517907810-36288-0"
+    },
+    {
+      "rounds": 48,
+      "mean_round_ms": 1767.3798897083327,
+      "max_round_ms": 3966.011708,
+      "accepted_updates": 4,
+      "acquisition_rounds": 17,
+      "accepted_acquisition_updates": 0,
+      "context_tokens": [
+        1048576
+      ],
+      "generated_tokens": 42467136,
+      "candidate_choices": [
+        {
+          "candidate": 0,
+          "count": 4
+        },
+        {
+          "candidate": 1,
+          "count": 5
+        },
+        {
+          "candidate": 2,
+          "count": 5
+        },
+        {
+          "candidate": 3,
+          "count": 3
+        }
+      ],
+      "distance_profiles": [
+        4
+      ],
+      "neighbor_range": {
+        "min": 15,
+        "max": 45
+      },
+      "calibration": {
+        "kind": "empirical-prequential",
+        "observations": 17,
+        "multiplier": 2.0,
+        "observed_coverage": 0.8823529411764706,
+        "coverage_guarantee": false
+      },
+      "validation_initial": [
+        -12.49078
+      ],
+      "validation_final": [
+        -12.490715
+      ],
+      "target_met": false,
+      "causal_output_verification": false,
+      "run": ".cache/blckbaux/runs/pretrain/254891a463e4f5cf37f0/run-1791518829118-73049-0",
+      "selected_norm_error": {
+        "mean": 0.004375849501553131,
+        "max": 0.015515901755702366
+      }
+    },
+    {
+      "rounds": 40,
+      "mean_round_ms": 1654.5393417,
+      "max_round_ms": 1973.107834,
+      "accepted_updates": 4,
+      "acquisition_rounds": 9,
+      "accepted_acquisition_updates": 0,
+      "context_tokens": [
+        1048576
+      ],
+      "generated_tokens": 34283200,
+      "candidate_choices": [
+        {
+          "candidate": 0,
+          "count": 4
+        },
+        {
+          "candidate": 1,
+          "count": 3
+        },
+        {
+          "candidate": 2,
+          "count": 2
+        }
+      ],
+      "distance_profiles": [
+        4
+      ],
+      "neighbor_range": {
+        "min": 15,
+        "max": 40
+      },
+      "calibration": {
+        "kind": "empirical-prequential",
+        "observations": 9,
+        "multiplier": 2.0,
+        "observed_coverage": 0.8888888888888888,
+        "coverage_guarantee": false
+      },
+      "validation_initial": [
+        -12.490744
+      ],
+      "validation_final": [
+        -12.490709
+      ],
+      "target_met": false,
+      "causal_output_verification": false,
+      "run": ".cache/blckbaux/runs/pretrain/254891a463e4f5cf37f0/run-1791519220184-3744-0",
+      "selected_norm_error": {
+        "mean": 0.004610261008279064,
+        "max": 0.015515901755702366
+      }
+    }
+  ],
+  "cuda": {
+    "neighbor_geometry": {
+      "samples": 51437,
+      "history": 64,
+      "candidates": 4,
+      "kernel_ms": 0.324592,
+      "max_relative_error": 7.90E-7,
+      "full_bo_loop": false
+    },
+    "acquisitions_verified": [
+      "ucb",
+      "thompson",
+      "pareto"
+    ],
+    "optimizer_curve": {
+      "schema": "blckbaux.cuda.bf16-bo-curve.v1",
+      "target": "sm_75",
+      "storage": "bf16",
+      "distance_fusion": "candidate-pairs",
+      "fused_pair_parity": true,
+      "points": [
+        {
+          "candidates": 4,
+          "history": 8,
+          "parameter_elements": 4096,
+          "iterations": 4,
+          "proposal_score_ms": 0.112688,
+          "pick_ms": 0.007352,
+          "materialize_ms": 0.023400,
+          "gpu_ms": 0.143440,
+          "wall_ms": 0.177564,
+          "asks_per_second": 5631.756,
+          "candidates_per_second": 22527.025
+        },
+        {
+          "candidates": 4,
+          "history": 8,
+          "parameter_elements": 65536,
+          "iterations": 4,
+          "proposal_score_ms": 0.092416,
+          "pick_ms": 0.006600,
+          "materialize_ms": 0.019960,
+          "gpu_ms": 0.118976,
+          "wall_ms": 0.157222,
+          "asks_per_second": 6360.423,
+          "candidates_per_second": 25441.692
+        },
+        {
+          "candidates": 4,
+          "history": 8,
+          "parameter_elements": 1048576,
+          "iterations": 4,
+          "proposal_score_ms": 0.534536,
+          "pick_ms": 0.007032,
+          "materialize_ms": 0.082792,
+          "gpu_ms": 0.624360,
+          "wall_ms": 0.659452,
+          "asks_per_second": 1516.410,
+          "candidates_per_second": 6065.640
+        }
+      ],
+      "context_tokens": 0,
+      "drafted_tokens": 0,
+      "evaluated_tokens": 0,
+      "repaired_tokens": 0,
+      "generated_tokens": 0,
+      "committed_tokens": 0,
+      "full_generation_loop": false
+    },
+    "log": "results/cuda/neighbors-t4-20261009.log"
+  },
+  "learning_demonstrated": false,
+  "latency_target_achieved": false,
+  "limitations": [
+    "Coordinate sampling preserves realized distinctions but does not prove objective-relevant neighbourhoods.",
+    "Empirical adaptive-sequence coverage is not a conformal or population-improvement guarantee.",
+    "All accepted updates in these runs occurred during initialization; acquisition-phase improvement remains unestablished.",
+    "CUDA kernel parity and optimizer fixtures are not the native H-Net full BO generation loop."
+  ],
+  "research": [
+    "https://proceedings.mlr.press/v306/bafna26a.html",
+    "https://arxiv.org/abs/1110.4300",
+    "https://arxiv.org/abs/2507.15741",
+    "https://arxiv.org/abs/2609.33016"
+  ],
+  "verification": {
+    "format_check_passed": true,
+    "metal_optimizer_tests_passed": true,
+    "metal_feedback_tests_passed": true,
+    "terminal_tests_passed": true,
+    "cuda_geometry_and_acquisition_checks_passed": true,
+    "full_suite_passed": false,
+    "remaining_failures": [
+      "fbt_moe::block_decode::tests::parallel_repairs",
+      "fbt_moe::decode::tests::decode_prefix",
+      "fbt_moe::diffusion::tests::draft_target",
+      "fbt_moe::loss_tests::vocabulary_loss"
+    ]
+  },
+  "provenance": {
+    "metal": "Each run preserves experiment.toml, source.txt and performance-source.sha256; source snapshots must not be replaced by the final working-copy revision.",
+    "cuda": "Measured log preserves native build, sm_75 parity, fixture sizes and command results."
+  }
+}

@@ -1,8 +1,8 @@
-//! Symbolic intermediate representation and emitter for PTX targeting Turing (`sm_75`).
+//! Symbolic intermediate representation and emitter for supported PTX targets.
 
 use std::fmt::Write;
 
-pub use crate::reg::{MmaAccumulator, Reg32, Reg64, RegF32, RegPair, RegPred, RegQuad, TargetArch};
+pub use crate::reg::{Reg32, Reg64, RegF32, RegPred, TargetArch};
 
 /// Virtual register allocator with strict tracking of register bank counts.
 #[derive(Debug, Default, Clone)]
@@ -42,28 +42,6 @@ impl RegAlloc {
         p
     }
 
-    pub fn alloc_pair(&mut self) -> RegPair {
-        RegPair(self.alloc_r32(), self.alloc_r32())
-    }
-
-    pub fn alloc_quad(&mut self) -> RegQuad {
-        RegQuad(
-            self.alloc_r32(),
-            self.alloc_r32(),
-            self.alloc_r32(),
-            self.alloc_r32(),
-        )
-    }
-
-    pub fn alloc_mma_accum(&mut self) -> MmaAccumulator {
-        MmaAccumulator(
-            self.alloc_f32(),
-            self.alloc_f32(),
-            self.alloc_f32(),
-            self.alloc_f32(),
-        )
-    }
-
     /// Total 32-bit equivalent hardware registers allocated.
     /// Note: 64-bit registers count as two 32-bit registers.
     pub fn total_32bit_regs(&self) -> u32 {
@@ -97,7 +75,7 @@ impl PtxKernelBuilder {
             name: name.into(),
             arch,
             max_threads_per_block: (128, 1, 1),
-            max_regs: Some(128), // Default max occupancy target on T4
+            max_regs: Some(128), // Conservative default; schedules can override it.
             smem_bytes: 0,
             params: Vec::new(),
             alloc: RegAlloc::new(),
@@ -117,15 +95,11 @@ impl PtxKernelBuilder {
     }
 
     pub fn set_shared_memory_bytes(&mut self, bytes: usize) -> &mut Self {
-        let max_smem = match self.arch {
-            TargetArch::Sm75 => 65536,
-            TargetArch::Sm80 => 167936,
-            TargetArch::Sm90 => 232448,
-        };
+        let max_smem = self.arch.shared_bytes();
         assert!(
             bytes <= max_smem,
             "Shared memory requested ({bytes} B) exceeds {} limit ({max_smem} B)!",
-            self.arch.ptx_target_str()
+            self.arch.ptx_target()
         );
         self.smem_bytes = bytes;
         self
@@ -167,11 +141,11 @@ impl PtxKernelBuilder {
         writeln!(
             ptx,
             "// Synthesized by ptx-synth for {}",
-            self.arch.ptx_target_str()
+            self.arch.ptx_target()
         )
         .unwrap();
-        writeln!(ptx, ".version {}", self.arch.ptx_version_str()).unwrap();
-        writeln!(ptx, ".target {}", self.arch.ptx_target_str()).unwrap();
+        writeln!(ptx, ".version {}", self.arch.ptx_version()).unwrap();
+        writeln!(ptx, ".target {}", self.arch.ptx_target()).unwrap();
         writeln!(ptx, ".address_size 64\n").unwrap();
 
         // Entry header

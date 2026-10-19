@@ -1,17 +1,20 @@
 //! FP16 GEMM recipes. Numerical parity and timing are established on hardware.
+use crate::TargetArch;
 use std::fmt::Write;
 
 #[derive(Debug, Clone)]
-pub struct TuringGemmConfig {
+pub struct GemmConfig {
     pub name: String,
+    pub target: TargetArch,
     /// Shared-memory staging depth; each MMA consumes eight K elements.
     pub tile_k: u32,
 }
 
-impl Default for TuringGemmConfig {
+impl Default for GemmConfig {
     fn default() -> Self {
         Self {
-            name: "turing_fp16_gemm".into(),
+            name: "fp16_gemm".into(),
+            target: TargetArch::Sm75,
             tile_k: 32,
         }
     }
@@ -19,7 +22,17 @@ impl Default for TuringGemmConfig {
 
 /// Row-major A[M,K] * B[K,N] -> C[M,N], FP16 storage, FP32 accumulation.
 /// A block covers 64x16 outputs with eight warps. Partial tiles are zero padded.
-pub fn synthesize_turing_fp16_gemm(cfg: &TuringGemmConfig) -> String {
+pub fn emit_gemm16(cfg: &GemmConfig) -> String {
+    synthesize(cfg, false)
+}
+
+/// FP16 A/B with an FP32 accumulator and FP32 C. Optimizer polynomial products
+/// need the accumulator precision across their elementwise epilogues.
+pub fn emit_gemm32(cfg: &GemmConfig) -> String {
+    synthesize(cfg, true)
+}
+
+fn synthesize(cfg: &GemmConfig, fp32: bool) -> String {
     assert!([8, 16, 32, 64].contains(&cfg.tile_k));
     assert!(
         !cfg.name.is_empty()
@@ -30,8 +43,8 @@ pub fn synthesize_turing_fp16_gemm(cfg: &TuringGemmConfig) -> String {
     );
     let k = cfg.tile_k;
     let mut ptx = format!(
-        r#".version 6.5
-.target sm_75
+        r#".version {}
+.target {}
 .address_size 64
 .visible .entry {}(
     .param .u64 a, .param .u64 b, .param .u64 c,
@@ -128,6 +141,8 @@ bra B_LOAD;
 LOADED:
 bar.sync 0;
 "#,
+        cfg.target.ptx_version(),
+        cfg.target.ptx_target(),
         cfg.name,
         64 * k * 2,
         k * 16 * 2,
@@ -136,6 +151,13 @@ bar.sync 0;
         64 * k,
         k * 16
     );
+    if fp32 {
+        // The FP32 recipe also batches contiguous matrix banks along grid.z.
+        // Insert after parameter loads and before any shared-memory address use.
+        let marker = "mov.u32 %r0, %tid.x;";
+        let batch = "mov.u32 %r37, %ctaid.z;\ncvt.u64.u32 %rd4, %r37;\nmul.wide.u32 %rd3, %r9, %r11;\nshl.b64 %rd3, %rd3, 1;\nmad.lo.u64 %rd0, %rd3, %rd4, %rd0;\nmul.wide.u32 %rd3, %r11, %r10;\nshl.b64 %rd3, %rd3, 1;\nmad.lo.u64 %rd1, %rd3, %rd4, %rd1;\nmul.wide.u32 %rd3, %r9, %r10;\nshl.b64 %rd3, %rd3, 2;\nmad.lo.u64 %rd2, %rd3, %rd4, %rd2;\nmov.u32 %r0, %tid.x;";
+        ptx = ptx.replacen(marker, batch, 1);
+    }
     for start in (0..k).step_by(8) {
         writeln!(ptx, r#"
 mad.lo.u32 %r25, %r21, {k}, %r4;
@@ -166,6 +188,12 @@ mma.sync.aligned.m16n8k8.row.col.f32.f16.f16.f32 {{%f0,%f1,%f2,%f3}}, {{%r27,%r2
     )
     .unwrap();
     for (f, row, col) in [(0, 21, 23), (1, 21, 24), (2, 22, 23), (3, 22, 24)] {
+        let shift = if fp32 { 2 } else { 1 };
+        let store = if fp32 {
+            format!("@%p0 st.global.f32 [%rd3], %f{f};")
+        } else {
+            format!("cvt.rn.f16.f32 %h0, %f{f};\n@%p0 st.global.b16 [%rd3], %h0;")
+        };
         writeln!(
             ptx,
             r#"
@@ -177,10 +205,9 @@ and.pred %p0, %p0, %p1;
 mul.wide.u32 %rd3, %r16, %r10;
 cvt.u64.u32 %rd4, %r17;
 add.u64 %rd3, %rd3, %rd4;
-shl.b64 %rd3, %rd3, 1;
+shl.b64 %rd3, %rd3, {shift};
 add.u64 %rd3, %rd2, %rd3;
-cvt.rn.f16.f32 %h0, %f{f};
-@%p0 st.global.b16 [%rd3], %h0;
+{store}
 "#
         )
         .unwrap();

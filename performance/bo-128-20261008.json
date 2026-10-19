@@ -1,0 +1,44 @@
+{
+  "schema": "blckbaux.bo-run-audit.v1",
+  "run": ".cache/blckbaux/runs/pretrain/146f2f655c2a54d075fd/run-1791515425681-57283-0",
+  "rounds": 128,
+  "initialization_rounds": 32,
+  "acquisition_rounds": 96,
+  "accepted_updates": 6,
+  "context_tokens": [
+    1048576
+  ],
+  "generated_tokens": 114130944,
+  "generated_range": [
+    125632,
+    1048512
+  ],
+  "latency_ms": {
+    "mean": 1731.7557402343753,
+    "range": [
+      1345.109083,
+      3083.530208
+    ],
+    "proposal_mean": 166.18311299218743,
+    "evaluation_mean": 1398.4110781953127
+  },
+  "acquisition_choices": [
+    {
+      "candidate": 0,
+      "count": 96
+    }
+  ],
+  "interpretation": "Same-radius independent Gaussian expected-distance inputs collapse candidate distinctions. Accepted updates do not establish held-out improvement.",
+  "metadata_corrections": [
+    "generation.json claims paired_candidate_incumbent=true; the executed path evaluates only the candidate and uses a surrogate incumbent.",
+    "response.tokens.evaluated counts H-Net core positions; generation.evaluated_tokens counts lexical output positions. New source aligns these labels."
+  ],
+  "validation": {
+    "initial_nll": 12.490742683410645,
+    "final_nll": 12.49073600769043,
+    "nll_improvement": 0.00000667572021484375,
+    "evaluations": 2,
+    "used_for_acceptance": false
+  },
+  "learning_demonstrated": false
+}

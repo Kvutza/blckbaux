@@ -5,9 +5,9 @@ release_always = false
 publish_timeout = "30m"
 
 [[package]]
-name = "ennx-bpann"
+name = "blckbaux-neighbor-index"
 git_release_enable = false
 
 [[package]]
-name = "ennx-py"
+name = "blckbaux-py"
 release = false

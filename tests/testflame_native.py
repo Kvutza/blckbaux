@@ -154,7 +154,7 @@ def test_directsources(
     if backend == "metal":
         from ops.flame import metal
 
-        experimental = sys.modules["ennx.experimental"]
+        experimental = sys.modules["blckbaux.experimental"]
         experimental.MetalFlameEvaluator = experimental.FlameEvaluator
         experimental.MetalSearchState = experimental.SearchState
         experimental.MetalParamBlock = experimental.ParamBlock

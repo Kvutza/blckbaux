@@ -1,0 +1,27 @@
+# Muon baseline over natural corpus units for the H-Net/PISA/mHC/MoE model.
+version = 4
+
+experiment = "pretrain"
+model = "fbt-pisa1-hnet-mhc4-v1"
+[data]
+recipe = "stack-v3-rust-go-v1"
+
+[execution]
+rounds = 512
+round-target-ms = 200
+
+[evaluation]
+interval = 128
+
+[optimizer]
+algorithm = "muon"
+
+[objective]
+function = "cross-entropy"
+sampling = "natural"
+
+[seeds]
+model = 240105308887621659
+reference = 150813718214252701
+proposal = 91614869253048103
+acquisition = 314159265358979323

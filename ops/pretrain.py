@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import argparse
 import hashlib
 import json
 import logging
@@ -23,10 +22,13 @@ from dataclasses import dataclass
 from importlib.metadata import version
 from pathlib import Path
 
+import click
+
 SOURCE_ID = "HuggingFaceCode/stack-v3-train"
 SOURCE_REVISION = "1f61b735bc0a5698345ce2196730f24bfa467f33"
 CORPUS_PRESET = "stack_v3_python_pilot_v1"
 CORPUS_800K = "stack_v3_python_800k_v1"
+CORPUS_GEMMA4 = "stack_v3_python_gemma4_v1"
 MODEL_PRESET = "fbt_pisa1_legacy_v1"
 MODEL_ALIASES = {
     "fbt-pisa1-legacy-v1": MODEL_PRESET,
@@ -39,7 +41,8 @@ MODEL_ALIASES = {
 CORPUS_ALIASES = {
     "stack-v3-python-pilot-v1": CORPUS_PRESET,
     "stack-v3-python-800k-v1": CORPUS_800K,
-    "fineweb-10bt-pilot-v1": "fineweb_10bt_pilot_v1",
+    "stack-v3-python-gemma4-v1": CORPUS_GEMMA4,
+    "gemma4-pilot-v1": CORPUS_GEMMA4,
 }
 MODEL_PRESETS = (
     MODEL_PRESET,
@@ -48,8 +51,9 @@ MODEL_PRESETS = (
     "fbt_pisa1_hc4_v1",
     "fbt_pisa1_mhc4_v1",
 )
-MAGIC = b"ENNXPTN1"
+MAGIC = b"BLCKPTN1"
 VOCAB = 8192
+GEMMA4_VOCAB = 256015
 CONTEXT = 4096
 SEED = 0x454E4E58
 SPECIALS = ("<|unknown|>", "<|endoftext|>", "<|endrepository|>")
@@ -70,8 +74,9 @@ PRESET_SEQUENCES = {"train": 20, "validation": 16, "test": 16}
 CORPUS_SEQUENCES = {
     CORPUS_PRESET: PRESET_SEQUENCES,
     CORPUS_800K: {"train": 200, "validation": 16, "test": 16},
+    CORPUS_GEMMA4: PRESET_SEQUENCES,
 }
-LOG = logging.getLogger("ennx.pretrain")
+LOG = logging.getLogger("blckbaux.pretrain")
 
 
 @contextmanager
@@ -271,33 +276,55 @@ def train_tokenizer(documents, buckets=None):
     return tokenizer
 
 
-def write_values(stream, values) -> int:
-    if any(not 0 <= token < VOCAB for token in values):
+def write_values(stream, values, vocab: int = VOCAB) -> int:
+    if any(not 0 <= token < vocab for token in values):
         raise ValueError("tokenizer emitted an out-of-range token")
-    encoded = array("H", values)
+    typecode = "H" if vocab <= 65536 else "I"
+    encoded = array(typecode, values)
     if sys.byteorder != "little":
         encoded.byteswap()
     encoded.tofile(stream)
     return len(encoded)
 
 
-def spool_tokens(tokenizer, documents, directory: Path, buckets=None):
-    eot = tokenizer.token_to_id(SPECIALS[1])
-    eor = tokenizer.token_to_id(SPECIALS[2])
+def spool_tokens(
+    tokenizer, documents, directory: Path, buckets=None, vocab: int = VOCAB
+):
+    try:
+        eot = tokenizer.token_to_id(SPECIALS[1])
+    except (KeyError, ValueError):
+        eot = None
+    if eot is None:
+        try:
+            eot = tokenizer.token_to_id("<eos>")
+        except (KeyError, ValueError):
+            eot = None
+    try:
+        eor = tokenizer.token_to_id(SPECIALS[2])
+    except (KeyError, ValueError):
+        eor = None
+    if eor is None:
+        try:
+            eor = tokenizer.token_to_id("<|endrepository|>")
+        except (KeyError, ValueError):
+            eor = None
+    if eot is None or eor is None:
+        raise ValueError("tokenizer missing required document/repository delimiters")
     paths = {split: {} for split in documents}
     counts = {split: {} for split in documents}
     document_index = {}
     directory.mkdir()
+    extension = "u16" if vocab <= 65536 else "u32"
     for split, buckets in documents.items():
         for bucket in buckets or QUOTAS:
-            path = directory / f"{split}-{bucket}.u16"
+            path = directory / f"{split}-{bucket}.{extension}"
             count = 0
             records = []
             previous_repository = None
             with path.open("xb") as stream:
                 for document in buckets[bucket]:
                     if previous_repository not in (None, document.repository):
-                        count += write_values(stream, [eor])
+                        count += write_values(stream, [eor], vocab=vocab)
                     encoding = tokenizer.encode(document.text, add_special_tokens=False)
                     records.append(
                         {
@@ -309,8 +336,8 @@ def spool_tokens(tokenizer, documents, directory: Path, buckets=None):
                             "content_id": document.content_id,
                         }
                     )
-                    count += write_values(stream, encoding.ids)
-                    count += write_values(stream, [eot])
+                    count += write_values(stream, encoding.ids, vocab=vocab)
+                    count += write_values(stream, [eot], vocab=vocab)
                     previous_repository = document.repository
             paths[split][bucket] = path
             counts[split][bucket] = count
@@ -347,12 +374,14 @@ def pack(
     return packed, {bucket: offsets[bucket] for bucket in QUOTAS}
 
 
-def write_stream(path: Path, tokens: list[int], sequences: int) -> str:
-    header = MAGIC + VOCAB.to_bytes(4, "little") + CONTEXT.to_bytes(4, "little")
+def write_stream(
+    path: Path, tokens: list[int], sequences: int, vocab: int = VOCAB
+) -> str:
+    header = MAGIC + vocab.to_bytes(4, "little") + CONTEXT.to_bytes(4, "little")
     header += sequences.to_bytes(4, "little") + (0).to_bytes(4, "little")
     with path.open("xb") as stream:
         stream.write(header)
-        write_values(stream, tokens)
+        write_values(stream, tokens, vocab=vocab)
     return file_digest(path)
 
 
@@ -371,6 +400,7 @@ def pack_stream(
     sequences: int,
     seed: int,
     quotas=None,
+    vocab: int = VOCAB,
 ) -> tuple[str, dict[str, int]]:
     quotas = quotas or QUOTAS
     needed = {bucket: sequences * quota for bucket, quota in quotas.items()}
@@ -381,7 +411,8 @@ def pack_stream(
     }
     if short:
         raise ValueError(f"token pools are smaller than the requested mixture: {short}")
-    header = MAGIC + VOCAB.to_bytes(4, "little") + CONTEXT.to_bytes(4, "little")
+    stride = 2 if vocab <= 65536 else 4
+    header = MAGIC + vocab.to_bytes(4, "little") + CONTEXT.to_bytes(4, "little")
     header += sequences.to_bytes(4, "little") + (0).to_bytes(4, "little")
     streams = {bucket: paths[bucket].open("rb") for bucket in quotas}
     offsets = {bucket: 0 for bucket in quotas}
@@ -392,7 +423,7 @@ def pack_stream(
                 order = list(quotas)
                 random.Random(seed + sequence).shuffle(order)
                 for bucket in order:
-                    size = quotas[bucket] * 2
+                    size = quotas[bucket] * stride
                     chunk = streams[bucket].read(size)
                     if len(chunk) != size:
                         raise ValueError(f"token pool ended early: {bucket}")
@@ -411,17 +442,20 @@ def canonical_id(namespace: str, value: dict) -> str:
 
 def corpus_recipe(rounds: int = 10, preset: str = CORPUS_PRESET) -> dict:
     sequences = CORPUS_SEQUENCES[preset]
+    is_gemma = preset == CORPUS_GEMMA4
+    vocab = GEMMA4_VOCAB if is_gemma else VOCAB
+    kind = "gemma4" if is_gemma else "byte_level_bpe"
     return {
         "preset": preset,
-        "format": "ennx.pretraining.v1",
+        "format": "blckbaux.pretraining.v1",
         "source": {"id": SOURCE_ID, "revision": SOURCE_REVISION},
         "collector_version": COLLECTOR_VERSION,
         "split_policy": SPLIT_POLICY,
         "shuffle_repositories": SHUFFLE_REPOSITORIES,
         "parquet_batch_repositories": PARQUET_BATCH,
         "tokenizer": {
-            "kind": "byte_level_bpe",
-            "vocabulary": VOCAB,
+            "kind": kind,
+            "vocabulary": vocab,
             "package": "tokenizers==0.21.4",
         },
         "datasets_package": "datasets==4.1.1",
@@ -434,9 +468,15 @@ def corpus_recipe(rounds: int = 10, preset: str = CORPUS_PRESET) -> dict:
     }
 
 
-def token_stage(characters: dict) -> dict:
+def token_stage(characters: dict, preset: str = CORPUS_PRESET) -> dict:
+    is_gemma = preset == CORPUS_GEMMA4
+    vocab = GEMMA4_VOCAB if is_gemma else VOCAB
+    kind = "gemma4" if is_gemma else "byte_level_bpe"
+    from ops import gemma4
+
+    specials = list(gemma4.SPECIAL_TAGS if is_gemma else SPECIALS)
     return {
-        "format": "ennx.token-pools.v1",
+        "format": "blckbaux.token-pools.v1",
         "collector_version": COLLECTOR_VERSION,
         "split_policy": SPLIT_POLICY,
         "source": {"id": SOURCE_ID, "revision": SOURCE_REVISION},
@@ -449,11 +489,11 @@ def token_stage(characters: dict) -> dict:
         },
         "required_characters": characters,
         "tokenizer": {
-            "kind": "byte_level_bpe",
-            "vocabulary": VOCAB,
+            "kind": kind,
+            "vocabulary": vocab,
             "package": "tokenizers",
             "package_version": "0.21.4",
-            "special_tokens": list(SPECIALS),
+            "special_tokens": specials,
         },
         "seed": SEED,
         "shuffle_repositories": SHUFFLE_REPOSITORIES,
@@ -479,11 +519,9 @@ def plan_study(document: dict, root: Path, source: str) -> dict:
     if document.get("model") not in MODEL_PRESETS:
         choices = ", ".join(repr(model) for model in MODEL_PRESETS)
         raise ValueError(f"model must be one of {choices}")
-    from ops import fineweb
-
     corpus = document.get("corpus")
-    if corpus not in (*CORPUS_SEQUENCES, fineweb.PRESET):
-        choices = ", ".join(repr(name) for name in (*CORPUS_SEQUENCES, fineweb.PRESET))
+    if corpus not in CORPUS_SEQUENCES:
+        choices = ", ".join(repr(name) for name in CORPUS_SEQUENCES)
         raise ValueError(f"corpus must be one of {choices}")
     forbidden = sorted(
         {"output", "dataset", "validation_dataset"}.intersection(document)
@@ -497,16 +535,10 @@ def plan_study(document: dict, root: Path, source: str) -> dict:
         raise ValueError("rounds must be a positive integer")
     generation = document.get("generation")
 
-    recipe = (
-        fineweb.recipe() if corpus == fineweb.PRESET else corpus_recipe(rounds, corpus)
-    )
-    if corpus == fineweb.PRESET and generation is not None:
-        raise ValueError(
-            "FineWeb optimizer pilot uses corpus-prefix NLL, not generation rewards"
-        )
+    recipe = corpus_recipe(rounds, corpus)
     if generation is not None and generation.get("corpus_prompt_tokens") is not None:
         recipe["episodes"] = {
-            "schema": "ennx.document_episodes.v2",
+            "schema": "blckbaux.document_episodes.v2",
             "prompt_tokens": generation["corpus_prompt_tokens"],
             "generated_tokens": generation["max_tokens"],
             "counts": {"train": 16, "validation": 3, "test": 3},
@@ -517,18 +549,18 @@ def plan_study(document: dict, root: Path, source: str) -> dict:
             },
             "buckets": ["implementation", "tests"],
         }
-    corpus_id = canonical_id("ennx-corpus-v1", recipe)
+    corpus_id = canonical_id("blckbaux-corpus-v1", recipe)
     characters = required_characters(recipe["sequences"])
-    stage_recipe = recipe if corpus == fineweb.PRESET else token_stage(characters)
-    stage_id = canonical_id("ennx-token-pools-v1", stage_recipe)
+    stage_recipe = token_stage(characters, preset=corpus)
+    stage_id = canonical_id("blckbaux-token-pools-v1", stage_recipe)
     experiment = {
         "config": document,
         "corpus_id": corpus_id,
         "stage_id": stage_id,
         "source": source,
     }
-    experiment_id = canonical_id("ennx-experiment-v1", experiment)
-    cache = root / ".cache" / "ennx"
+    experiment_id = canonical_id("blckbaux-experiment-v1", experiment)
+    cache = root / ".cache" / "blckbaux"
     return {
         "corpus_id": corpus_id,
         "experiment_id": experiment_id,
@@ -764,11 +796,7 @@ def resolved_toml(document: dict, plan: dict) -> str:
             **resolved["generation"],
             "episode_dataset": str((plan["corpus"] / "episodes.json").resolve()),
         }
-    resolved["dataset"] = str((plan["corpus"] / "train.ennxptn").resolve())
-    if document.get("corpus") == "fineweb_10bt_pilot_v1":
-        resolved["validation_dataset"] = str(
-            (plan["corpus"] / "validation.ennxptn").resolve()
-        )
+    resolved["dataset"] = str((plan["corpus"] / "train.blckbauxptn").resolve())
     resolved["output"] = str(plan["output"].resolve())
     keys = ["version"] + sorted(key for key in resolved if key != "version")
     return "".join(f"{key} = {toml_value(resolved[key])}\n" for key in keys)
@@ -819,12 +847,7 @@ def resolve_plan(document: dict, plan: dict) -> Path:
             raise ValueError(
                 f"cached corpus recipe does not match its identity: {corpus}"
             )
-        if document.get("corpus") == "fineweb_10bt_pilot_v1":
-            from ops.fineweb import validate_cache as validate_fineweb_cache
-
-            validate_fineweb_cache(corpus, manifest, plan["recipe"])
-        else:
-            validate_cache(corpus, manifest, plan["recipe"])
+        validate_cache(corpus, manifest, plan["recipe"])
     else:
         sequences = plan["recipe"]["sequences"]
         LOG.info(
@@ -832,11 +855,18 @@ def resolve_plan(document: dict, plan: dict) -> Path:
             sequences["train"] // 2,
             CONTEXT,
         )
-        if document.get("corpus") == "fineweb_10bt_pilot_v1":
-            from ops.fineweb import prepare as prepare_fineweb
-
-            prepare_fineweb(corpus, plan["recipe"], plan["corpus_id"])
-        else:
+        try:
+            prepare(
+                corpus,
+                sequences["train"],
+                sequences["validation"],
+                sequences["test"],
+                recipe_id=plan["corpus_id"],
+                stage=plan["stage"],
+                episodes=plan["recipe"].get("episodes"),
+                preset=plan["recipe"].get("preset", CORPUS_PRESET),
+            )
+        except TypeError:
             prepare(
                 corpus,
                 sequences["train"],
@@ -857,7 +887,7 @@ def resolve_plan(document: dict, plan: dict) -> Path:
 
 
 def validate_cache(corpus: Path, manifest: dict, recipe: dict) -> None:
-    if manifest.get("format") != "ennx.pretraining.v1":
+    if manifest.get("format") != "blckbaux.pretraining.v1":
         raise ValueError(f"cached corpus has the wrong format: {corpus}")
     tokenizer = manifest.get("tokenizer")
     splits = manifest.get("splits")
@@ -877,7 +907,7 @@ def validate_cache(corpus: Path, manifest: dict, recipe: dict) -> None:
     expected = {
         "tokenizer.json": tokenizer.get("sha256"),
         **{
-            f"{split}.ennxptn": splits.get(split, {}).get("sha256")
+            f"{split}.blckbauxptn": splits.get(split, {}).get("sha256")
             for split in recipe["sequences"]
         },
     }
@@ -913,6 +943,7 @@ def prepare(
     recipe_id: str | None = None,
     stage: Path | None = None,
     episodes: dict | None = None,
+    preset: str = CORPUS_PRESET,
 ):
     sequences = {
         "train": train_sequences,
@@ -924,10 +955,11 @@ def prepare(
     output = output.resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
     characters_required = required_characters(sequences)
-    stage_recipe = token_stage(characters_required)
-    stage_id = canonical_id("ennx-token-pools-v1", stage_recipe)
+    stage_recipe = token_stage(characters_required, preset=preset)
+    stage_id = canonical_id("blckbaux-token-pools-v1", stage_recipe)
     stage = (stage or output.parent / "token-pools" / stage_id).resolve()
     stage.parent.mkdir(parents=True, exist_ok=True)
+    vocab = stage_recipe["tokenizer"]["vocabulary"]
 
     def load_stage():
         metadata_path = stage / "metadata.json"
@@ -964,17 +996,19 @@ def prepare(
             {split: {} for split in sequences},
             {split: {} for split in sequences},
         )
+        extension = "u16" if vocab <= 65536 else "u32"
+        stride = 2 if vocab <= 65536 else 4
         for split in sequences:
             for bucket in QUOTAS:
                 key = f"{split}/{bucket}"
                 record = pool_records.get(key)
-                path = stage / "pools" / f"{split}-{bucket}.u16"
+                path = stage / "pools" / f"{split}-{bucket}.{extension}"
                 if (
                     not isinstance(record, dict)
                     or type(record.get("count")) is not int
                     or record["count"] < 0
                     or not path.is_file()
-                    or path.stat().st_size != record["count"] * 2
+                    or path.stat().st_size != record["count"] * stride
                     or file_digest(path) != record.get("sha256")
                 ):
                     raise ValueError(f"token pool is missing or corrupt: {path}")
@@ -990,15 +1024,25 @@ def prepare(
         with phase("collect and filter"):
             documents, characters = collect_native(required_characters(sequences))
         with phase("train tokenizer"):
-            tokenizer = train_tokenizer(documents)
+            if preset == CORPUS_GEMMA4:
+                from ops import gemma4
+
+                tokenizer = gemma4.load_gemma4()
+            else:
+                tokenizer = train_tokenizer(documents)
         stage_temporary = Path(
             tempfile.mkdtemp(prefix=f".{stage.name}.", dir=stage.parent)
         )
         try:
             with phase("tokenize"):
-                pool_paths, pool_counts = spool_tokens(
-                    tokenizer, documents, stage_temporary / "pools"
-                )
+                try:
+                    pool_paths, pool_counts = spool_tokens(
+                        tokenizer, documents, stage_temporary / "pools", vocab=vocab
+                    )
+                except TypeError:
+                    pool_paths, pool_counts = spool_tokens(
+                        tokenizer, documents, stage_temporary / "pools"
+                    )
             tokenizer_path = stage_temporary / "tokenizer.json"
             tokenizer.save(str(tokenizer_path))
             pool_metadata = {}
@@ -1058,8 +1102,9 @@ def prepare(
     temporary = Path(tempfile.mkdtemp(prefix=f".{output.name}.", dir=output.parent))
     try:
         shutil.copyfile(stage / "tokenizer.json", temporary / "tokenizer.json")
+        specials = stage_recipe["tokenizer"]["special_tokens"]
         manifest = {
-            "format": "ennx.pretraining.v1",
+            "format": "blckbaux.pretraining.v1",
             "recipe_id": recipe_id,
             "stage_id": stage_id,
             "source": {"id": SOURCE_ID, "revision": SOURCE_REVISION},
@@ -1076,9 +1121,9 @@ def prepare(
             "deduplication": "content ID across all admitted splits",
             "mixture_tokens_per_sequence": QUOTAS,
             "tokenizer": {
-                "kind": "byte_level_bpe",
-                "vocabulary": VOCAB,
-                "special_tokens": dict(zip(SPECIALS, range(len(SPECIALS)))),
+                "kind": stage_recipe["tokenizer"]["kind"],
+                "vocabulary": vocab,
+                "special_tokens": dict(zip(specials, range(len(specials)))),
                 "package_version": stage_metadata["tokenizer_package_version"],
                 "sha256": stage_metadata["tokenizer_sha256"],
             },
@@ -1086,15 +1131,25 @@ def prepare(
             "splits": {},
         }
         for index, (split, count) in enumerate(sequences.items()):
-            path = temporary / f"{split}.ennxptn"
+            path = temporary / f"{split}.blckbauxptn"
             with phase(f"pack {split} ({count} sequences)"):
-                digest, mixture = pack_stream(
-                    path,
-                    pool_paths[split],
-                    pool_counts[split],
-                    count,
-                    SEED + index * 1_000_000,
-                )
+                try:
+                    digest, mixture = pack_stream(
+                        path,
+                        pool_paths[split],
+                        pool_counts[split],
+                        count,
+                        SEED + index * 1_000_000,
+                        vocab=vocab,
+                    )
+                except TypeError:
+                    digest, mixture = pack_stream(
+                        path,
+                        pool_paths[split],
+                        pool_counts[split],
+                        count,
+                        SEED + index * 1_000_000,
+                    )
             split_metadata = stage_metadata["splits"][split]
             manifest["splits"][split] = {
                 "sequences": count,
@@ -1137,41 +1192,54 @@ def prepare(
     return manifest
 
 
-def parser() -> argparse.ArgumentParser:
-    result = argparse.ArgumentParser(description=__doc__)
-    result.add_argument("--output", required=True, type=Path)
-    result.add_argument("--train-sequences", type=int, default=4096)
-    result.add_argument("--validation-sequences", type=int, default=256)
-    result.add_argument("--test-sequences", type=int, default=256)
-    return result
-
-
-def main() -> None:
+@click.group(invoke_without_command=True, help=__doc__)
+@click.option("--output", type=click.Path(file_okay=False, path_type=Path))
+@click.option(
+    "--train-sequences", type=click.IntRange(min=1), default=4096, show_default=True
+)
+@click.option(
+    "--validation-sequences",
+    type=click.IntRange(min=1),
+    default=256,
+    show_default=True,
+)
+@click.option(
+    "--test-sequences", type=click.IntRange(min=1), default=256, show_default=True
+)
+@click.pass_context
+def main(
+    context: click.Context,
+    output: Path | None,
+    train_sequences: int,
+    validation_sequences: int,
+    test_sequences: int,
+) -> None:
     logging.basicConfig(level=logging.WARNING, format="[pretrain] %(message)s")
     LOG.setLevel(logging.INFO)
-    if len(sys.argv) >= 2 and sys.argv[1] == "resolve":
-        resolve = argparse.ArgumentParser(
-            description="Resolve a path-free pretrain study."
-        )
-        resolve.add_argument("config", type=Path)
-        arguments = resolve.parse_args(sys.argv[2:])
-        try:
-            path = resolve_study(arguments.config, Path.cwd())
-        except (OSError, ValueError) as error:
-            resolve.error(str(error))
-        print(path)
+    if context.invoked_subcommand is not None:
         return
-    arguments = parser().parse_args()
+    if output is None:
+        raise click.UsageError("Missing option '--output'.")
     try:
         manifest = prepare(
-            arguments.output,
-            arguments.train_sequences,
-            arguments.validation_sequences,
-            arguments.test_sequences,
+            output,
+            train_sequences,
+            validation_sequences,
+            test_sequences,
         )
     except (OSError, ValueError) as error:
-        parser().error(str(error))
-    print(json.dumps(manifest["splits"], sort_keys=True))
+        raise click.ClickException(str(error)) from error
+    click.echo(json.dumps(manifest["splits"], sort_keys=True))
+
+
+@main.command(help="Resolve a path-free pretrain study.")
+@click.argument("config", type=click.Path(exists=True, dir_okay=False, path_type=Path))
+def resolve(config: Path) -> None:
+    try:
+        path = resolve_study(config, Path.cwd())
+    except (OSError, ValueError) as error:
+        raise click.ClickException(str(error)) from error
+    click.echo(path)
 
 
 if __name__ == "__main__":

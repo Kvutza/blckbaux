@@ -1,0 +1,67 @@
+{
+  "schema": "blckbaux.performance.pretrain.v1",
+  "date": "2026-10-10",
+  "source_revision": "fc4504f78b080efe751e52cc31bb62ffdc1b86cb",
+  "performance_source_sha256": "8117bffc2773fcea2c33de371dbea3eac82e3f374c4fa59f5b698f22d23f49cd",
+  "hardware": {
+    "model": "MacBook Air Mac16,12",
+    "chip": "Apple M4",
+    "gpu_cores": 10,
+    "memory_gb": 24,
+    "api": "Metal 4"
+  },
+  "experiment": {
+    "config": "examples/tuning/hnet-1m-gaussian.toml",
+    "parameters": 1177756440,
+    "rounds": 128,
+    "context_tokens": 1048576,
+    "evaluated_core_positions": 16384,
+    "objective": "paired conditional cross entropy improvement",
+    "accepted_updates": 6
+  },
+  "learning": {
+    "validation_tasks": 32,
+    "initial_nll": 12.484328180551529,
+    "final_nll": 12.48422259092331,
+    "nll_change": -0.00010558962821960449,
+    "paired_standard_error": 0.000020751304825630244,
+    "paired_standard_errors_from_zero": 5.088380259673587,
+    "tasks_improved": 24,
+    "claim": "measurable positive movement at 1M context; effect is too small to establish practically useful learning"
+  },
+  "systems": {
+    "initialization_seconds": 74.4,
+    "mean_round_ms": 1737.0847939375005,
+    "median_round_ms": 1452.8374375,
+    "minimum_round_ms": 1322.149208,
+    "maximum_round_ms": 3240.509583,
+    "proposal_mean_ms": 356.85264195312493,
+    "evaluation_mean_ms": 1359.5681240156246,
+    "tell_mean_ms": 0.9838668828125006,
+    "condition_reuse_mean_ms": 1457.9463225416673,
+    "condition_refresh_mean_ms": 2573.2578554062497,
+    "target_round_ms": 200,
+    "target_met": false
+  },
+  "trust_region": {
+    "shape": "scalar over architecture-normalized tensor blocks",
+    "success_tolerance": 3,
+    "failure_tolerance": 4,
+    "transitions": [
+      { "round": 47, "from": 0.001, "to": 0.0005 },
+      { "round": 87, "from": 0.0005, "to": 0.00025 },
+      { "round": 127, "from": 0.00025, "to": 0.000125 }
+    ],
+    "radius_results": [
+      { "radius": 0.001, "rounds": 47, "accepted": 4, "mean_changed_fraction": 0.6184622215431476 },
+      { "radius": 0.0005, "rounds": 40, "accepted": 2, "mean_changed_fraction": 0.4576036070963874 },
+      { "radius": 0.00025, "rounds": 40, "accepted": 0, "mean_changed_fraction": 0.3218665379363156 },
+      { "radius": 0.000125, "rounds": 1, "accepted": 0, "mean_changed_fraction": 0.2353197763028152 }
+    ],
+    "surrogate_actual_correlation": 0.024640753549584616,
+    "predicted_positive_rounds": 121,
+    "positive_observed_rounds": 50,
+    "interpretation": "contraction reduced resolvable improvement and did not improve model agreement"
+  },
+  "artifact": ".cache/blckbaux/runs/pretrain/ba6099e2fedb6b647b09/run-1791660939589-4869-0"
+}

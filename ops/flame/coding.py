@@ -266,7 +266,7 @@ def prepare(rows: list[dict], tokenizer, *, count: int = 8, max_tokens: int = 25
             "No truncation or partial objective was written."
         )
     return {
-        "format": "ennx.solution_tokens.v1",
+        "format": "blckbaux.solution_tokens.v1",
         "provenance": {
             "model": {"id": MODEL_ID, "revision": REVISION, "iteration": ITERATION},
             "dataset": {
@@ -306,7 +306,7 @@ def prepare(rows: list[dict], tokenizer, *, count: int = 8, max_tokens: int = 25
             },
             "reference_verification": "dataset-supplied references; no programs executed",
             "evaluation_separation": "BigCodeBench-Hard is evaluation-only; no data loaded or used",
-            "prompt_template": "ennx.mbpp_comments.v1",
+            "prompt_template": "blckbaux.mbpp_comments.v1",
             "loss_mask_semantics": "mask[i] scores tokens[i] from tokens[:i]; mask[0]=false",
             "eos_policy": "append exactly one EOS (ID 0) after reference; score it; no BOS",
             "text_hash_encoding": "SHA256 of exact UTF-8 text before tokenizer NFC normalization",

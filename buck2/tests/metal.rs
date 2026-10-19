@@ -1,12 +1,12 @@
-use ennx::experimental::{
+use blckbaux::experimental::{
     AcquisitionKind, ComputeDevice, DenseLeaf, DenseTerm, ForwardProgram, KdaControlRequest,
     KdaForwardRequest, KdaMoeLayerRequest, KdaMoeMetalArena, KdaMoeMetalExecutor,
     KdaMoeMetalKdaVectors, KdaMoeMetalModel, KdaMoeMetalWeights, KdaPackedLinear, KdaTensorLayout,
-    ParamBuffer, ResidentBoState, SearchConfig,
+    ParamBuffer, ResidentBoState, RoundConfig,
 };
-use ennx::search::Parameter;
-use ennx::search::Search;
-use ennx::{ENN, ENNParams, IndexDriver, PosteriorFlags, compute_internals};
+use blckbaux::search::Parameter;
+use blckbaux::search::TrialEngine;
+use blckbaux::{ENN, ENNParams, IndexDriver, PosteriorFlags, compute_internals};
 use ndarray::Array2;
 
 fn leaves() -> Vec<Parameter> {
@@ -25,27 +25,23 @@ fn base() -> Vec<u8> {
 
 fn ask(device: ComputeDevice) -> Result<(usize, f32, Vec<u8>), String> {
     let base = base();
-    let mut search = Search::new(&base, 0.25, leaves(), 4, device)?;
-    let warm = search.ask(
-        &[17],
-        SearchConfig {
-            neighbors: 1,
-            length: 1.0,
-            ..SearchConfig::default()
-        },
-    )?;
+    let mut search = TrialEngine::new(&base, 0.25, leaves(), 4, device)?;
+    let warm = search.ask(&[17], {
+        let mut config = RoundConfig::default();
+        config.surrogate.neighbors = 1;
+        config.proposal.radius = 1.0;
+        config
+    })?;
     search.tell(warm, 0.75, true)?;
-    let trial = search.ask(
-        &[19, 23, 29, 31],
-        SearchConfig {
-            neighbors: 2,
-            length: 0.65,
-            beta: 1.3,
-            acquisition: AcquisitionKind::Ucb,
-            seed: 41,
-            ..SearchConfig::default()
-        },
-    )?;
+    let trial = search.ask(&[19, 23, 29, 31], {
+        let mut config = RoundConfig::default();
+        config.surrogate.neighbors = 2;
+        config.proposal.radius = 0.65;
+        config.acquisition.beta = 1.3;
+        config.acquisition.kind = AcquisitionKind::Ucb;
+        config.acquisition.seed = 41;
+        config
+    })?;
     Ok((trial.index, trial.score, search.row(trial)?))
 }
 
@@ -237,13 +233,11 @@ fn kda_row() {
     )
     .unwrap();
     let round = state
-        .ask(
-            &[17],
-            SearchConfig {
-                neighbors: 1,
-                ..SearchConfig::default()
-            },
-        )
+        .ask(&[17], {
+            let mut config = RoundConfig::default();
+            config.surrogate.neighbors = 1;
+            config
+        })
         .unwrap();
     state.bind_metal(&round, &mut executor).unwrap();
 }
@@ -324,14 +318,12 @@ fn row_forward() {
     )
     .unwrap();
     let round = state
-        .ask(
-            &[17],
-            SearchConfig {
-                neighbors: 1,
-                length: 1.0,
-                ..SearchConfig::default()
-            },
-        )
+        .ask(&[17], {
+            let mut config = RoundConfig::default();
+            config.surrogate.neighbors = 1;
+            config.proposal.radius = 1.0;
+            config
+        })
         .unwrap();
     let mut materialized = kda_executor(
         &request,

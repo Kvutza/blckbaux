@@ -36,15 +36,16 @@ _SDK = {
 
 def _unpack_impl(ctx):
     python = ctx.attrs.python[DefaultInfo].default_outputs[0]
+    click = ctx.attrs.click[DefaultInfo].default_outputs[0]
     output = ctx.actions.declare_output("prefix", dir = True)
-    command = cmd_args(python.project("bin/python3"), ctx.attrs.script)
+    command = cmd_args("env", cmd_args(click, format = "PYTHONPATH={}"), python.project("bin/python3"), ctx.attrs.script)
     if ctx.attrs.sdk:
         command.add("--sdk")
     command.add(output.as_output())
     for archive in ctx.attrs.archives:
         command.add(archive[DefaultInfo].default_outputs[0])
     # Keep the interpreter's shared libraries and standard library materialized.
-    command.add(cmd_args(hidden = [python]))
+    command.add(cmd_args(hidden = [python, click]))
     ctx.actions.run(command, category = "native_unpack")
     return [DefaultInfo(default_output = output)]
 
@@ -52,6 +53,7 @@ _unpack = rule(
     impl = _unpack_impl,
     attrs = {
         "archives": attrs.list(attrs.dep()),
+        "click": attrs.dep(),
         "python": attrs.exec_dep(),
         "script": attrs.source(),
         "sdk": attrs.bool(default = False),
@@ -59,6 +61,12 @@ _unpack = rule(
 )
 
 def native_archives():
+    native.http_file(
+        name = "click-wheel",
+        urls = ["https://files.pythonhosted.org/packages/58/50/6c0d534c5f134586a8e1ba4e330569e32f057e33372ae556463212fb4cd3/click-8.5.0-py3-none-any.whl"],
+        sha256 = "255bc9599cf7748b4b1a446ccc735421bd08a2ae529a8b88597d3de5664ee360",
+        out = "click-8.5.0-py3-none-any.whl",
+    )
     for triple, checksum in _UNPACK_PYTHON.items():
         native.http_archive(
             name = "native-unpack-python-" + triple,
@@ -84,6 +92,7 @@ def native_archives():
         _unpack(
             name = name,
             archives = [":" + name + "-download"],
+            click = ":click-wheel",
             python = python,
             script = "native_unpack.py",
             visibility = ["PUBLIC"],
@@ -103,6 +112,7 @@ def native_archives():
         _unpack(
             name = "sdk-linux-" + arch,
             archives = downloads,
+            click = ":click-wheel",
             python = python,
             script = "native_unpack.py",
             sdk = True,

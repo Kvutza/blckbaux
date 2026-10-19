@@ -4,12 +4,12 @@ set -eu
 revision=6abfaa091e29a6275c1943895bfbc97efa306e98
 rust_toolchain=nightly-2026-08-28
 llvm_major=21
-cuda_root=/usr/local/cuda-13.0
-workspace=${ENNX_CUDA_OXIDE_WORKSPACE:-/content/cuda-oxide}
+cuda_root=${CUDA_HOME:-/usr/local/cuda-13.0}
+workspace=${BLCKBAUX_CUDA_OXIDE_WORKSPACE:-/content/cuda-oxide}
 cargo_home=${CARGO_HOME:-"$HOME/.cargo"}
 
 fail() {
-    echo "ennx cuda setup: $*" >&2
+    echo "blckbaux cuda setup: $*" >&2
     exit 1
 }
 
@@ -39,12 +39,12 @@ fi
 "$cargo_home/bin/rustup" toolchain install "$rust_toolchain" --profile minimal \
     --component rust-src --component rustc-dev --component llvm-tools
 
-if [ ! -f "$workspace/.ennx-revision" ] || [ "$(cat "$workspace/.ennx-revision" 2>/dev/null || true)" != "$revision" ]; then
-    [ ! -e "$workspace" ] || fail "$workspace exists without the requested ENNX revision marker"
+if [ ! -f "$workspace/.blckbaux-revision" ] || [ "$(cat "$workspace/.blckbaux-revision" 2>/dev/null || true)" != "$revision" ]; then
+    [ ! -e "$workspace" ] || fail "$workspace exists without the requested BLCKBAUX revision marker"
     mkdir -p "$workspace"
     curl -fsSL "https://github.com/NVlabs/cuda-oxide/archive/$revision.tar.gz" -o /tmp/cuda-oxide.tar.gz
     tar -xzf /tmp/cuda-oxide.tar.gz --strip-components=1 -C "$workspace"
-    echo "$revision" > "$workspace/.ennx-revision"
+    echo "$revision" > "$workspace/.blckbaux-revision"
 fi
 
 export CUDA_HOME=$cuda_root
@@ -59,4 +59,4 @@ if [ ! -x "$cargo_home/bin/cargo-oxide" ]; then
     "$cargo_home/bin/cargo" "+$rust_toolchain" install \
         --path "$workspace/crates/cargo-oxide" --locked --force
 fi
-echo "CUDA-Oxide $revision bootstrap is ready; run ./ennx cuda build"
+echo "CUDA-Oxide $revision bootstrap is ready; run ./blckbaux cuda build"

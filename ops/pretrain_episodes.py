@@ -167,7 +167,7 @@ def write_episodes(
             f"episode provenance is missing for {len(missing)} selected documents"
         )
     document = {
-        "schema": "ennx.document_episodes.v2",
+        "schema": "blckbaux.document_episodes.v2",
         "prompt_tokens": prompt_tokens,
         "generated_tokens": generated_tokens,
         "window_stride": max(1, (prompt_tokens + generated_tokens) // 4),

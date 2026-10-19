@@ -6,7 +6,7 @@ rust_test(
     crate_root = "metal.rs",
     deps = [
         "//buck2/native:openmp-macos",
-        "//rust/crates/ennx:ennx",
+        "//rust/crates/blckbaux:blckbaux",
         "//rust:ndarray",
     ],
     rpath = True,
@@ -15,17 +15,17 @@ rust_test(
 )
 
 rust_test(
-    name = "bpann",
-    srcs = ["bpann.rs"],
-    crate_root = "bpann.rs",
-    deps = ["//rust/crates/bpann:bpann"],
+    name = "neighbor-index",
+    srcs = ["neighbor_index.rs"],
+    crate_root = "neighbor_index.rs",
+    deps = ["//rust/crates/neighbor-index:neighbor-index"],
 )
 
 rust_test(
     name = "dense",
     srcs = ["dense.rs"],
     crate_root = "dense.rs",
-    deps = ["//rust/crates/ennx:ennx"] + select({
+    deps = ["//rust/crates/blckbaux:blckbaux"] + select({
         "//:macos-arm64": [
             "//buck2/native:openmp-macos",
         ],
@@ -43,17 +43,21 @@ rust_test(
 )
 
 _TESTS = [
-    ":bpann",
+    ":neighbor-index",
     ":dense",
     ":opencl",
-    "//rust/crates/dev-cli:ennx-test",
+    "//rust/crates/cli:blckbaux-test",
+    "//rust/crates/runner:blckbaux-runner-test",
+    "//rust/crates/tooling:tooling-unit",
     "//rust/crates/corpus:corpus-test",
-    "//rust/crates/bpann:bpann-unit",
-    "//rust/crates/ennx:ennx-unit",
-    "//rust/crates/ennx:turbo-enn-test",
-    "//rust/crates/ennx:region-math",
-    "//rust/crates/ennx:region-opencl",
-    "//rust/crates/ennx:integration",
+    "//rust/crates/neighbor-index:neighbor-index-unit",
+    "//rust/crates/semantics:semantics-unit",
+    "//rust/crates/artifact:artifact-unit",
+    "//rust/crates/blckbaux:blckbaux-unit",
+    "//rust/crates/blckbaux:turbo-enn-test",
+    "//rust/crates/blckbaux:region-math",
+    "//rust/crates/blckbaux:region-opencl",
+    "//rust/crates/blckbaux:integration",
 ] + select({
     "//:macos-arm64": [":metal"],
     "DEFAULT": [],

@@ -9,11 +9,11 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from ennx.turbo.hypervolume import hypervolume2d_max
+from blckbaux.turbo.hypervolume import hypervolume2d_max
 
 # Try to import Rust implementation
 try:
-    from ennx._rust import hypervolume2d_max as rust_hypervolume_2d_max
+    from blckbaux._rust import hypervolume2d_max as rust_hypervolume_2d_max
 
     RUST_AVAILABLE = True
 except ImportError:

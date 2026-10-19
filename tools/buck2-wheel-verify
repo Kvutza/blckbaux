@@ -32,7 +32,7 @@ cleanup() {
 trap cleanup EXIT HUP INT TERM
 
 hydrate_lfs_fixtures() {
-    fixture_restore_dir=$(mktemp -d "${TMPDIR:-/tmp}/ennx-lfs-fixtures.XXXXXX")
+    fixture_restore_dir=$(mktemp -d "${TMPDIR:-/tmp}/blckbaux-lfs-fixtures.XXXXXX")
     grep -RIl '^version https://git-lfs.github.com/spec/v1$' tests/fixtures \
         > "$fixture_restore_dir/paths" || true
     if [ ! -s "$fixture_restore_dir/paths" ]; then
@@ -56,19 +56,23 @@ hydrate_lfs_fixtures() {
 
 hydrate_lfs_fixtures
 
-python_version=${ENNX_PYTHON_VERSION:-3.13}
+python_version=${BLCKBAUX_PYTHON_VERSION:-3.13}
 case "$python_version" in
     3.12)
         python_abi=cp312
-        python_environment=ennx-py312
+        python_environment=blckbaux-py312
         ;;
     3.13)
         python_abi=cp313
-        python_environment=ennx
+        python_environment=blckbaux
         ;;
     3.14)
         python_abi=cp314
-        python_environment=ennx-py314
+        python_environment=blckbaux-py314
+        ;;
+    3.15)
+        python_abi=cp315
+        python_environment=blckbaux-py315
         ;;
     *)
         echo "unsupported Python version: $python_version" >&2
@@ -76,12 +80,12 @@ case "$python_version" in
         ;;
 esac
 
-python_bin=${ENNX_PYTHON:-}
+python_bin=${BLCKBAUX_PYTHON:-}
 if [ -z "$python_bin" ] && [ -n "$python_environment" ]; then
     python_bin="$repo_dir/.pixi/envs/$python_environment/bin/python"
 fi
 if [ -z "$python_bin" ]; then
-    echo "set ENNX_PYTHON to a CPython $python_version interpreter" >&2
+    echo "set BLCKBAUX_PYTHON to a CPython $python_version interpreter" >&2
     exit 1
 fi
 case "$python_bin" in
@@ -89,11 +93,11 @@ case "$python_bin" in
     *) python_bin="$repo_dir/$python_bin" ;;
 esac
 if [ ! -x "$python_bin" ]; then
-    echo "missing CPython $python_version environment; run ./ennx build first" >&2
+    echo "missing CPython $python_version environment; run ./blckbaux build first" >&2
     exit 1
 fi
 
-wheel_path=${ENNX_WHEEL_PATH:-}
+wheel_path=${BLCKBAUX_WHEEL_PATH:-}
 if [ -z "$wheel_path" ]; then
     for candidate in "$repo_dir"/dist/*-"$python_abi"-"$python_abi"-*.whl; do
         if [ -f "$candidate" ]; then
@@ -103,7 +107,7 @@ if [ -z "$wheel_path" ]; then
     done
 fi
 if [ -z "$wheel_path" ]; then
-    echo "set ENNX_WHEEL_PATH to an existing wheel; run ./ennx build first" >&2
+    echo "set BLCKBAUX_WHEEL_PATH to an existing wheel; run ./blckbaux build first" >&2
     exit 1
 fi
 if [ -z "$wheel_path" ] || [ ! -f "$wheel_path" ]; then
@@ -118,11 +122,11 @@ case $(basename "$wheel_path") in
         ;;
 esac
 
-verify_dir=$(mktemp -d "${TMPDIR:-/tmp}/ennx-buck2-wheel.XXXXXX")
+verify_dir=$(mktemp -d "${TMPDIR:-/tmp}/blckbaux-buck2-wheel.XXXXXX")
 "$python_bin" -m zipfile -e "$wheel_path" "$verify_dir"
 
-extension=$(find "$verify_dir/ennx" -maxdepth 1 -name 'ennx_rust*.so' -print)
-dist_info=$(find "$verify_dir" -maxdepth 1 -type d -name 'ennx-*.dist-info' -print)
+extension=$(find "$verify_dir/blckbaux" -maxdepth 1 -name 'blckbaux_rust*.so' -print)
+dist_info=$(find "$verify_dir" -maxdepth 1 -type d -name 'blckbaux-*.dist-info' -print)
 test -n "$extension"
 test -n "$dist_info"
 test -f "$dist_info/licenses/LICENSE"
@@ -135,7 +139,7 @@ grep -Fqx "Requires-Dist: ax-platform>=1.3.1,<1.4" "$dist_info/METADATA"
 
 case $(uname -s) in
     Darwin)
-        runtime="$verify_dir/ennx/.dylibs/libomp.dylib"
+        runtime="$verify_dir/blckbaux/.dylibs/libomp.dylib"
         test -f "$runtime"
         otool -L "$extension" | grep -F '@rpath/libomp.dylib'
         otool -l "$extension" | grep -A2 LC_RPATH | grep -F '@loader_path/.dylibs'
@@ -146,7 +150,7 @@ case $(uname -s) in
         fi
         ;;
     Linux)
-        test ! -e "$verify_dir/ennx/.dylibs/librust_crates_ennx-py_ennx-py.so"
+        test ! -e "$verify_dir/blckbaux/.dylibs/librust_crates_blckbaux-py_blckbaux-py.so"
         readelf -d "$extension" | grep -F '$ORIGIN/.dylibs'
         if readelf -d "$extension" | grep -E '/home/|/\\.pixi/|conda'; then
             echo "wheel extension contains a host-specific library path" >&2
@@ -164,30 +168,30 @@ esac
     unset LD_LIBRARY_PATH LD_PRELOAD
     PYTHONPATH="$verify_dir" "$python_bin" - <<'PY'
 import sys
-from ennx import _rust
+from blckbaux import _rust
 
 assert "numpy" not in sys.modules
 PY
 )
 
 if [ "$(uname -s)" = Linux ]; then
-    # Conda NumPy needs its own C++ runtime, even when ENNX is imported first.
+    # Conda NumPy needs its own C++ runtime, even when BLCKBAUX is imported first.
     LD_LIBRARY_PATH=$("$python_bin" -c 'import sys; print(sys.prefix + "/lib")')
     export LD_LIBRARY_PATH
 fi
 
-ENNX_EXPECTED_PYTHON="$python_version" PYTHONPATH="$verify_dir" "$python_bin" - <<'PY'
+BLCKBAUX_EXPECTED_PYTHON="$python_version" PYTHONPATH="$verify_dir" "$python_bin" - <<'PY'
 import os
 import sys
 
-expected_python = tuple(int(part) for part in os.environ["ENNX_EXPECTED_PYTHON"].split("."))
+expected_python = tuple(int(part) for part in os.environ["BLCKBAUX_EXPECTED_PYTHON"].split("."))
 assert sys.version_info[:2] == expected_python
 assert "numpy" not in sys.modules
-from ennx import _rust
-from ennx import ENN
-from ennx.experimental import DenseLinear, dense_apply, dense_dist2, dense_linear
-from ennx.ennx.eclssup import posterior_neighbors
-from ennx.turbo.config import ENNIndexDriver
+from blckbaux import _rust
+from blckbaux import ENN
+from blckbaux.experimental import DenseLinear, dense_apply, dense_dist2, dense_linear
+from blckbaux.enn.eclssup import posterior_neighbors
+from blckbaux.turbo.config import NeighborIndex
 import numpy as np
 
 center, scale = _rust.standardize_y(np.array([1.0, 2.0, 3.0]))
@@ -198,8 +202,8 @@ rng = np.random.default_rng(17)
 train_x = rng.normal(size=(32, 5))
 train_y = np.zeros((32, 1), dtype=float)
 query = rng.normal(size=(4, 5))
-flat = ENN(train_x, train_y, index_driver=ENNIndexDriver.FLAT)
-usearch = ENN(train_x, train_y, index_driver=ENNIndexDriver.USEARCH)
+flat = ENN(train_x, train_y, index_driver=NeighborIndex.FLAT)
+usearch = ENN(train_x, train_y, index_driver=NeighborIndex.USEARCH)
 expected = posterior_neighbors(flat.rust_backend, query, search_k=10)
 actual = posterior_neighbors(usearch.rust_backend, query, search_k=10)
 assert np.array_equal(actual[1], expected[1])
@@ -260,10 +264,10 @@ if [ "$run_tests" -eq 1 ]; then
     # Includes the smoke cases and BO integrations, against this extracted wheel.
     (
         cd "$repo_dir"
-        ENNX_TEST_WHEEL_ROOT="$verify_dir" \
+        BLCKBAUX_TEST_WHEEL_ROOT="$verify_dir" \
             PYTHONPATH="$verify_dir:$repo_dir:$repo_dir/tests" \
             "$python_bin" -m pytest -q -p no:cacheprovider \
-            -m 'not slow or gp' tests
+            -m 'not slow and not gp' tests
     )
 else
     (

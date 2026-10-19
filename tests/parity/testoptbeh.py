@@ -3,15 +3,15 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from ennx.turbo.config import (
-    AcqType,
-    ENNFitConfig,
-    ENNSurrogateConfig,
+from blckbaux.turbo.config import (
+    AcquisitionKind,
+    SurrogateFit,
+    ENNSurrogate,
     turbo_enn,
     turbo_zero,
 )
 
-pytest.importorskip("ennx._rust")
+pytest.importorskip("blckbaux._rust")
 
 
 def _obj(x):
@@ -50,8 +50,8 @@ def test_002():
     bounds = np.array([[0.0, 1.0], [0.0, 1.0]], dtype=float)
     num_arms = 3
     config = turbo_enn(
-        acq_type=AcqType.PARETO,
-        enn=ENNSurrogateConfig(k=3, fit=ENNFitConfig(num_samples=10)),
+        acquisition=AcquisitionKind.PARETO,
+        enn=ENNSurrogate(k=3, fit=SurrogateFit(num_samples=10)),
         num_init=6,
     )
     opt = make_optimizer(bounds, config, seed=47)
@@ -66,8 +66,8 @@ def test_003():
 
     bounds = np.array([[0.0, 1.0], [0.0, 1.0]], dtype=float)
     config = turbo_enn(
-        acq_type=AcqType.UCB,
-        enn=ENNSurrogateConfig(k=3, fit=ENNFitConfig(num_samples=10)),
+        acquisition=AcquisitionKind.UCB,
+        enn=ENNSurrogate(k=3, fit=SurrogateFit(num_samples=10)),
         num_init=4,
     )
     opt = make_optimizer(bounds, config, seed=19)
@@ -79,8 +79,8 @@ def test_004():
 
     bounds = np.array([[0.0, 1.0], [0.0, 1.0]], dtype=float)
     config = turbo_enn(
-        acq_type=AcqType.THOMPSON,
-        enn=ENNSurrogateConfig(k=3, fit=ENNFitConfig(num_samples=10)),
+        acquisition=AcquisitionKind.THOMPSON,
+        enn=ENNSurrogate(k=3, fit=SurrogateFit(num_samples=10)),
         num_init=4,
     )
     opt = make_optimizer(bounds, config, seed=23)
@@ -88,12 +88,12 @@ def test_004():
 
 
 def test_multiobjectiveroute():
-    from ennx import create_optimizer
+    from blckbaux import create_optimizer
 
     bounds = np.array([[0.0, 1.0], [0.0, 1.0]], dtype=float)
     config = turbo_enn(
-        acq_type=AcqType.PARETO,
-        enn=ENNSurrogateConfig(k=4, fit=ENNFitConfig(num_samples=10)),
+        acquisition=AcquisitionKind.PARETO,
+        enn=ENNSurrogate(k=4, fit=SurrogateFit(num_samples=10)),
         num_init=4,
     )
     rng = np.random.default_rng(3)
@@ -103,12 +103,12 @@ def test_multiobjectiveroute():
 
 
 def test_multiobjectivewidth():
-    from ennx import create_optimizer
+    from blckbaux import create_optimizer
 
     bounds = np.array([[0.0, 1.0], [0.0, 1.0]], dtype=float)
     config = turbo_enn(
-        acq_type=AcqType.PARETO,
-        enn=ENNSurrogateConfig(k=3, fit=ENNFitConfig(num_samples=10)),
+        acquisition=AcquisitionKind.PARETO,
+        enn=ENNSurrogate(k=3, fit=SurrogateFit(num_samples=10)),
         num_init=4,
     )
     rng = np.random.default_rng(5)
@@ -124,12 +124,12 @@ def test_multiobjectivewidth():
 
 
 def test_005():
-    from ennx import create_optimizer
+    from blckbaux import create_optimizer
 
     bounds = np.array([[0.0, 1.0], [0.0, 1.0]], dtype=float)
     config = turbo_enn(
-        acq_type=AcqType.PARETO,
-        enn=ENNSurrogateConfig(k=3, fit=ENNFitConfig(num_samples=10)),
+        acquisition=AcquisitionKind.PARETO,
+        enn=ENNSurrogate(k=3, fit=SurrogateFit(num_samples=10)),
         num_init=4,
     )
     rng = np.random.default_rng(11)
@@ -145,12 +145,12 @@ def test_005():
 
 
 def test_006():
-    from ennx import create_optimizer
+    from blckbaux import create_optimizer
 
     bounds = np.array([[0.0, 1.0], [0.0, 1.0]], dtype=float)
     config = turbo_enn(
-        acq_type=AcqType.PARETO,
-        enn=ENNSurrogateConfig(k=3, fit=ENNFitConfig(num_samples=10)),
+        acquisition=AcquisitionKind.PARETO,
+        enn=ENNSurrogate(k=3, fit=SurrogateFit(num_samples=10)),
         num_init=4,
     )
     rng = np.random.default_rng(7)

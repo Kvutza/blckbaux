@@ -1,0 +1,28 @@
+load("//buck2:reindeer_rules.bzl", "app_rust_library")
+load("//build:targets.bzl", "ARTIFACT_CRATES", "ARTIFACT_TEST_CRATES", "RUST_EDITION")
+
+filegroup(
+    name = "source",
+    srcs = glob(["src/**"]) + ["Cargo.toml"],
+    visibility = ["PUBLIC"],
+)
+
+app_rust_library(
+    name = "artifact",
+    srcs = glob(["src/**/*.rs"]),
+    crate = "blckbaux_artifact",
+    crate_root = "src/lib.rs",
+    edition = RUST_EDITION,
+    deps = ["//rust:" + crate for crate in ARTIFACT_CRATES] + ["//rust/crates/semantics:semantics"],
+    visibility = ["PUBLIC"],
+)
+
+rust_test(
+    name = "artifact-unit",
+    srcs = glob(["src/**/*.rs"]),
+    crate = "blckbaux_artifact",
+    crate_root = "src/lib.rs",
+    edition = RUST_EDITION,
+    deps = ["//rust:" + crate for crate in ARTIFACT_TEST_CRATES] + ["//rust/crates/semantics:semantics"],
+    visibility = ["//buck2/tests:all"],
+)

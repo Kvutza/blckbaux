@@ -1,5 +1,5 @@
 use super::*;
-use ennx_cuda_kernels::diffusion_model;
+use blckbaux_cuda_device::diffusion_model;
 
 pub(super) struct DiffusionState {
     pub module: diffusion_model::LoadedModule,
@@ -62,7 +62,7 @@ impl FbtModel {
         let start = timing_event(&self.stream)?;
         for step in 0..steps {
             let step_seed = mix(seed ^ step as u64 ^ 0x6469_6666);
-            self.enqueue(&plan, temperature, step_seed)?;
+            self.enqueue(&plan, temperature, step_seed, None)?;
             let proposed = read_prefix(&self.scratch.sampled, &self.stream, self.rows)?;
             confidence = read_prefix(
                 &self.diffusion.as_ref().unwrap().confidence,

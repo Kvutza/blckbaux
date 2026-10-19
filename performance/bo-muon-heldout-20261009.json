@@ -1,0 +1,49 @@
+{
+  "schema": "blckbaux.optimizer-comparison.v1",
+  "date": "2026-10-09",
+  "hardware": "Apple M4",
+  "model": "fbt-pisa1-hnet-mhc4-v1",
+  "parameters": 1177756440,
+  "context_tokens": 4096,
+  "objective": "held-out-conditional-cross-entropy",
+  "validation": {
+    "corpus": "separate-validation-corpus",
+    "tasks": 32,
+    "frozen_across_optimizers": true,
+    "included_in_round_latency": false,
+    "initial_mean_nll": 12.485830903053284
+  },
+  "bayesian_optimization": {
+    "config": "examples/tuning/hnet-4k-gaussian.toml",
+    "rounds": 512,
+    "accepted": 104,
+    "loop_seconds": 50.89176242899997,
+    "mean_round_ms": 99.39797349414056,
+    "max_round_ms": 157.622667,
+    "final_mean_nll": 12.485460966825485,
+    "mean_nll_reduction": 0.0003699362277984619,
+    "paired_standard_error": 0.00023562311755899736,
+    "heldout_tasks_improved": 20,
+    "run": ".cache/blckbaux/runs/pretrain/fd55c1e5e284ccfdc2bc/run-1791591369953-18299-0"
+  },
+  "muon": {
+    "config": "examples/tuning/hnet-4k-muon.toml",
+    "rounds": 4,
+    "loop_seconds": 54.886481168,
+    "mean_round_ms": 13721.620292000001,
+    "final_mean_nll": 11.844985157251358,
+    "mean_nll_reduction": 0.6408457458019257,
+    "paired_standard_error": 0.022510831522117376,
+    "heldout_tasks_improved": 32,
+    "run": ".cache/blckbaux/runs/pretrain/9fee45d624c7459408c6/run-1791591471914-18651-0"
+  },
+  "comparison": {
+    "wall_time_ratio_muon_over_bo": 1.0784944075099214,
+    "nll_reduction_per_second_bo": 0.000007269078729874344,
+    "nll_reduction_per_second_muon": 0.011675839517574184,
+    "learning_efficiency_ratio_muon_over_bo": 1606.2337404035816,
+    "latency_winner": "bayesian-optimization",
+    "learning_winner": "muon",
+    "decoded_text_coherent": false
+  }
+}

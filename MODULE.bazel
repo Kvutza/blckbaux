@@ -1,5 +1,5 @@
 module(
-    name = "ennx",
+    name = "blckbaux",
     version = "0.2.0",
 )
 

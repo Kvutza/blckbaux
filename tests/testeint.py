@@ -1,8 +1,8 @@
 import numpy as np
 
-from ennx.ennx.draw_internals import DrawInternals
-from ennx.ennx.neighbor_data import NeighborData
-from ennx.ennx.weighted_stats import WeightedStats
+from blckbaux.enn.draw_internals import DrawInternals
+from blckbaux.enn.neighbor_data import NeighborData
+from blckbaux.enn.weighted_stats import WeightedStats
 
 
 def test_drawinternals2():

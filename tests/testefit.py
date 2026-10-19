@@ -14,10 +14,10 @@ def _fitmodel(
     params_warm_start=None,
     infer_aleatoric_variance_scale: bool = True,
 ):
-    from ennx.ennx.enn_fit import ENNIncrementalDelta, enn_fit
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
+    from blckbaux.enn.enn_fit import ENNIncrementalDelta, enn_fit
+    from blckbaux.enn.enn_fitter import ENNFitter
 
-    fitter = ENNStatefulFitter(
+    fitter = ENNFitter(
         k=k,
         rng=rng,
         infer_aleatoric_variance_scale=infer_aleatoric_variance_scale,
@@ -45,9 +45,9 @@ def _ybatch(inc_std, batch_std) -> None:
 def test_001():
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
-    from ennx.ennx.enn_fit import subsample_loglik
-    from ennx.ennx.enn_params import ENNParams
+    from blckbaux.enn.enn_class import ENN
+    from blckbaux.enn.enn_fit import subsample_loglik
+    from blckbaux.enn.enn_params import ENNParams
 
     rng = np.random.default_rng(0)
     x = rng.standard_normal((40, 2))
@@ -74,7 +74,7 @@ def test_001():
 def _captureresult(model, params, num_samples, eval_x, eval_y):
     import numpy as np
 
-    from ennx.ennx.enn_fit import subsample_loglik
+    from blckbaux.enn.enn_fit import subsample_loglik
 
     loglik = subsample_loglik(
         model,
@@ -98,7 +98,7 @@ def _captureresult(model, params, num_samples, eval_x, eval_y):
 def _runsweep(x_train, y_train, y_var_train, sample_sizes):
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
+    from blckbaux.enn.enn_class import ENN
 
     captured = []
     for num_samples in sample_sizes:
@@ -117,16 +117,16 @@ def _runsweep(x_train, y_train, y_var_train, sample_sizes):
 def _runsweep2(x_train, y_train, y_var_train, sample_sizes):
     import numpy as np
 
-    from ennx.ennx.enn_class import ENN
-    from ennx.ennx.enn_fit import ENNIncrementalDelta, enn_fit
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
+    from blckbaux.enn.enn_class import ENN
+    from blckbaux.enn.enn_fit import ENNIncrementalDelta, enn_fit
+    from blckbaux.enn.enn_fitter import ENNFitter
 
     incremental_model = ENN(
         np.empty((0, x_train.shape[1])),
         np.empty((0, y_train.shape[1])),
         np.empty((0, y_var_train.shape[1])),
     )
-    fitter = ENNStatefulFitter(k=10, rng=np.random.default_rng(4242))
+    fitter = ENNFitter(k=10, rng=np.random.default_rng(4242))
     params_warm_start = None
     captured = []
     for num_samples, (x, y, y_var) in enumerate(

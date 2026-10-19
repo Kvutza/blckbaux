@@ -12,7 +12,7 @@ from ops.flame import codecheck
 def sandbox():
     result = codecheck.check_solution("x = 1", "", ["assert x == 1"])
     if result["status"] == "sandbox_unavailable":
-        if os.environ.get("ENNX_CODECHECK_REQUIRE_SANDBOX") == "1":
+        if os.environ.get("BLCKBAUX_CODECHECK_REQUIRE_SANDBOX") == "1":
             pytest.fail(str(result))
         pytest.skip(str(result))
     assert result["status"] == "passed", result

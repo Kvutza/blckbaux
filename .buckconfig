@@ -23,6 +23,11 @@ target_platform_detector_spec = target:root//...->prelude//platforms:default \
 [build]
 execution_platforms = prelude//platforms:default
 
+[project]
+# Cargo creates and removes transient directories here during compilation.
+# They are build outputs, never inputs to Buck2 package discovery.
+ignore = target
+
 [buck2]
 # Keep one persistent materializer record so stale artifacts can be reclaimed
 # without discarding every reusable output on each cleanup.
@@ -40,5 +45,5 @@ clean_stale_low_disk_adaptive_min_ttl_hours = 12
 default_edition = 2024
 remap_src_paths = yes
 
-[ennx]
+[blckbaux]
 release_version = 0.2.0

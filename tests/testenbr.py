@@ -4,8 +4,8 @@ import numpy as np
 import pytest
 from enn_helpers import enn_model
 
-from ennx.ennx.enn_class import ENN
-from ennx.turbo.config.eidxdrv import ENNIndexDriver
+from blckbaux.enn.enn_class import ENN
+from blckbaux.turbo.config.surrogate import NeighborIndex
 
 
 def test_001():
@@ -25,7 +25,7 @@ def test_002():
     n, d = 35, 4
     train_x = rng.standard_normal((n, d))
     train_y = train_x.sum(axis=1, keepdims=True).astype(float)
-    model = ENN(train_x, train_y, scale_x=False, index_driver=ENNIndexDriver.FLAT)
+    model = ENN(train_x, train_y, scale_x=False, index_driver=NeighborIndex.FLAT)
     x_query = rng.standard_normal(d)
     neighbors = model.neighbors(x_query, k=6, exclude_nearest=False)
     assert neighbors.shape == (6,)

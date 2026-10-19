@@ -35,15 +35,15 @@ from bo_fixtures import (
 
 
 def install_extension(monkeypatch, tmp_path, experimental):
-    extension_path = tmp_path / "ennx_rust.so"
+    extension_path = tmp_path / "blckbaux_rust.so"
     extension_path.write_bytes(b"test extension")
-    extension = ModuleType("ennx.ennx_rust")
+    extension = ModuleType("blckbaux.blckbaux_rust")
     extension.__file__ = str(extension_path)
-    package = ModuleType("ennx")
-    package.ennx_rust = extension
-    monkeypatch.setitem(sys.modules, "ennx", package)
-    monkeypatch.setitem(sys.modules, "ennx.ennx_rust", extension)
-    monkeypatch.setitem(sys.modules, "ennx.experimental", experimental)
+    package = ModuleType("blckbaux")
+    package.blckbaux_rust = extension
+    monkeypatch.setitem(sys.modules, "blckbaux", package)
+    monkeypatch.setitem(sys.modules, "blckbaux.blckbaux_rust", extension)
+    monkeypatch.setitem(sys.modules, "blckbaux.experimental", experimental)
 
 
 def test_initialsave(tiny_model, tmp_path, monkeypatch):
@@ -51,7 +51,7 @@ def test_initialsave(tiny_model, tmp_path, monkeypatch):
     (tmp_path / "manifest.json").write_text(
         json.dumps({"revision": REVISION, "complete": True})
     )
-    experimental = ModuleType("ennx.experimental")
+    experimental = ModuleType("blckbaux.experimental")
     calls = []
     saved = []
 
@@ -108,7 +108,7 @@ def test_initialsave(tiny_model, tmp_path, monkeypatch):
     monkeypatch.setattr(bo, "save_best", lambda *args: saved.append(args))
     settings = bo.Settings(evaluations=3, minibatch_size=2)
     document = {
-        "format": "ennx.solution_tokens.v1",
+        "format": "blckbaux.solution_tokens.v1",
         "provenance": {"dataset": "test"},
         "examples": [
             {"id": str(i), "tokens": [1, 2, 3], "loss_mask": [False, False, True]}
@@ -347,7 +347,7 @@ def test_metadata(
 ):
     config, params = tiny_model
     checkpoint = metadata_checkpoint(tmp_path)
-    experimental = ModuleType("ennx.experimental")
+    experimental = ModuleType("blckbaux.experimental")
     calls = []
     stages = []
     size = sum(value.size for value in params.values())
@@ -423,7 +423,7 @@ def test_metadata(
     output = tmp_path / "run"
     tokens = (
         {
-            "format": "ennx.solution_tokens.v1",
+            "format": "blckbaux.solution_tokens.v1",
             "provenance": {"dataset": "test"},
             "examples": [
                 {"id": "a", "tokens": [1, 2, 3], "loss_mask": [False, False, True]}

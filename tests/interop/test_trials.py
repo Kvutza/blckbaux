@@ -5,7 +5,7 @@ import sys
 import numpy as np
 import pytest
 
-from ennx._trials import Loop, Space
+from blckbaux._trials import Loop, Space
 
 
 def test_space():
@@ -48,7 +48,7 @@ def test_import():
         [
             sys.executable,
             "-c",
-            "import sys, ennx; assert not {'torch', 'botorch', 'optuna', 'ax'} & sys.modules.keys()",
+            "import sys, blckbaux; assert not {'torch', 'botorch', 'optuna', 'ax'} & sys.modules.keys()",
         ],
         env=os.environ.copy(),
         capture_output=True,

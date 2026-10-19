@@ -1,0 +1,14 @@
+# Taplo configuration file for TOML Language Server (taplo-lsp)
+# Provides instant auto-completion, hover docs, and schema validation
+# across VS Code, Cursor, Zed, Helix, and Neovim.
+
+[schema]
+enabled = true
+
+[[rule]]
+include = [
+  "examples/tuning/**/*.toml",
+  "performance/configs/**/*.toml",
+  "configs/**/*.toml",
+]
+url = "schemas/tune-spec.schema.json"

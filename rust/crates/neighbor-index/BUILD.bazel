@@ -1,0 +1,30 @@
+load("@crates//:defs.bzl", "aliases", "crate_deps", "crate_edition")
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_test")
+load("//build:targets.bzl", "NEIGHBOR_INDEX_CRATES", "NEIGHBOR_INDEX_TEST_CRATES")
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["Cargo.toml"])
+
+rust_library(
+    name = "neighbor-index",
+    srcs = glob(["src/**/*.rs"]),
+    aliases = aliases(),
+    crate_root = "src/lib.rs",
+    edition = crate_edition(),
+    deps = crate_deps(NEIGHBOR_INDEX_CRATES) + [
+        "//rust/crates/artifact",
+    ],
+)
+
+rust_test(
+    name = "neighbor_index_test",
+    crate = ":neighbor-index",
+    aliases = aliases(normal_dev = True, proc_macro_dev = True),
+    deps = crate_deps(NEIGHBOR_INDEX_TEST_CRATES) + [
+        "//rust/crates/artifact",
+    ],
+    rustc_env = {
+        "CARGO_MANIFEST_DIR": "rust/crates/neighbor-index",
+    },
+)

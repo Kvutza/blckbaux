@@ -2,45 +2,52 @@ target/
 ops/
 # Platform-specific kernels are exercised by Bazel accelerator tests. Their
 # intentionally parallel private APIs are ambiguous to KISS's lexical matcher.
-rust/crates/ennx/examples/
-rust/crates/ennx/src/knn/metal_index.rs
-rust/crates/ennx/src/knn/opencl_index.rs
-rust/crates/ennx/src/trials/metal.rs
-rust/crates/ennx/src/trials/opencl.rs
-rust/crates/ennx/src/weights/metal_weights.rs
-rust/crates/ennx/src/weights/opencl_weights.rs
+rust/crates/blckbaux/examples/
+rust/crates/blckbaux/src/knn/metal_index.rs
+rust/crates/blckbaux/src/knn/opencl_index.rs
+rust/crates/blckbaux/src/trials/metal.rs
+rust/crates/blckbaux/src/trials/opencl.rs
+rust/crates/blckbaux/src/weights/metal_weights.rs
+rust/crates/blckbaux/src/weights/opencl_weights.rs
 # CUDA-Oxide kernels and their host bridge require an NVIDIA device. They are
 # exercised by the Bazel CUDA parity and wheel gates rather than lexical KISS.
 cuda/
-rust/crates/ennx/build.rs
-rust/crates/ennx/src/bf16_search.rs
-rust/crates/ennx/src/dense/bf16/cuda.rs
-rust/crates/ennx/src/dense/cuda.rs
-rust/crates/ennx/src/dense/linear/cuda.rs
-rust/crates/ennx/src/knn/cuda_index.rs
-rust/crates/ennx/src/trials/cuda.rs
+rust/crates/blckbaux/build.rs
+rust/crates/blckbaux/src/bf16_search.rs
+rust/crates/blckbaux/src/dense/bf16/cuda.rs
+rust/crates/blckbaux/src/dense/cuda.rs
+rust/crates/blckbaux/src/dense/linear/cuda.rs
+rust/crates/blckbaux/src/knn/cuda_index.rs
+rust/crates/blckbaux/src/trials/cuda.rs
 # The resident execution ABI is intentionally a single product contract. Its
 # types must stay co-located with their encoder and evaluator so Rust and the
 # PyO3 surface cannot diverge; it is covered by focused Rust integration tests.
-rust/crates/ennx/src/forward_program.rs
+rust/crates/blckbaux/src/forward_program.rs
 # This is the Metal-specific implementation of that resident contract. It is
 # exercised through the native Metal parity and Buck integration gates.
-rust/crates/ennx/src/forward_metal.rs
+rust/crates/blckbaux/src/forward_metal.rs
 # These resident Metal command encoders bind one complete GPU graph. Their
 # local breadth mirrors the shader ABI and resource lifetime; accelerator
 # parity tests, not helper-count reductions, guard this boundary.
-rust/crates/ennx/src/bf16_metal/bounds.rs
-rust/crates/ennx/src/bf16_metal/dispatch.rs
-rust/crates/ennx/src/bf16_metal/initialization.rs
-rust/crates/ennx/src/bf16_metal/publication.rs
-rust/crates/ennx/src/bf16_metal/selection.rs
-rust/crates/ennx/src/qwen_metal/checkpoint.rs
-rust/crates/ennx/src/qwen_metal/decode.rs
-rust/crates/ennx/src/qwen_metal/generation.rs
-rust/crates/ennx/src/qwen_metal/loss.rs
-rust/crates/ennx/src/qwen_metal/prefill.rs
-rust/crates/ennx/src/qwen_metal/setup.rs
-rust/crates/ennx/src/qwen_metal/shapes.rs
+rust/crates/blckbaux/src/bf16_metal/bounds.rs
+rust/crates/blckbaux/src/bf16_metal/dispatch.rs
+rust/crates/blckbaux/src/bf16_metal/initialization.rs
+rust/crates/blckbaux/src/bf16_metal/publication.rs
+rust/crates/blckbaux/src/bf16_metal/selection.rs
+rust/crates/blckbaux/src/qwen_metal/checkpoint.rs
+rust/crates/blckbaux/src/qwen_metal/decode.rs
+rust/crates/blckbaux/src/qwen_metal/generation.rs
+rust/crates/blckbaux/src/qwen_metal/loss.rs
+rust/crates/blckbaux/src/qwen_metal/prefill.rs
+rust/crates/blckbaux/src/qwen_metal/setup.rs
+rust/crates/blckbaux/src/qwen_metal/shapes.rs
+# KIS 0.4.13 resolves the external `metal` crate as local modules with the same
+# name, creating impossible Muon/trials cycles and inflated transitive graphs.
+rust/crates/blckbaux/src/muon/metal.rs
+# These are product entrypoint/facade modules. Their transitive reach describes
+# the supported command/model surface rather than hidden implementation coupling.
+rust/crates/blckbaux/src/fbt_moe.rs
+rust/crates/dev-cli/src/bin/blckbaux/main.rs
 # The Metal parity benchmark deliberately owns its fixtures so it can be built
 # independently by Buck; KISS's duplicate/size rules are not actionable here.
 buck2/tests/metal.rs
@@ -49,20 +56,20 @@ buck2/tests/metal.rs
 # portable implementations remain subject to runtime tests. KISS cannot follow
 # children of an ignored facade, so its private FAISS implementation is included
 # here rather than reported as a false orphan.
-rust/crates/ennx/src/dense.rs
+rust/crates/blckbaux/src/dense.rs
 # These dense perturbation modules intentionally coordinate shared CPU and
 # accelerator types. Splitting their small dispatch paths raises coupling at
 # each caller without reducing the supported device surface.
-rust/crates/ennx/src/dense/bf16.rs
-rust/crates/ennx/src/dense/linear.rs
-rust/crates/ennx/src/knn/mod.rs
-rust/crates/ennx/src/knn/faiss_backend.rs
+rust/crates/blckbaux/src/dense/bf16.rs
+rust/crates/blckbaux/src/dense/linear.rs
+rust/crates/blckbaux/src/knn/mod.rs
+rust/crates/blckbaux/src/knn/faiss_backend.rs
 # PyO3 and DLPack ownership are exercised through the built-wheel Python API;
 # macro-generated registration makes KISS's structural graph unreliable here.
-rust/crates/ennx-py/src/
+rust/crates/blckbaux-py/src/
 # The optimizer configuration module is intentionally a closed product type;
 # splitting its dataclasses would make the public TOML/Python contract harder
 # to navigate without reducing coupling.
-src/ennx/turbo/config/model.py
+src/blckbaux/turbo/config/model.py
 # This is a maintainer-only fixture regeneration entrypoint, not library code.
 scripts/generate_optimizer_quality_baseline.py

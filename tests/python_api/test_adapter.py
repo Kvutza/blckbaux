@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from ennx import _rust
+from blckbaux import _rust
 
 
 class StubGP:

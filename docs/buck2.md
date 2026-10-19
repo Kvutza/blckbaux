@@ -1,68 +1,47 @@
-# Build
+# Build System
+
+BLCKBAUX builds through Buck2. `./blckbaux build` bootstraps the native toolchain — no system Rust or Clang needed.
 
 ```sh
-./ennx build                  # Library, CLI, tests, and Python 3.12–3.14 wheels
-./ennx build --tests          # Test each wheel on its matching Python version
-./ennx build --out artifacts
-./ennx test
-./ennx dev                    # Format, build, and test
-./ennx fmt --check
+./blckbaux build                         # build the native library
+./blckbaux build --tests                 # build and run the native test suite
+./blckbaux build --distribution          # build and smoke-test Python 3.12–3.15 wheels
+./blckbaux build --distribution --tests  # run the full Python suite against every wheel
+./blckbaux build --distribution --out dist
 ```
 
-Wheels go to `dist/`. `./ennx build` prepares dependencies and builds in one command.
-Plain `build` runs wheel smoke verification for Python 3.12, 3.13, and 3.14.
-`build --tests` runs the broad Python suite against each wheel on its matching
-interpreter. DotSlash bootstraps Buck2.
-Buck downloads and caches pinned Rust, Python,
-Clang/LLD, and the Linux sysroot and support libraries. Builds always use these
-managed toolchains. No system Rust, Python, or Clang installation is needed.
-Build results are reused when inputs and configuration have not changed.
+Buck downloads and caches pinned Rust, Clang/LLD, and the Linux sysroot. Build results are reused when inputs haven't changed.
 
-Pixi manages only Python wheel verification environments in `.pixi/envs/`.
-Missing environments are prepared automatically; existing environments are reused.
-On Linux, these environments include `auditwheel`, `patchelf`, and `binutils`
-(for `readelf`).
-Set `ENNX_PYTHON_312`, `ENNX_PYTHON_313`, or `ENNX_PYTHON_314` to use an
-existing CPython interpreter for a specific wheel verifier instead of Pixi.
-Overrides must include the verification dependencies declared in `pixi.toml`;
-invalid overrides fail before compilation and are never modified.
+## Toolchain
 
-Buck2 builds the project. Cargo manifests declare Rust dependencies; Reindeer
-generates their targets in `rust/BUCK`. When changing a crate's dependencies or
-features, also update its handwritten BUCK target and run `tools/buck2-deps`
-(requires Cargo). Normal builds use the checked-in graph. Lockfiles stay local.
+Rust `nightly-2026-09-29` is pinned in `rust-toolchain.toml`.
+Builds consume the repository pin directly. Synchronization is an internal
+maintenance operation rather than part of the public BLCKBAUX command surface.
 
-Rust `nightly-2026-09-29` is pinned through `rust-toolchain.toml`. Run
-`./ennx toolchain check` to detect drift or `./ennx toolchain sync
-[nightly-YYYY-MM-DD]` to synchronize or upgrade every consumer. Development uses optimization
-level 1; wheels use level 3 and ThinLTO. Build tools use level 0.
-Normal commands use the shared `dev` isolation directory. Set
-`BUCK_ISOLATION_DIR` only when a genuinely independent build is required (for
-example, the CUDA recursive build); every isolation directory has its own
-cache. Buck2's on-disk materializer state and adaptive stale cleanup are
-enabled in `.buckconfig`, so old artifacts can be reclaimed without manually
-editing `buck-out`.
+## Python Environments
 
-Use `./buck2w clean --stale --dry-run` to inspect candidates, or
-run `clean --stale` once per repo isolation directory when cleaning this
-repository. The newer `./buck2w cleanall --stale` command covers every Buck2
-project known to the machine, so use it only when that broader scope is
-intentional.
+Pixi manages wheel verification environments in `.pixi/envs/`. They are created automatically on first use. Set `BLCKBAUX_PYTHON_312`, `BLCKBAUX_PYTHON_313`, or `BLCKBAUX_PYTHON_314` to supply your own CPython interpreter instead.
 
-Supported hosts are Apple Silicon macOS and x86_64/aarch64 Linux. Bootstrap needs
-standard shell utilities, `curl`, `tar`, and `shasum` or `sha256sum`.
-macOS requires Apple's SDK (`xcode-select --install`); the managed compiler uses
-its C++ headers and system runtime. On Linux, Buck supplies the native sysroot,
-headers, and support libraries.
-Metal runs on macOS; OpenCL requires an installed driver. Linux wheels are audited
-for manylinux 2.28, so release builds need a compatible build host.
+## Rust Dependencies
 
-[CUDA](../cuda/README.md) uses a separate toolchain and build.
-Bazel provides an independent correctness check. Shared crate
-sets and executable targets are generated from Cargo metadata into
-`build/targets.bzl` by `tools/build-parity --sync`. `tools/build-parity` rejects
-stale generated data and targets missing from either graph. Set
-`ENNX_BUILD_SYSTEM=bazel` to launch the existing CLI through Bazel; unset it
-to return to Buck2.
+Cargo manifests declare Rust crates; Reindeer generates their Buck targets in `rust/BUCK`. When changing crate dependencies or features, update the handwritten BUCK target and run `tools/buck2-deps`.
 
-GitHub Actions builds and tests tagged releases.
+## Bazel
+
+`BLCKBAUX_BUILD_SYSTEM=bazel` routes the CLI through Bazel for an independent build correctness check. `tools/build-parity --sync` regenerates shared target definitions in `build/targets.bzl`.
+
+## Cache Cleanup
+
+```sh
+./buck2w clean --stale --dry-run   # inspect stale artifacts
+./buck2w clean --stale             # reclaim them
+```
+
+## Hosts
+
+| Platform | Notes |
+|---|---|
+| Apple Silicon macOS | Requires `xcode-select --install` |
+| x86\_64 / aarch64 Linux | Sysroot and headers supplied by Buck |
+
+Linux release builds must run on a manylinux 2.28 host. Metal runs on macOS; CUDA and OpenCL require an installed driver.

@@ -17,7 +17,7 @@ from .objective import SolutionObjective
 
 
 def compare(original, run):
-    import ennx.ennx_rust as extension
+    import blckbaux.blckbaux_rust as extension
 
     record = json.loads((run / "run.json").read_text())
     if record["status"] != "complete" or record["backend"] != "metal":

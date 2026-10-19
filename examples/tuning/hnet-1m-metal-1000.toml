@@ -1,0 +1,64 @@
+# 1,048,576-token pretraining experiment on Apple Silicon Metal with calibrated reliability control.
+# Full-parameter Bayesian optimization of fbt-pisa1-hnet-mhc4-v1.
+# 1000 rounds of fixed-corpus causal likelihood evaluation.
+# Each round evaluates one proposal on one contiguous causal sequence.
+version = 4
+
+experiment = "pretrain"
+model = "fbt-pisa1-hnet-mhc4-v1"
+[execution]
+rounds = 1000
+round-target-ms = 200
+
+[evaluation]
+interval = 128
+
+[data]
+recipe = "stack-v3-rust-go-v1"
+
+[objective]
+function = "cross-entropy"
+sampling = "natural"
+window-tokens = 1048576
+
+[optimizer]
+algorithm = "operator-bo"
+
+[optimizer.candidate-generation]
+generator = "independent"
+arms = 4
+candidates = 4
+
+[optimizer.candidate-generation.perturbation]
+distribution = "gaussian"
+
+[optimizer.surrogate]
+estimator = "knn"
+scaling = "global"
+neighbors = 10
+neighbor-rule = "fixed"
+epistemic-scale = 0.05
+aleatoric-scale = 0.05
+
+fit = "leave-one-out"
+fit-candidates = 30
+fit-samples = 10
+
+[optimizer.acquisition]
+function = "upper-confidence-bound"
+
+[optimizer.acceptance]
+criterion = "positive-improvement"
+
+[optimizer.radius-control]
+policy = "reliability"
+initial = 0.4
+min = 0.001
+max = 2.00
+failure-tolerance = 4
+
+[seeds]
+model = 240105308887621659
+reference = 150813718214252701
+proposal = 91614869253048103
+acquisition = 314159265358979323

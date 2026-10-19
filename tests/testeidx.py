@@ -3,20 +3,20 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from ennx.ennx.enn_class import ENN
-from ennx.ennx.eclssup import (
+from blckbaux.enn.enn_class import ENN
+from blckbaux.enn.eclssup import (
     posterior_neighbors,
     nearest_neighbors,
 )
-from ennx.ennx.enn_hash import (
+from blckbaux.enn.enn_hash import (
     normal_philox,
     normal_hash,
 )
-from ennx.ennx.enn_params import ENNParams, PosteriorFlags
-from ennx.turbo.config.eidxdrv import ENNIndexDriver
+from blckbaux.enn.enn_params import ENNParams, PosteriorFlags
+from blckbaux.turbo.config.surrogate import NeighborIndex
 
 
-def _enn(train_x, *, scale_x=False, index_driver=ENNIndexDriver.FLAT, train_y=None):
+def _enn(train_x, *, scale_x=False, index_driver=NeighborIndex.FLAT, train_y=None):
     if train_y is None:
         train_y = np.zeros((train_x.shape[0], 1), dtype=float)
     return ENN(train_x, train_y, scale_x=scale_x, index_driver=index_driver)
@@ -72,7 +72,7 @@ def test_004():
     rng = np.random.default_rng(11)
     n_train, dim = 40, 3
     train_x = rng.standard_normal((n_train, dim))
-    enn = _enn(train_x, scale_x=False, index_driver=ENNIndexDriver.FLAT)
+    enn = _enn(train_x, scale_x=False, index_driver=NeighborIndex.FLAT)
     query = rng.standard_normal((4, dim))
     search_k = 6
     dist2s, idx = nearest_neighbors(
@@ -186,7 +186,7 @@ def test_011():
     rng = np.random.default_rng(42)
     train_x = rng.standard_normal((20, 3))
     query = train_x[:3]
-    enn = _enn(train_x, scale_x=False, index_driver=ENNIndexDriver.FLAT)
+    enn = _enn(train_x, scale_x=False, index_driver=NeighborIndex.FLAT)
     dist2s, idx = posterior_neighbors(
         enn.rust_backend,
         query,

@@ -1,0 +1,38 @@
+{
+  "schema": "blckbaux.performance.pretrain.v1",
+  "date": "2026-10-10",
+  "hardware": {
+    "model": "MacBook Air Mac16,12",
+    "chip": "Apple M4",
+    "gpu_cores": 10,
+    "memory_gb": 24,
+    "api": "Metal 4"
+  },
+  "experiment": {
+    "config": "examples/tuning/hnet-1m-gaussian.toml",
+    "parameters": 1177756440,
+    "rounds": 4,
+    "context_tokens": 1048576,
+    "prompt_tokens": 177280,
+    "generated_and_scored_tokens": 871296,
+    "objective": "paired conditional cross entropy improvement",
+    "acquisition": "ucb",
+    "trust_radius_max": 0.016
+  },
+  "systems": {
+    "mean_round_ms": 1816.279552,
+    "steady_mean_round_ms_excluding_first": 1543.327111,
+    "median_round_ms": 1660.575333,
+    "max_round_ms": 2635.539,
+    "steady_mean_proposal_ms": 293.24634733333335,
+    "steady_mean_evaluation_ms": 1081.888083,
+    "subsecond_rounds": false,
+    "target_200ms_met": false
+  },
+  "learning_scope": {
+    "accepted_updates": 0,
+    "learning_claim": false,
+    "reason": "four rounds establish systems behavior only"
+  },
+  "artifact": "/Users/mehulbafna/research/blckbaux/.cache/blckbaux/runs/pretrain/97b89c9e0282138dd782/run-1791629697073-85459-0"
+}

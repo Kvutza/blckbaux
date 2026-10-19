@@ -2,31 +2,31 @@ from __future__ import annotations
 
 import pytest
 
-from ennx.turbo import config as cfg
-from ennx.turbo.config import (
-    AcqType,
-    CandidateGenConfig,
-    CandidateRV,
+from blckbaux.turbo import config as cfg
+from blckbaux.turbo.config import (
+    AcquisitionKind,
+    CandidateConfig,
+    CandidateSampler,
     DrawAcquisitionConfig,
-    ENNDistanceMetric,
-    ENNFitConfig,
-    ENNIndexDriver,
-    ENNSurrogateConfig,
-    GPSurrogateConfig,
+    DistanceMetric,
+    SurrogateFit,
+    NeighborIndex,
+    ENNSurrogate,
+    GaussianProcess,
     InitConfig,
     LHDOnlyInit,
-    MorboTRConfig,
+    MorboTrustRegion,
     MultiObjectiveConfig,
-    MultiTRConfig,
+    MultiTrustRegionPolicy,
     NDSOptimizerConfig,
-    NoSurrogateConfig,
-    NoTRConfig,
+    NoSurrogate,
+    NoTrustRegion,
     ObservationHistoryConfig,
     OptimizerConfig,
     ParetoAcquisitionConfig,
     RAASPOptimizerConfig,
     RandomAcquisitionConfig,
-    TurboTRConfig,
+    TurboTrustRegion,
     UCBAcquisitionConfig,
     lhd_only,
     turbo_enn,
@@ -46,7 +46,7 @@ def test_022():
 
 
 def test_023():
-    cfg = ENNSurrogateConfig()
+    cfg = ENNSurrogate()
     assert cfg.k is None
     assert cfg.num_samples is None
     assert cfg.num_candidates is None
@@ -54,7 +54,7 @@ def test_023():
 
 
 def test_024():
-    cfg = ENNSurrogateConfig(k=10, fit=ENNFitConfig(num_samples=50), scale_x=True)
+    cfg = ENNSurrogate(k=10, fit=SurrogateFit(num_samples=50), scale_x=True)
     assert cfg.k == 10
     assert cfg.num_samples == 50
     assert cfg.scale_x is True
@@ -64,33 +64,33 @@ def test_025():
     with pytest.raises(
         ValueError, match=r"scale_x=True is not compatible with BPANN_DISK"
     ):
-        ENNSurrogateConfig(scale_x=True, index_driver=ENNIndexDriver.BPANN_DISK)
+        ENNSurrogate(scale_x=True, index_driver=NeighborIndex.BPANN_DISK)
 
 
 def test_026():
-    cfg = ENNFitConfig()
+    cfg = SurrogateFit()
     assert cfg.num_samples is None
     assert cfg.num_candidates is None
 
 
 def test_ennfitconfigcustom():
-    cfg = ENNFitConfig(num_samples=50, num_candidates=100)
+    cfg = SurrogateFit(num_samples=50, num_candidates=100)
     assert cfg.num_samples == 50
     assert cfg.num_candidates == 100
 
 
 def test_027():
     with pytest.raises(ValueError, match="num_samples must be > 0"):
-        ENNFitConfig(num_samples=0)
+        SurrogateFit(num_samples=0)
 
 
 def test_028():
     with pytest.raises(ValueError, match="num_candidates must be > 0"):
-        ENNFitConfig(num_candidates=0)
+        SurrogateFit(num_candidates=0)
 
 
 def test_029():
-    cfg = ENNSurrogateConfig(fit=ENNFitConfig(num_candidates=100))
+    cfg = ENNSurrogate(fit=SurrogateFit(num_candidates=100))
     assert cfg.num_candidates == 100
 
 
@@ -101,25 +101,27 @@ def test_030():
 
 def test_031():
     cfg = OptimizerConfig()
-    assert isinstance(cfg.trust_region, TurboTRConfig)
-    assert cfg.candidate_rv == CandidateRV.SOBOL
+    assert isinstance(cfg.trust_region, TurboTrustRegion)
+    assert cfg.candidates.sampler == CandidateSampler.SOBOL
     assert cfg.init.num_init is None
-    assert isinstance(cfg.surrogate, NoSurrogateConfig)
+    assert isinstance(cfg.surrogate, NoSurrogate)
     assert isinstance(cfg.observation_history, ObservationHistoryConfig)
 
 
 def test_032():
     with pytest.raises(
-        ValueError, match="init_strategy='lhd_only' requires NoSurrogateConfig"
+        ValueError, match="init_strategy='lhd_only' requires NoSurrogate"
     ):
         OptimizerConfig(
             init=InitConfig(init_strategy=LHDOnlyInit()),
-            surrogate=GPSurrogateConfig(),
+            surrogate=GaussianProcess(),
         )
     config = OptimizerConfig(
         init=InitConfig(init_strategy=LHDOnlyInit()),
-        trust_region=MorboTRConfig(multi_objective=MultiObjectiveConfig(num_metrics=2)),
-        surrogate=NoSurrogateConfig(),
+        trust_region=MorboTrustRegion(
+            multi_objective=MultiObjectiveConfig(num_metrics=2)
+        ),
+        surrogate=NoSurrogate(),
     )
     assert config.num_metrics == 2
 
@@ -127,10 +129,10 @@ def test_032():
 def test_033():
     with pytest.raises(
         ValueError,
-        match="NoSurrogateConfig is not compatible with DrawAcquisitionConfig",
+        match="NoSurrogate is not compatible with DrawAcquisitionConfig",
     ):
         OptimizerConfig(
-            surrogate=NoSurrogateConfig(),
+            surrogate=NoSurrogate(),
             acquisition=DrawAcquisitionConfig(),
         )
 
@@ -138,10 +140,10 @@ def test_033():
 def test_034():
     with pytest.raises(
         ValueError,
-        match="NoSurrogateConfig is not compatible with UCBAcquisitionConfig",
+        match="NoSurrogate is not compatible with UCBAcquisitionConfig",
     ):
         OptimizerConfig(
-            surrogate=NoSurrogateConfig(),
+            surrogate=NoSurrogate(),
             acquisition=UCBAcquisitionConfig(),
         )
 
@@ -158,82 +160,82 @@ def test_035():
 
 def test_036():
     cfg = turbo_one()
-    assert isinstance(cfg.trust_region, TurboTRConfig)
-    assert isinstance(cfg.surrogate, GPSurrogateConfig)
+    assert isinstance(cfg.trust_region, TurboTrustRegion)
+    assert isinstance(cfg.surrogate, GaussianProcess)
     assert isinstance(cfg.acquisition, DrawAcquisitionConfig)
     assert isinstance(cfg.acq_optimizer, RAASPOptimizerConfig)
 
 
 def test_037():
-    cfg = turbo_one(acq_type=AcqType.PARETO)
-    assert isinstance(cfg.surrogate, GPSurrogateConfig)
+    cfg = turbo_one(acquisition=AcquisitionKind.PARETO)
+    assert isinstance(cfg.surrogate, GaussianProcess)
     assert isinstance(cfg.acquisition, ParetoAcquisitionConfig)
     assert isinstance(cfg.acq_optimizer, NDSOptimizerConfig)
 
 
 def test_038():
-    cfg = turbo_one(acq_type=AcqType.UCB)
-    assert isinstance(cfg.surrogate, GPSurrogateConfig)
+    cfg = turbo_one(acquisition=AcquisitionKind.UCB)
+    assert isinstance(cfg.surrogate, GaussianProcess)
     assert isinstance(cfg.acquisition, UCBAcquisitionConfig)
     assert isinstance(cfg.acq_optimizer, RAASPOptimizerConfig)
 
 
 def test_039():
-    cfg = turbo_one(acq_type=AcqType.THOMPSON)
-    assert isinstance(cfg.surrogate, GPSurrogateConfig)
+    cfg = turbo_one(acquisition=AcquisitionKind.THOMPSON)
+    assert isinstance(cfg.surrogate, GaussianProcess)
     assert isinstance(cfg.acquisition, DrawAcquisitionConfig)
     assert isinstance(cfg.acq_optimizer, RAASPOptimizerConfig)
 
 
 def test_040():
     cfg = turbo_zero()
-    assert isinstance(cfg.trust_region, TurboTRConfig)
-    assert isinstance(cfg.surrogate, NoSurrogateConfig)
+    assert isinstance(cfg.trust_region, TurboTrustRegion)
+    assert isinstance(cfg.surrogate, NoSurrogate)
     assert isinstance(cfg.acquisition, RandomAcquisitionConfig)
 
 
 def test_041():
-    cfg = turbo_enn(acq_type=AcqType.PARETO)
-    assert isinstance(cfg.surrogate, ENNSurrogateConfig)
+    cfg = turbo_enn(acquisition=AcquisitionKind.PARETO)
+    assert isinstance(cfg.surrogate, ENNSurrogate)
     assert isinstance(cfg.acquisition, ParetoAcquisitionConfig)
     assert isinstance(cfg.acq_optimizer, NDSOptimizerConfig)
 
 
 def test_042():
     cfg = turbo_enn(
-        acq_type=AcqType.UCB,
-        enn=ENNSurrogateConfig(fit=ENNFitConfig(num_samples=50)),
+        acquisition=AcquisitionKind.UCB,
+        enn=ENNSurrogate(fit=SurrogateFit(num_samples=50)),
     )
-    assert isinstance(cfg.surrogate, ENNSurrogateConfig)
+    assert isinstance(cfg.surrogate, ENNSurrogate)
     assert isinstance(cfg.acquisition, UCBAcquisitionConfig)
     assert isinstance(cfg.acq_optimizer, RAASPOptimizerConfig)
 
 
 def test_043():
     cfg = turbo_enn(
-        acq_type=AcqType.THOMPSON,
-        enn=ENNSurrogateConfig(fit=ENNFitConfig(num_samples=50)),
+        acquisition=AcquisitionKind.THOMPSON,
+        enn=ENNSurrogate(fit=SurrogateFit(num_samples=50)),
     )
-    assert isinstance(cfg.surrogate, ENNSurrogateConfig)
+    assert isinstance(cfg.surrogate, ENNSurrogate)
     assert isinstance(cfg.acquisition, DrawAcquisitionConfig)
 
 
 def test_044():
     with pytest.raises(ValueError, match="num_samples required"):
-        turbo_enn(acq_type=AcqType.UCB)
+        turbo_enn(acquisition=AcquisitionKind.UCB)
 
 
 def test_045():
     cfg = lhd_only()
-    assert isinstance(cfg.trust_region, NoTRConfig)
+    assert isinstance(cfg.trust_region, NoTrustRegion)
     assert isinstance(cfg.init.init_strategy, LHDOnlyInit)
-    assert isinstance(cfg.surrogate, NoSurrogateConfig)
+    assert isinstance(cfg.surrogate, NoSurrogate)
 
 
 def test_046():
     cfg = turbo_enn(
-        enn=ENNSurrogateConfig(k=15),
-        candidates=CandidateGenConfig(num_candidates=200),
+        enn=ENNSurrogate(k=15),
+        candidates=CandidateConfig(num_candidates=200),
         num_init=10,
     )
     assert cfg.surrogate.k == 15
@@ -242,33 +244,33 @@ def test_046():
 
 
 def test_047():
-    cfg_turbo = OptimizerConfig(trust_region=TurboTRConfig())
+    cfg_turbo = OptimizerConfig(trust_region=TurboTrustRegion())
     assert cfg_turbo.num_metrics is None
     cfg_morbo = OptimizerConfig(
-        trust_region=MorboTRConfig(multi_objective=MultiObjectiveConfig(num_metrics=2))
+        trust_region=MorboTrustRegion(
+            multi_objective=MultiObjectiveConfig(num_metrics=2)
+        )
     )
     assert cfg_morbo.num_metrics == 2
-    cfg_none = OptimizerConfig(trust_region=NoTRConfig())
+    cfg_none = OptimizerConfig(trust_region=NoTrustRegion())
     assert cfg_none.num_metrics is None
 
 
 def test_048():
-    config = cfg.turbo_enn(
-        enn=cfg.ENNSurrogateConfig(fit=cfg.ENNFitConfig(num_samples=4))
-    )
+    config = cfg.turbo_enn(enn=cfg.ENNSurrogate(fit=cfg.SurrogateFit(num_samples=4)))
 
     assert isinstance(config, cfg.OptimizerConfig)
-    assert config.candidates == cfg.CandidateGenConfig()
+    assert config.candidates == cfg.CandidateConfig()
     assert config.raasp_driver is cfg.RAASPDriver.ORIG
 
 
 def test_enumvalues():
-    assert ENNDistanceMetric.SQUARED_L2.value == "squared_l2"
-    assert ENNDistanceMetric.COSINE.value == "cosine"
+    assert DistanceMetric.SQUARED_L2.value == "squared_l2"
+    assert DistanceMetric.COSINE.value == "cosine"
 
 
 def test_multitrlengths():
-    tr = MultiTRConfig()
+    tr = MultiTrustRegionPolicy()
     assert (tr.length_init, tr.length_min, tr.length_max) == (
         tr.length.length_init,
         tr.length.length_min,

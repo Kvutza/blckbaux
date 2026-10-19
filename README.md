@@ -1,47 +1,65 @@
-# ENNX
+# BLCKBAUX
 
-Bayesian optimization for neural architectures at scale, in Rust and Python.
-Works with BoTorch, Optuna, and Ax.
+Bayesian optimization and kernel execution for resident recurrent architectures. Rust core, Python wheels for 3.12–3.15. Metal and CUDA backends.
 
-## Quickstart
-
-Hermetic builds via Buck2. Downloads and caches pinned Rust, Clang/LLD, and toolchains automatically:
+## Build
 
 ```sh
-./ennx build             # Build library, CLI, and Python 3.12–3.14 wheels
-./ennx test              # Run unit tests and accelerator kernels
-./ennx test --affected   # Run only tests affected by working changes
-./ennx test --python     # Run Python test suite
-./ennx dev               # Format, build, and test verification cycle
+./blckbaux build                   # native library
+./blckbaux build --distribution    # Python 3.12–3.15 wheels
+./blckbaux test        # repository verification policy
 ```
 
-## Bayesian Optimization & Tuning
+Distribution wheels land in `dist/`. No system Rust, Python, or Clang required.
+Version tags publish the CPython 3.12–3.15 wheels for macOS arm64 and
+manylinux x86-64/arm64 as assets on the corresponding GitHub Release.
 
-Run full-space zeroth-order optimization with the live terminal dashboard:
+## Optimize & Visualize
 
 ```sh
-./ennx tune examples/tuning/code-pretrain.toml
+./blckbaux tune examples/tuning/hnet-1m-operator-bo.toml  # runs optimization with live telemetry
 ```
 
-## Codebase Radar
+Experiments automatically export vector SVG figures (`convergence.svg`, `contrastive.svg`, `trust_region.svg`, `latency.svg`) and an interactive `report.html` dashboard under `<RUN_DIR>/plots/`.
 
-Tree-sitter AST queries, reachability analysis, and quality gates:
+## Configuration & Autocompletion
+
+All experiment recipes (`examples/tuning/*.toml`, `performance/configs/*.toml`) are strictly typed under version 4 syntax. Instant autocomplete, parameter docs, and schema validation are provided out-of-the-box for VS Code, Cursor, Zed, Helix, and Neovim via Taplo and [`schemas/tune-spec.schema.json`](schemas/tune-spec.schema.json).
+
+Each authored recipe compiles to a complete resolved run record: workload lives in `data` and `objective`, budgets and latency goals in `execution`, held-out cadence in `evaluation`, and algorithm choices under one closed `optimizer` variant. Authored omissions use typed defaults rather than patching another file. Unknown fields, legacy aliases, and components from a different optimizer variant are rejected.
+
+## Measure
 
 ```sh
-./ennx radar find <pattern>   # AST symbol search
-./ennx radar impact <target>  # Blast-radius analysis
-./ennx radar gate             # Structural quality checks
+./blckbaux radar performance show            # H-Net work and kernel coverage
+./blckbaux cuda context 1048576              # CUDA PISA cache benchmark
+./blckbaux cuda ptx-probe                    # synthesized PTX hardware probe
 ```
 
-## Hardware Backends
+## Codebase
 
-- **Apple Silicon (Metal)**: Zero-copy unified memory buffers and SIMDgroup matrix primitives.
-- **NVIDIA CUDA**: PTX synthesis for Turing (SM_75) and Hopper (SM_90a) architectures.
+```sh
+./blckbaux radar find <pattern>      # AST-scoped symbol search
+./blckbaux radar impact <symbol>     # blast-radius across call graph
+```
 
-## Documentation
+## Hardware
 
+| Backend | Platform |
+|---|---|
+| Metal | Apple Silicon — unified memory, SIMDgroup primitives |
+| CUDA | NVIDIA Turing / Hopper — PTX synthesis via CUDA-Oxide |
+
+## Theory & Publications
+
+- **Preprint:** [*Geometry and Observation Limits in Direct Neural Operator Optimization*](papers/operator_bo.pdf) (arXiv preprint, October 2026).
+- [Operator Geometry Theory](docs/operator-bo-theory.md) — formal operator reductions and observable objectives.
+- [Black-Box Optimization Program](docs/black-box-optimization-program.md) — normative design, theorem ledger, and proof contracts.
+
+## Docs
+
+- [Documentation Index](docs/README.md)
 - [API Reference](docs/api.md)
 - [Python Integrations](docs/interop.md)
 - [Build System](docs/buck2.md)
-- [Testing & Quality Gates](docs/testing.md)
-- [Architecture & Research](docs/README.md)
+- [Testing & Quality](docs/testing.md)

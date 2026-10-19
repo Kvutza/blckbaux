@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import numpy as np
 
-from ennx import create_optimizer
-from ennx.turbo.config.encode import supports
+from blckbaux import create_optimizer
+from blckbaux.turbo.config.encode import supports
 
 
 def tr_cycles(

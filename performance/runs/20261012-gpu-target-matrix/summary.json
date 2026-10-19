@@ -1,0 +1,22 @@
+{
+  "schema": "blckbaux.cuda.target-matrix.v1",
+  "source": "same local BLCKBAUX source snapshot",
+  "targets": {
+    "sm_75": {
+      "hardware": "Tesla T4",
+      "status": "measured",
+      "artifact": "../20261012-t4-target-suite/result.json"
+    },
+    "sm_80": {
+      "hardware": "NVIDIA A100-SXM4-40GB",
+      "status": "measured",
+      "artifact": "../20261012-a100-target-suite/result.json"
+    },
+    "sm_90a": {
+      "hardware": "H100",
+      "status": "unavailable",
+      "reason": "Colab rejected H100 allocation for the current account quota or entitlement"
+    }
+  },
+  "scope": "Stage parity and latency only; no A100 or H100 complete BO transaction was measured."
+}

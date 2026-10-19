@@ -3,7 +3,7 @@ use std::fs;
 
 pub fn run(args: &[String]) -> CudaResult<()> {
     if args.len() < 3 || args.len() > 10 {
-        return Err("usage: ./ennx cuda diffusion CHECKPOINT PROMPT_JSON OUTPUT_DIR [CONTEXT=4096] [VISITS=2] [TEMPERATURE=0.8] [SEED=17] [STEPS=2] [BLOCK=128] [SOFT=true]".into());
+        return Err("usage: ./blckbaux cuda diffusion CHECKPOINT PROMPT_JSON OUTPUT_DIR [CONTEXT=4096] [VISITS=2] [TEMPERATURE=0.8] [SEED=17] [STEPS=2] [BLOCK=128] [SOFT=true]".into());
     }
     let arg = |index: usize, default: &str| {
         args.get(index)
@@ -11,8 +11,9 @@ pub fn run(args: &[String]) -> CudaResult<()> {
             .unwrap_or(default)
             .to_owned()
     };
-    let prompt: Vec<u32> = ennx_wire::json::from_slice(&fs::read(&args[1]).map_err(cuda_error)?)
-        .map_err(cuda_error)?;
+    let prompt: Vec<u32> =
+        blckbaux_artifact::json::from_slice(&fs::read(&args[1]).map_err(cuda_error)?)
+            .map_err(cuda_error)?;
     let context = arg(3, "4096").parse::<usize>().map_err(cuda_error)?;
     let visits = arg(4, "2").parse().map_err(cuda_error)?;
     let temperature = arg(5, "0.8").parse().map_err(cuda_error)?;
@@ -26,10 +27,10 @@ pub fn run(args: &[String]) -> CudaResult<()> {
     fs::create_dir(output).map_err(cuda_error)?;
     fs::write(
         output.join("tokens.json"),
-        ennx_wire::json::to_string(&result.tokens).map_err(cuda_error)?,
+        blckbaux_artifact::json::to_string(&result.tokens).map_err(cuda_error)?,
     )
     .map_err(cuda_error)?;
-    let record = ennx_wire::json::json!({
+    let record = blckbaux_artifact::json::json!({
         "stage": "cuda-learned-block-diffusion", "checkpoint": args[0],
         "context": context, "prompt-tokens": prompt.len(), "generated-tokens": context - prompt.len(),
         "steps": steps, "block": block, "soft": soft, "index": "independent",
@@ -39,7 +40,7 @@ pub fn run(args: &[String]) -> CudaResult<()> {
     });
     fs::write(
         output.join("result.json"),
-        ennx_wire::json::pretty_string(&record).map_err(cuda_error)?,
+        blckbaux_artifact::json::pretty_string(&record).map_err(cuda_error)?,
     )
     .map_err(cuda_error)?;
     println!(

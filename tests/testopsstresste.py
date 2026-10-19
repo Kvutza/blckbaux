@@ -6,8 +6,8 @@ import numpy as np
 import pytest
 from click.testing import CliRunner
 
-from ennx.turbo.config import UCBAcquisitionConfig
-from ennx.turbo.config.eidxdrv import ENNIndexDriver
+from blckbaux.turbo.config import UCBAcquisitionConfig
+from blckbaux.turbo.config.surrogate import NeighborIndex
 from ops.stress import (
     TURBO_ENN_NUM_FIT_SAMPLES,
     TURBO_ENN_NUM_INIT,
@@ -56,12 +56,12 @@ def test_003(num_obs, num_ask, fragment):
 
 
 def test_004():
-    cfg = enn_config(index_driver=ENNIndexDriver.FLAT)
+    cfg = enn_config(index_driver=NeighborIndex.FLAT)
     assert cfg.init.num_init == TURBO_ENN_NUM_INIT
     assert isinstance(cfg.acquisition, UCBAcquisitionConfig)
     assert cfg.surrogate.k == 10
     assert cfg.surrogate.num_samples == TURBO_ENN_NUM_FIT_SAMPLES
-    assert cfg.surrogate.index_driver == ENNIndexDriver.FLAT
+    assert cfg.surrogate.index_driver == NeighborIndex.FLAT
     assert cfg.surrogate.enn_storage is None
     assert cfg.surrogate.work_dir is None
     assert cfg.trust_region.noise_aware is True
@@ -69,15 +69,15 @@ def test_004():
 
 def test_005():
     with pytest.raises(ValueError, match="bpann_disk requires work_dir"):
-        enn_config(index_driver=ENNIndexDriver.BPANN_DISK)
+        enn_config(index_driver=NeighborIndex.BPANN_DISK)
 
 
 def test_006():
     cfg = enn_config(
-        index_driver=ENNIndexDriver.BPANN_DISK,
+        index_driver=NeighborIndex.BPANN_DISK,
         work_dir="/tmp/turbo_enn_work",
     )
-    assert cfg.surrogate.index_driver == ENNIndexDriver.BPANN_DISK
+    assert cfg.surrogate.index_driver == NeighborIndex.BPANN_DISK
     assert cfg.surrogate.enn_storage == "disk"
     assert cfg.surrogate.work_dir == "/tmp/turbo_enn_work"
 
@@ -85,7 +85,7 @@ def test_006():
 def test_007():
     with pytest.raises(ValueError, match="work_dir requires bpann_disk"):
         enn_config(
-            index_driver=ENNIndexDriver.FLAT,
+            index_driver=NeighborIndex.FLAT,
             work_dir="/tmp/x",
         )
 
@@ -143,7 +143,7 @@ def test_009():
     )
     rows = list(
         enn_stress2(
-            index_driver=ENNIndexDriver.FLAT,
+            index_driver=NeighborIndex.FLAT,
             num_dim=2,
             num_obs=10,
             num_ask=3,
@@ -161,7 +161,7 @@ def test_009():
     for gap in gaps:
         expected_events.extend([f"eval:{gap}", f"tell:{gap}", "ask:1"])
     assert events == expected_events
-    # Ask arms must not be fed back into tell (tell sizes == DGP gaps only).
+    # Proposed arms must not be fed back into tell (tell sizes == DGP gaps only).
     assert sum(tell_sizes) == 10
     assert all(r.iter_s == pytest.approx(r.ask_s + r.tell_s) for r in rows)
     assert len(ask_returns_used) == len(stops)
@@ -171,7 +171,7 @@ def test_010():
     with pytest.raises(ValueError, match="num_ask must be <="):
         list(
             enn_stress2(
-                index_driver=ENNIndexDriver.FLAT,
+                index_driver=NeighborIndex.FLAT,
                 num_dim=2,
                 num_obs=3,
                 num_ask=4,
@@ -203,7 +203,7 @@ def test_012():
     num_obs, num_ask = 10, 3
     rows = list(
         enn_stress2(
-            index_driver=ENNIndexDriver.FLAT,
+            index_driver=NeighborIndex.FLAT,
             num_dim=2,
             num_obs=num_obs,
             num_ask=num_ask,
@@ -396,8 +396,8 @@ def test_019():
     assert TURBO_ENN_SEED_CHUNK == 100_000
     assert TURBO_ENN_SEED_CHUNK_FLAT == 200_000
     assert TURBO_ENN_SEED_CHUNK_FLAT > TURBO_ENN_SEED_CHUNK
-    assert enn_chunk(ENNIndexDriver.FLAT) == TURBO_ENN_SEED_CHUNK_FLAT
-    assert enn_chunk(ENNIndexDriver.BPANN_DISK) == TURBO_ENN_SEED_CHUNK
+    assert enn_chunk(NeighborIndex.FLAT) == TURBO_ENN_SEED_CHUNK_FLAT
+    assert enn_chunk(NeighborIndex.BPANN_DISK) == TURBO_ENN_SEED_CHUNK
     sig = inspect.signature(enn_stress2)
     assert sig.parameters["seed_chunk"].default is None
 
@@ -406,8 +406,8 @@ def _enncount(gap: int, chunk: int) -> int:
     """Count ``tell`` calls while bulk-seeding ``gap`` points with ``chunk``."""
     from unittest.mock import MagicMock
 
-    from ennx import create_optimizer
-    from ennx.benchmarks import Ackley
+    from blckbaux import create_optimizer
+    from blckbaux.benchmarks import Ackley
     from ops.stress import (
         TURBO_ENN_ACKLEY_NOISE,
         TURBO_ENN_SEED,
@@ -415,7 +415,7 @@ def _enncount(gap: int, chunk: int) -> int:
         enn_n,
     )
 
-    cfg = enn_config(index_driver=ENNIndexDriver.FLAT)
+    cfg = enn_config(index_driver=NeighborIndex.FLAT)
     ackley = Ackley(
         noise=TURBO_ENN_ACKLEY_NOISE, rng=np.random.default_rng(TURBO_ENN_SEED)
     )

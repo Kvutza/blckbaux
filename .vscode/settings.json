@@ -1,0 +1,8 @@
+{
+  "evenBetterToml.schema.enabled": true,
+  "evenBetterToml.schema.associations": {
+    "examples/tuning/.*\\.toml": "schemas/tune-spec.schema.json",
+    "performance/configs/.*\\.toml": "schemas/tune-spec.schema.json",
+    "configs/.*\\.toml": "schemas/tune-spec.schema.json"
+  }
+}

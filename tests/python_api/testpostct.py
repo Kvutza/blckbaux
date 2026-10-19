@@ -7,8 +7,8 @@ import inspect
 import numpy as np
 import pytest
 
-from ennx import ENN
-from ennx.ennx.enn_params import ENNParams, PosteriorFlags
+from blckbaux import ENN
+from blckbaux.enn.enn_params import ENNParams, PosteriorFlags
 
 
 @pytest.fixture

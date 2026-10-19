@@ -14,15 +14,15 @@ from pathlib import Path
 import click
 import numpy as np
 
-from ennx.ennx.enn_class import ENN
-from ennx.ennx.enn_fit import enn_fit
-from ennx.ennx.enn_params import ENNParams, PosteriorFlags
-from ennx.turbo.config.eidxdrv import ENNIndexDriver
+from blckbaux.enn.enn_class import ENN
+from blckbaux.enn.enn_fit import enn_fit
+from blckbaux.enn.enn_params import ENNParams, PosteriorFlags
+from blckbaux.turbo.config.surrogate import NeighborIndex
 
 INDEX_TYPE_CHOICES: tuple[str, ...] = ("flat", "bpann_disk")
 DISK_INDEX_TYPE_CHOICES: frozenset[str] = frozenset({"bpann_disk"})
-DISK_DEFER_SYNC_DRIVERS: frozenset[ENNIndexDriver] = frozenset(
-    {ENNIndexDriver.BPANN_DISK}
+DISK_DEFER_SYNC_DRIVERS: frozenset[NeighborIndex] = frozenset(
+    {NeighborIndex.BPANN_DISK}
 )
 DEFAULT_NUM_DIM = 10
 STRESS_OBS_BATCH_SIZE = 100
@@ -118,7 +118,7 @@ def rss_stress(
     *,
     num_obs: int,
     work_dir: str,
-    index_driver: ENNIndexDriver = ENNIndexDriver.BPANN_DISK,
+    index_driver: NeighborIndex = NeighborIndex.BPANN_DISK,
     config: DiskRssStressConfig | None = None,
 ) -> DiskRssStressResult:
     """Stream batched adds to disk ENN; return RSS and on-disk metrics."""
@@ -190,19 +190,19 @@ class EnnAddStressConfig:
     work_dir: str | None = None
 
 
-def parse_driver2(name: str) -> ENNIndexDriver:
+def parse_driver2(name: str) -> NeighborIndex:
     mapping = {
-        "flat": ENNIndexDriver.FLAT,
-        "bpann_disk": ENNIndexDriver.BPANN_DISK,
+        "flat": NeighborIndex.FLAT,
+        "bpann_disk": NeighborIndex.BPANN_DISK,
     }
     if name not in mapping:
         raise ValueError(f"Unknown index type: {name}")
     return mapping[name]
 
 
-def enn_chunk(index_driver: ENNIndexDriver) -> int:
+def enn_chunk(index_driver: NeighborIndex) -> int:
     """Return turbo-enn bulk-seed chunk sized for the index backend."""
-    if index_driver == ENNIndexDriver.FLAT:
+    if index_driver == NeighborIndex.FLAT:
         return TURBO_ENN_SEED_CHUNK_FLAT
     return TURBO_ENN_SEED_CHUNK
 
@@ -353,7 +353,7 @@ def bpann_enn(work_dir: str) -> tuple[ENN, dict]:
         np.empty((0, num_dim), dtype=float),
         np.empty((0, num_metrics), dtype=float),
         scale_x=scale_x,
-        index_driver=ENNIndexDriver.BPANN_DISK,
+        index_driver=NeighborIndex.BPANN_DISK,
         work_dir=work_dir,
         enn_storage="disk",
     )
@@ -402,7 +402,7 @@ def _times(model: ENN, x_query: np.ndarray) -> float:
 
 def enn_stress(
     *,
-    index_driver: ENNIndexDriver,
+    index_driver: NeighborIndex,
     num_obs: int,
     config: EnnAddStressConfig | None = None,
 ) -> Iterator[tuple[int, float, float]]:
@@ -1013,7 +1013,7 @@ def enn_stops(num_obs: int, num_ask: int) -> tuple[int, ...]:
 
 def enn_config(
     *,
-    index_driver: ENNIndexDriver,
+    index_driver: NeighborIndex,
     work_dir: str | None = None,
     num_init: int = TURBO_ENN_NUM_INIT,
 ):
@@ -1022,11 +1022,11 @@ def enn_config(
     Overrides only ``num_init`` (fixed at ``TURBO_ENN_NUM_INIT`` for the stress CLI).
     For ``BPANN_DISK``, both ``enn_storage="disk"`` and ``work_dir`` are required.
     """
-    from ennx.turbo.config import (
-        AcqType,
-        ENNFitConfig,
-        ENNSurrogateConfig,
-        TurboTRConfig,
+    from blckbaux.turbo.config import (
+        AcquisitionKind,
+        SurrogateFit,
+        ENNSurrogate,
+        TurboTrustRegion,
         turbo_enn,
     )
 
@@ -1034,10 +1034,10 @@ def enn_config(
         raise ValueError("num_init must be >= 1")
     enn_kwargs: dict[str, object] = {
         "k": TURBO_ENN_K,
-        "fit": ENNFitConfig(num_samples=TURBO_ENN_NUM_FIT_SAMPLES),
+        "fit": SurrogateFit(num_samples=TURBO_ENN_NUM_FIT_SAMPLES),
         "index_driver": index_driver,
     }
-    if index_driver == ENNIndexDriver.BPANN_DISK:
+    if index_driver == NeighborIndex.BPANN_DISK:
         if work_dir is None:
             raise ValueError("bpann_disk requires work_dir")
         enn_kwargs["enn_storage"] = "disk"
@@ -1045,9 +1045,9 @@ def enn_config(
     elif work_dir is not None:
         raise ValueError("work_dir requires bpann_disk")
     return turbo_enn(
-        enn=ENNSurrogateConfig(**enn_kwargs),
-        trust_region=TurboTRConfig(noise_aware=True),
-        acq_type=AcqType.UCB,
+        enn=ENNSurrogate(**enn_kwargs),
+        trust_region=TurboTrustRegion(noise_aware=True),
+        acquisition=AcquisitionKind.UCB,
         num_init=num_init,
     )
 
@@ -1080,7 +1080,7 @@ def enn_row(n: int, iter_s: float, ask_s: float, tell_s: float, *, n_width: int)
 
 def enn_stress2(
     *,
-    index_driver: ENNIndexDriver,
+    index_driver: NeighborIndex,
     num_dim: int,
     num_obs: int,
     num_ask: int,
@@ -1103,8 +1103,8 @@ def enn_stress2(
     if seed_chunk < 1:
         raise ValueError("seed_chunk must be >= 1")
 
-    from ennx import create_optimizer
-    from ennx.benchmarks import Ackley
+    from blckbaux import create_optimizer
+    from blckbaux.benchmarks import Ackley
 
     if objective is None:
         ackley = Ackley(noise=TURBO_ENN_ACKLEY_NOISE, rng=np.random.default_rng(seed))
@@ -1270,7 +1270,7 @@ def format_row2(
 
 
 def run_stress3(
-    index_driver: ENNIndexDriver,
+    index_driver: NeighborIndex,
     num_dim: int,
     max_n: int,
     *,
@@ -1293,8 +1293,8 @@ def run_stress3(
         raise ValueError("seed_chunk must be >= 1")
     grid = proposal_ns(max_n)
 
-    from ennx import create_optimizer
-    from ennx.benchmarks import Ackley
+    from blckbaux import create_optimizer
+    from blckbaux.benchmarks import Ackley
 
     if objective is None:
         ackley = Ackley(noise=TURBO_ENN_ACKLEY_NOISE, rng=np.random.default_rng(seed))
@@ -1389,10 +1389,10 @@ def cli() -> None:
             ),
         ),
         click.Option(
-            ["--ennx-config"],
+            ["--blckbaux-config"],
             type=click.Path(file_okay=True, dir_okay=False, path_type=str),
             default=None,
-            help="Path to ennx config.toml (overrides ~/.ennx/config.toml).",
+            help="Path to blckbaux config.toml (overrides ~/.blckbaux/config.toml).",
         ),
     ],
 )
@@ -1404,13 +1404,13 @@ def enn(
     heartbeat_seconds: float,
     work_dir: str | None,
     batch: bool,
-    ennx_config: str | None,
+    blckbaux_config: str | None,
 ) -> None:
     """Time 1000-point ENN queries at sparse checkpoints while streaming adds."""
-    if ennx_config is not None:
-        from ennx._rust import set_path
+    if blckbaux_config is not None:
+        from blckbaux._rust import set_path
 
-        set_path(ennx_config)
+        set_path(blckbaux_config)
     if num_obs < 1:
         raise click.ClickException("num_obs must be >= 1")
     if num_dim < 1:

@@ -93,11 +93,11 @@ jobs:
           rustup toolchain install 1.96.0 --profile minimal --component rustfmt
 
       - name: Install Pixi
-        uses: prefix-dev/setup-pixi@v0.9.0
+        uses: prefix-dev/setup-pixi@v0.11.2
         with:
-          pixi-version: v0.78.0
+          pixi-version: v0.82.0
           cache: false
-          environments: ennx ennx-py312 ennx-py314
+          environments: blckbaux blckbaux-py312 blckbaux-py314 blckbaux-py315
           locked: false
 
       - name: Restore Buck2 cache
@@ -114,16 +114,21 @@ jobs:
         env:
           RELEASE_TAG: ${{ needs.resolve.outputs.tag }}
           RELEASE_COMMIT: ${{ needs.resolve.outputs.commit }}
-        run: pixi run -e ennx python tools/release_provenance.py "$RELEASE_TAG" --commit "$RELEASE_COMMIT"
+        run: pixi run -e blckbaux python tools/release_provenance.py "$RELEASE_TAG" --commit "$RELEASE_COMMIT"
 
       - name: Check formatting
-        run: ./ennx fmt --check
+        run: ./blckbaux fmt --check
+
+      - name: Check source policy
+        run: |
+          tools/bootstrap-dotslash
+          .buck2-tools/bin/dotslash tools/prek run semantic-name kiss-check --config prek.toml --all-files
 
       - name: Build and verify wheels
-        run: ./ennx build --tests --out release
+        run: ./blckbaux build --distribution --tests --out release
 
       - name: Run Rust and kernel tests
-        run: ./ennx test
+        run: ./blckbaux test
 
       - name: Collect wheel artifacts
         env:
@@ -131,13 +136,13 @@ jobs:
           RELEASE_COMMIT: ${{ needs.resolve.outputs.commit }}
           WHEEL_PLATFORM_TAG: ${{ matrix.platform-tag }}
         run: |
-          pixi run -e ennx python tools/release_provenance.py "$RELEASE_TAG" --commit "$RELEASE_COMMIT" --wheels release --platform-tag "$WHEEL_PLATFORM_TAG"
-          test "$(find release -type f -name 'ennx-*.whl' | wc -l | tr -d ' ')" -eq 3
+          pixi run -e blckbaux python tools/release_provenance.py "$RELEASE_TAG" --commit "$RELEASE_COMMIT" --wheels release --platform-tag "$WHEEL_PLATFORM_TAG"
+          test "$(find release -type f -name 'blckbaux-*.whl' | wc -l | tr -d ' ')" -eq 4
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ennx-${{ matrix.os }}
+          name: blckbaux-${{ matrix.os }}
           path: release/
           if-no-files-found: error
 

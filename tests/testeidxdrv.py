@@ -3,14 +3,14 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from ennx._rust import ENN as RustENN
-from ennx.ennx.enn_class import ENN
-from ennx.ennx.eclssup import posterior_neighbors
-from ennx.ennx_rust import optimizer
-from ennx.turbo.config.eidxdrv import ENN_INDEX_DRIVER_TO_RUST, ENNIndexDriver
+from blckbaux._rust import ENN as RustENN
+from blckbaux.enn.enn_class import ENN
+from blckbaux.enn.eclssup import posterior_neighbors
+from blckbaux.blckbaux_rust import optimizer
+from blckbaux.turbo.config.surrogate import INDEX_NAMES, NeighborIndex
 
 
-def _enn(train_x, *, index_driver=ENNIndexDriver.FLAT, work_dir=None):
+def _enn(train_x, *, index_driver=NeighborIndex.FLAT, work_dir=None):
     train_y = np.zeros((train_x.shape[0], 1), dtype=float)
     kwargs: dict = {"scale_x": False, "index_driver": index_driver}
     if work_dir is not None:
@@ -20,15 +20,15 @@ def _enn(train_x, *, index_driver=ENNIndexDriver.FLAT, work_dir=None):
 
 
 def test_001():
-    assert set(ENNIndexDriver) == set(ENN_INDEX_DRIVER_TO_RUST.keys())
-    assert ENN_INDEX_DRIVER_TO_RUST[ENNIndexDriver.FLAT] == "exact"
-    assert ENN_INDEX_DRIVER_TO_RUST[ENNIndexDriver.USEARCH] == "usearch"
-    assert ENN_INDEX_DRIVER_TO_RUST[ENNIndexDriver.BPANN_DISK] == "bpann_disk"
-    assert ENN_INDEX_DRIVER_TO_RUST[ENNIndexDriver.METAL] == "metal"
-    assert ENN_INDEX_DRIVER_TO_RUST[ENNIndexDriver.OPENCL] == "opencl"
-    assert ENN_INDEX_DRIVER_TO_RUST[ENNIndexDriver.CUDA] == "cuda"
-    assert "AGX" not in ENNIndexDriver.__members__
-    assert "agx" not in ENN_INDEX_DRIVER_TO_RUST.values()
+    assert set(NeighborIndex) == set(INDEX_NAMES.keys())
+    assert INDEX_NAMES[NeighborIndex.FLAT] == "exact"
+    assert INDEX_NAMES[NeighborIndex.USEARCH] == "usearch"
+    assert INDEX_NAMES[NeighborIndex.BPANN_DISK] == "bpann_disk"
+    assert INDEX_NAMES[NeighborIndex.METAL] == "metal"
+    assert INDEX_NAMES[NeighborIndex.OPENCL] == "opencl"
+    assert INDEX_NAMES[NeighborIndex.CUDA] == "cuda"
+    assert "AGX" not in NeighborIndex.__members__
+    assert "agx" not in INDEX_NAMES.values()
 
 
 @pytest.mark.parametrize("driver", ["agx", "AGX", "Agx"])
@@ -36,12 +36,10 @@ def test_002(driver):
     with pytest.raises(ValueError, match="Unknown index_driver"):
         RustENN(np.zeros((2, 1)), np.zeros((2, 1)), index_driver=driver)
     with pytest.raises(ValueError, match="Unknown index_driver"):
-        optimizer.enn_optimizer(
-            np.array([[0.0, 1.0]]), config_overrides={"index_driver": driver}
-        )
+        optimizer.enn_optimizer(np.array([[0.0, 1.0]]), config={"index_driver": driver})
 
 
-@pytest.mark.parametrize("index_driver", [ENNIndexDriver.METAL, ENNIndexDriver.OPENCL])
+@pytest.mark.parametrize("index_driver", [NeighborIndex.METAL, NeighborIndex.OPENCL])
 def test_003(index_driver):
     train_x = np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [2.0, 2.0]], dtype=float)
     query = np.array([[0.1, 0.2], [1.1, 0.1]], dtype=float)
@@ -73,7 +71,7 @@ def test_003(index_driver):
 def test_004():
     train_x = np.arange(2049, dtype=float).reshape(-1, 1)
     query = np.array([[0.25]])
-    automatic = _enn(train_x, index_driver=ENNIndexDriver.AUTO)
+    automatic = _enn(train_x, index_driver=NeighborIndex.AUTO)
     exact = _enn(train_x)
     np.testing.assert_array_equal(
         automatic.rust_backend.neighbors(query, 2049),
@@ -87,7 +85,7 @@ def test_005():
     query = rng.normal(size=(4, 5))
     flat = _enn(train_x)
     try:
-        usearch = _enn(train_x, index_driver=ENNIndexDriver.USEARCH)
+        usearch = _enn(train_x, index_driver=NeighborIndex.USEARCH)
     except ValueError as error:
         message = str(error)
         if "USearch index is unavailable" in message:
@@ -103,11 +101,11 @@ def test_005():
 def test_006():
     train_x = np.array([[0.0, 0.0], [1.0, 1.0]], dtype=float)
     train_y = np.zeros((2, 1), dtype=float)
-    with pytest.raises(ValueError, match="work_dir|ENNX_WORK_DIR"):
+    with pytest.raises(ValueError, match="work_dir|BLCKBAUX_WORK_DIR"):
         ENN(
             train_x,
             train_y,
-            index_driver=ENNIndexDriver.BPANN_DISK,
+            index_driver=NeighborIndex.BPANN_DISK,
             enn_storage="disk",
         )
 
@@ -118,7 +116,7 @@ def test_007(seed: int):
     n_train, dim, search_k = 20, 4, 3
     train_x = rng.uniform(0.0, 1.0, size=(n_train, dim))
     query = rng.uniform(0.0, 1.0, size=(1, dim))
-    enn = _enn(train_x, index_driver=ENNIndexDriver.FLAT)
+    enn = _enn(train_x, index_driver=NeighborIndex.FLAT)
     _, idx = posterior_neighbors(enn.rust_backend, query, search_k=search_k)
     assert idx.shape == (1, search_k)
     assert np.all(idx >= 0)
@@ -135,7 +133,7 @@ def test_008():
         ENN(
             train_x,
             train_y,
-            index_driver=ENNIndexDriver.FLAT,
+            index_driver=NeighborIndex.FLAT,
             work_dir="/tmp/enn_work",
             enn_storage="disk",
         )
@@ -147,7 +145,7 @@ def test_009(tmp_path):
     np.zeros((2, 1), dtype=float)
     model = _enn(
         train_x,
-        index_driver=ENNIndexDriver.BPANN_DISK,
+        index_driver=NeighborIndex.BPANN_DISK,
         work_dir=str(work_dir),
     )
     assert (work_dir / "train_x.bin").exists()
@@ -159,7 +157,7 @@ def test_009(tmp_path):
 
 
 def test_010(tmp_path):
-    from ennx.ennx.enn_params import ENNParams
+    from blckbaux.enn.enn_params import ENNParams
 
     rng = np.random.default_rng(42)
     d = 3
@@ -173,7 +171,7 @@ def test_010(tmp_path):
         x0,
         y0,
         scale_x=False,
-        index_driver=ENNIndexDriver.BPANN_DISK,
+        index_driver=NeighborIndex.BPANN_DISK,
         work_dir=str(work_dir),
         enn_storage="disk",
     )
@@ -184,7 +182,7 @@ def test_010(tmp_path):
         np.vstack([x0, x1]),
         np.vstack([y0, y1]),
         scale_x=False,
-        index_driver=ENNIndexDriver.BPANN_DISK,
+        index_driver=NeighborIndex.BPANN_DISK,
         work_dir=str(tmp_path / "enn_disk_fresh"),
         enn_storage="disk",
     )
@@ -199,7 +197,7 @@ def test_010(tmp_path):
 
 def test_011(tmp_path):
     """Reopen must not trust placeholder empty train_y column count for num_outputs."""
-    from ennx.ennx.enn_params import ENNParams
+    from blckbaux.enn.enn_params import ENNParams
 
     work_dir = tmp_path / "enn_disk_reopen_num_metrics"
     train_x = np.array([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]], dtype=float)
@@ -211,7 +209,7 @@ def test_011(tmp_path):
         train_x,
         train_y,
         scale_x=False,
-        index_driver=ENNIndexDriver.BPANN_DISK,
+        index_driver=NeighborIndex.BPANN_DISK,
         work_dir=str(work_dir),
         enn_storage="disk",
     )
@@ -220,7 +218,7 @@ def test_011(tmp_path):
         np.zeros((0, 2), dtype=float),
         np.zeros((0, 1), dtype=float),
         scale_x=False,
-        index_driver=ENNIndexDriver.BPANN_DISK,
+        index_driver=NeighborIndex.BPANN_DISK,
         work_dir=str(work_dir),
         enn_storage="disk",
     )
@@ -237,7 +235,7 @@ def test_012(tmp_path):
         np.zeros((0, 2), dtype=float),
         np.zeros((0, 2), dtype=float),
         scale_x=False,
-        index_driver=ENNIndexDriver.BPANN_DISK,
+        index_driver=NeighborIndex.BPANN_DISK,
         work_dir=str(work_dir),
         enn_storage="disk",
     )
@@ -245,7 +243,7 @@ def test_012(tmp_path):
         np.zeros((0, 2), dtype=float),
         np.zeros((0, 1), dtype=float),
         scale_x=False,
-        index_driver=ENNIndexDriver.BPANN_DISK,
+        index_driver=NeighborIndex.BPANN_DISK,
         work_dir=str(work_dir),
         enn_storage="disk",
     )
@@ -263,7 +261,7 @@ def test_013(tmp_path):
             train_x,
             train_y,
             scale_x=True,
-            index_driver=ENNIndexDriver.BPANN_DISK,
+            index_driver=NeighborIndex.BPANN_DISK,
             work_dir=str(tmp_path / "enn_scale_x_bpann"),
             enn_storage="disk",
         )
@@ -280,7 +278,7 @@ def _buildmodel(work_dir, d, rng):
         np.empty((0, d)),
         np.empty((0, 1)),
         scale_x=False,
-        index_driver=ENNIndexDriver.BPANN_DISK,
+        index_driver=NeighborIndex.BPANN_DISK,
         work_dir=str(work_dir),
         enn_storage="disk",
     )
@@ -295,7 +293,7 @@ def test_014(tmp_path):
     """Multi-batch disk store: persist preserves in-session posterior; reopen matches reference."""
     import json
 
-    from ennx.ennx.enn_params import ENNParams
+    from blckbaux.enn.enn_params import ENNParams
 
     rng = np.random.default_rng(17)
     d = 32
@@ -316,7 +314,7 @@ def test_014(tmp_path):
         x_all,
         y_all,
         scale_x=False,
-        index_driver=ENNIndexDriver.BPANN_DISK,
+        index_driver=NeighborIndex.BPANN_DISK,
         work_dir=str(tmp_path / "enn_disk_persist_fresh"),
         enn_storage="disk",
     )
@@ -327,7 +325,7 @@ def test_014(tmp_path):
         np.empty((0, d)),
         np.empty((0, 1)),
         scale_x=False,
-        index_driver=ENNIndexDriver.BPANN_DISK,
+        index_driver=NeighborIndex.BPANN_DISK,
         work_dir=str(work_dir),
         enn_storage="disk",
     )
@@ -337,7 +335,7 @@ def test_014(tmp_path):
     np.testing.assert_allclose(post_reopen.se, post_fresh.se, rtol=1e-5)
 
 
-@pytest.mark.parametrize("driver", [ENNIndexDriver.BPANN_DISK])
+@pytest.mark.parametrize("driver", [NeighborIndex.BPANN_DISK])
 def test_015(tmp_path, driver):
     work_dir = tmp_path / f"enn_disk_{driver.name.lower()}"
     rng = np.random.default_rng(42)
@@ -355,7 +353,7 @@ def test_015(tmp_path, driver):
     assert len(model) == n
     model.ensure_sync()
 
-    flat = _enn(train_x, index_driver=ENNIndexDriver.FLAT)
+    flat = _enn(train_x, index_driver=NeighborIndex.FLAT)
     for qi in range(10):
         query = train_x[qi : qi + 1]
         _, idx = posterior_neighbors(model.rust_backend, query, search_k=1)
@@ -363,13 +361,13 @@ def test_015(tmp_path, driver):
         assert int(idx[0, 0]) == int(flat_idx[0, 0]), f"query row {qi}"
 
 
-@pytest.mark.parametrize("driver", [ENNIndexDriver.BPANN_DISK])
+@pytest.mark.parametrize("driver", [NeighborIndex.BPANN_DISK])
 def test_016(tmp_path, driver):
     work_dir = tmp_path / f"enn_disk_rows_{driver.name.lower()}"
     rng = np.random.default_rng(7)
     n, d = 30, 3
     train_x = rng.standard_normal((n, d))
-    mem = _enn(train_x, index_driver=ENNIndexDriver.FLAT)
+    mem = _enn(train_x, index_driver=NeighborIndex.FLAT)
     disk = _enn(train_x, index_driver=driver, work_dir=str(work_dir))
     indices = rng.choice(n, size=10, replace=False).tolist()
     mx, my, _ = mem.train_rows(indices)

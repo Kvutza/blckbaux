@@ -11,7 +11,7 @@ import click
 from .config import MODEL_ID, REVISION, Config
 from .tokenizer import load as load_tokenizer
 
-FORMAT = "ennx.solution_tokens.v1"
+FORMAT = "blckbaux.solution_tokens.v1"
 
 
 class BoundaryError(ValueError):
@@ -149,7 +149,7 @@ def prepare(rows: list[dict], tokenizer, *, count: int, max_tokens: int) -> dict
                 "selected_task_ids": [example["task_id"] for example in examples],
                 "excluded": excluded,
             },
-            "prompt_template": "ennx.qwen_fim_code.v1",
+            "prompt_template": "blckbaux.qwen_fim_code.v1",
             "loss_mask_semantics": "mask[i] scores tokens[i] from tokens[:i]; mask[0]=false",
             "eos_policy": "append exactly one Qwen EOS and score it",
             "statistics": stats,

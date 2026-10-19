@@ -60,7 +60,7 @@ def sobol_parity(report: ParityReport) -> None:
         return
 
     try:
-        from ennx._rust import sobol_sequence
+        from blckbaux._rust import sobol_sequence
     except ImportError:
         append_case(
             report,

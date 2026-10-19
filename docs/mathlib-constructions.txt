@@ -1,0 +1,1949 @@
+BLCKBAUX CONSTRUCTION CATALOGUE
+2026-10-18. List with ./blckbaux research list; read one with ./blckbaux research show TOPIC.
+
+This catalogue describes the complete research surface, not a completed
+verification of the production system. PROVED means the named Lean result is
+checked under its stated hypotheses. OPEN means source correspondence or a
+mathematical property is missing. PROPOSED means a research construction, not
+an implementation decision or guarantee. A library import is not an invocation.
+Different mathematical views may expose different findings without agreeing.
+
+For every construction, retain the operational definition, source, exact
+Mathlib object/result, inherited property, hypotheses, follow-up opportunities,
+and execution obligations. Derivatives are analytical objects, not optimizer
+oracle inputs. Parameter count, descriptor size, proposal count, observation
+count, and token count are distinct. Complexity bounds have explicit regimes;
+200 ms and 1000 ms are complete-transaction targets, not mathematical constants
+inferred from an asymptotic class. Dense P-by-P matrices below are symbolic views,
+not proposed billion-parameter storage layouts.
+
+CONSTRUCTION frontier
+Current: CorpusMemory.lean constructs origin-conditioned interval memory from
+  raw window observations. streamValid/exactBound give corpus-loss bounds at
+  every finite horizon without accumulating path bias. gainValid/relativeError
+  bound relative rewards and arbitrary ENN predictions. meanUpdate/readCached
+  allow incremental means and a read without a corpus-wide scan. The state is
+  2*N*C real fields for N fixed references and C origins, not a small-memory
+  result independent of C. coverageBound makes the remaining coverage/geometry
+  error explicit. unseenRegret constructs indistinguishable bounded objectives
+  with opposite preferred states. CorpusWitness realizes them with finite
+  softmax logits for any vocabulary of size >=2, using Forward.logLoss; token
+  repetition does not change the example. This is not deployed-H-Net or actual
+  corpus realizability. See "corpus memory", "corpus witness", and section 73.
+Previous: WindowPath.lean checks accumulated same-window improvements against
+  the finite-corpus objective. errorSplit identifies their exact path error;
+  errorBound bounds it by cross-origin improvement oscillations. separableIff
+  characterizes universal two-edge cancellation as additive state/origin
+  separability. cycleGrowth gives score T with zero population improvement,
+  bounded losses, and a return to the same state every two transitions.
+  This is a function-class obstruction, not an observed production trajectory.
+  Source audit: the current Metal long runner scores incumbent AND candidate,
+  stores baseline+paired_gain, and starts from zero. Its candidate-only
+  docstrings are stale. No runtime change was made. See "window path" and
+  handoff section 72; valid small errors for these stored values remain open.
+Previous: EnvelopeMemory.lean constructs a streaming summary with two real
+  scalars per fixed reference state. streamLaw proves exact agreement with
+  full-history envelopes at those references for every finite horizon. At a
+  query within r of a reference, readBounds/radiusBound bound the extra error
+  by 2*L*r without a factor of T. localError gives noise+L*observation_distance
+  +2*L*r. excluded rules out an entire ball from a validated lower bound.
+  refinementLoss shows why new references cannot recover old information from
+  the scalar summary alone. These are fixed-resolution, exact-real results;
+  small reference covers, valid pretraining intervals, numeric refinement, and
+  cheap geometry remain open. See "envelope memory" and handoff section 71.
+Previous: Envelope.lean characterizes exactly the objective values compatible
+  with interval observations and a fixed Lipschitz class. retentionIff gives a
+  finite necessary-and-sufficient test for information-preserving deletion;
+  retentionBound bounds the global envelope widening from approximate deletion.
+  estimateBound/attainedError give the sharp error around any prediction, and
+  Retention.sourceBound specializes the bound to the source real ENN mean.
+  This does not establish a small qualifying archive, valid pretraining
+  intervals/regularity, calibrated ENN variance, or affordable acquisition.
+  See construction "envelope" and handoff section 70.
+Previous: Localized.lean counts optimistic evaluations in near-optimal level
+  sets, with an explicit charge for lost local observations. scaleCount sums
+  over uncertainty bands; terminalBound converts a strict high-uncertainty
+  count into a terminal objective gap. KnnDecision.localizedQueries supplies
+  optimism from the existing finite selector and represented-comparator
+  coverage. This route does not assume useful updates on every round. See
+  construction "localized queries" and handoff section 69 for the exact bounds,
+  checks, and remaining accuracy, geometry, retention, and search obligations.
+Audit: 2026-10-18, handoff section 68. The separate base/trial transport bound
+  cannot certify positive reuse of an accepted record when the current
+  population objective is no greater than that record's trial objective.
+  REPL-checked endpointBound gives q <= currentValue - trialValue - trialShift;
+  expiredGain concludes q <= 0 in that regime. Thus all accepted records are
+  ineligible at a strictly positive threshold along a population-monotone
+  trajectory. This falsifies that exploitation route, not the validity of the
+  existing conditional theorems or the usefulness of replay itself. The audit
+  proofs are reproduced in the handoff, not added to the built import closure.
+Earlier construction: Construct one history-conditioned, derivative-free proposal per
+  transaction. A retained record contains its source state, complete parameter
+  move, and a lower bound on realized population gain. At the current state,
+  subtract certified source-state and trial-state transport errors; select the
+  record with the largest remaining lower bound; evaluate exactly that proposal.
+Source: Optimization/TransferGuide.lean, EnnCommit.lean,
+  PretrainRegret.lean, PretrainHorizon.lean, Guide.lean, and the production
+  history-conditioned proposal path.
+Mathlib: Finite argmax, order, Lipschitz transport, probability measures,
+  conditional concentration, finite union bounds, and geometric recurrences.
+Proved: RetainedGuide.scoreBound turns a stored source/trial score gap minus
+  their separate error radii into a population-gain lower bound, and
+  RetainedGuide.chooseMax proves exact-real argmax preserves the best retained
+  lower bound. RetainedGuide.progressBound transports that bound to the current
+  state. RetainedGuide.commitBound proves the one selected proposal is accepted
+  when its bound clears fresh score errors and the acceptance margin, and
+  RetainedGuide.regretBound concludes
+  `nextRegret <= (1-alpha) * currentRegret + beta` whenever the certified gain
+  is at least `alpha * currentRegret - beta`. RetainedGuide.eligible and
+  RetainedGuide.propose now define the complete exact-real two-case specification:
+  use the
+  retained argmax only when its transported lower bound clears the execution
+  threshold, otherwise emit exactly one seed-indexed exploration move.
+  RetainedGuide.eligibleRegret proves that the retained branch pays no proposal-
+  mass penalty; RetainedGuide.exploreRegret proves that the fallback branch pays
+  exactly the probability mass of a safe useful exploration atom. EnnCommit and
+  PretrainRegret.sourceTail prove that, when `q` clears the ENN error, natural-
+  window error, and acceptance margin and also satisfies
+  `alpha * currentRegret - beta <= q`, the single committed proposal obeys
+  `nextRegret <= (1-alpha) * currentRegret + beta` outside the stated window
+  tail event. PretrainHorizon composes those local events over any token horizon.
+Requires: Supply statistically valid error radii for the stored source and
+  trial scores; refine the exact-real retained-move record and finite argmax to an
+  executable finite-precision selection rule with a stated comparison error;
+  prove a backend execution-refinement error and either subtract it explicitly
+  or include it in the trial transport bound;
+  and establish when history supplies a record whose score-corrected and
+  transported lower bound meets the displayed regret inequality. The last item
+  is the optimizer-existence question, not a premise that may be silently
+  assumed.
+Falsifier: If no retained record has a positive lower bound after transport and
+  score errors, exploitation cannot be claimed to contract regret. The policy
+  must take a separately analyzed exploration proposal, and its discovery law
+  must pay explicitly in the rate. Failure to establish either case rejects the
+  construction.
+Source falsification: The one-candidate operator-BO specification gives
+  acquisition a singleton, so Information.singletonLaw proves acquisition
+  cannot change the represented proposal. The live non-threshold Metal
+  `proposal_pair` ignores its proposal seed and maps program tags 0, 3, and 4 to
+  the same `lie_flow_pair`; without a threshold object its basis seed is zero.
+  Thus the current singleton direction is not selected from ENN history. The
+  default latent history also releases full historical rows and exact replay
+  metadata. Consequently the deployed path cannot instantiate the retained-move
+  premise above. Changing only ENN fitting, acquisition, or the scalar radius
+  cannot repair that missing directional dependence.
+Earlier route: The exact-real Lean algorithmic object was the certificate-gated,
+  history-conditioned generator RetainedGuide.propose, which emits exactly one
+  proposal. For each retained move it computes
+  `q = sourceScore - trialScore - sourceError - trialError
+       - baseShift - trialShift`,
+  select the largest q, and reapply that complete move only when q clears the
+  fresh acceptance-error budget. Otherwise it emits one proposal from a
+  separately analyzed exploration law. Regret and the optimum remain proof-side:
+  execution does not compare q with unknown current regret. The unresolved
+  mathematical result is whether the retained branch supplies
+  `q >= alpha * currentRegret - beta`, or the exploration branch supplies an
+  atom with that gain, with conditional probability bounded away from zero.
+  RetainedGuide proves the resulting local recurrence, and PretrainHorizon
+  already proves its geometric composition; neither theorem manufactures this
+  gain/capture premise.
+  Retaining a compact move descriptor is enough; retaining a billion-parameter
+  state is not assumed. The audit above falsifies its positive-gain supply
+  premise in a population-monotone regime. The localized-count route does not
+  rehabilitate that bound or establish a replacement production policy.
+Execution: Selection and bound maintenance must fit inside the complete 200 ms
+  aspirational and sub-second operating targets. One proposed state per round
+  is the research constraint; the inspected long runner also evaluates the
+  incumbent. The candidate-only descriptions above are not source refinement.
+
+CONSTRUCTION corpus memory
+Definition: For each fixed parameter reference c_j and corpus origin o, keep
+  [A_oj,B_oj] for l(c_j,o). A raw observation (x,o,y) with own-window error eta
+  updates only that origin by max(A,y-eta-L*d(x,c_j)) and
+  min(B,y+eta+L*d(x,c_j)). Initial intervals [0,B] need valid reference bounds.
+Source: Objective/CorpusMemory.lean. Reuses EnvelopeMemory.update/read and
+  NaturalWindow.corpusMean. This construction is not deployed Rust behavior.
+Mathlib: LipschitzWith.le_add_mul, interval order, finite means, sum_eq_single,
+  finite-set complements, and natural-number induction.
+Proved: streamValid preserves reference validity for arbitrary adaptive streams;
+  exactBound instantiates own-window accuracy with exact loss evaluations.
+  readValid/midpointBound enclose corpus loss, while gainValid/relativeError
+  enclose relative rewards and bound any fitted prediction without claiming
+  posterior calibration. streamOrder/readOrder prove fixed-query intervals
+  never widen. recordBound preserves every prior constraint at its origin.
+  coverageBound gives mean(eta+L*observation_distance)+2*L*reference_distance
+  when every origin has a suitable recorded point. meanUpdate and readCached
+  give exact incremental averaging identities. unseenExact retains [0,B] at
+  unobserved origins. blindBound/blindAgreement/blindRegular/blindMean/
+  blindOptimal/unseenRegret construct two bounded, regular two-state objectives
+  agreeing on all seen origins but with opposite optima; either recommendation
+  has regret scale*unseen_fraction in one objective.
+Requires: Useful parameter regularity in an affordable metric, valid initial
+  bounds, small reference coverage error, numerical refinement, and corpus
+  information. Bounds are not narrow solely because the horizon is long.
+Opens: Source-value intervals from contextual evidence, independent of the
+  cumulative score's bias. Reducing origin-dependent storage needs additional
+  cross-origin structure or a separately justified probabilistic argument.
+Execution: 2*N*C real fields plus references; optional 2*N cached means. An
+  update touches N distances and N origin/reference pairs. Cached reads need
+  one reference distance after reference selection. These are algebraic
+  operation counts, not finite-bit or subsecond guarantees. Cached floating-
+  point sums need error control. No new objective evaluations or runtime edits.
+
+CONSTRUCTION corpus witness
+Definition: For any desired q>0 and m>=1 competing tokens, target logit is zero
+  and every other logit is log((exp(q)-1)/m). Use q=1+blindLoss to retain the
+  unseen-origin decision ambiguity with strictly positive losses.
+Source: Objective/CorpusWitness.lean; existing Forward.Algebra.logLoss/average.
+Mathlib: exp_log, log_exp, one_lt_exp_iff, finite sums, positive division.
+Proved: lossExact realizes q for any vocabulary of size m+1. windowExact
+  preserves q under any positive number of repeated token losses. meanExact
+  preserves corpus comparisons after adding 1. observedExact gives identical
+  observed log loss for both objectives. likelihoodRegret gives the same
+  scale*unseen_fraction simple regret with a proved optimal state.
+Requires: A source-specific theory must restrict possible logit maps, corpus
+  dependencies, or observation laws beyond the cross-entropy formula alone.
+Opens: Testing the actual model/corpus assumptions that could exclude this
+  witness; it does not imply derivative-free learning is impossible.
+Execution: No actual H-Net weights, overlapping-corpus realization, BF16
+  refinement, randomized-policy lower bound, or measured run is claimed.
+
+CONSTRUCTION window path
+Definition: For loss l(x,o), F(x) is the uniform aligned-origin mean.
+  Each accepted edge contributes g_t=l(x_t,o_t)-l(x_(t+1),o_t) to a zero-
+  anchored score S_T. The intended target is F(x_0)-F(x_T), not absolute NLL.
+Source: Objective/WindowPath.lean; rust/crates/blckbaux/src/fbt_moe/long.rs,
+  pretrain_data.rs, config/seeds.rs; rust/crates/artifact/src/pretrain.rs.
+Mathlib: Finite sums, sum_range_succ, abs_sum_le_sum_abs, metric Lipschitz
+  dist_le_mul, finite means through NaturalWindow.biasBound, and exact algebra.
+Proved: errorSplit identifies S_T-[F(x_0)-F(x_T)] as the sum of edge biases.
+  errorBound bounds its absolute value by the sum of improvement oscillations
+  across origins, with arbitrary adaptive states and deterministic origins.
+  rowBound carries incumbent error into a proposed historical row.
+  separableIff proves all two-edge cycles cancel iff l(x,o)=f(x)+b(o), with
+  explicit reference state/origin. separableExact gives exact corpus-relative
+  scores under that condition. movementBound bounds error by kappa times path
+  length when mixed state/origin differences obey that bound; mixedBound gives
+  the potentially loose kappa=2*L from per-origin L-Lipschitz loss.
+  cycleBound/cycleMean/cycleReturns/cycleGain/cycleGrowth construct losses in
+  [0,1], equal population means 1/2, a closed alternating two-state path, and
+  score T after T transitions despite zero population improvement.
+Requires: Derive small mixed-difference bounds or a justified conditional
+  sampling/selection argument for the real objective. Small sample scatter,
+  fixed seeds, and long windows alone do not discharge these conditions.
+Opens: A specific source-value accuracy obligation for the existing memory
+  bounds: accumulated scores need accumulated bias control, not just an error
+  allowance for the most recent window. This is separate from compression loss.
+Execution: The witness is not proved realizable by the actual model/controller
+  or actual hash schedule. Accepted transitions form the analyzed path;
+  rejected candidate rows use rowBound. Float/patch refinement is not proved.
+  No new sampler, paired evaluation, optimizer policy, or experiment was added.
+
+CONSTRUCTION parameters
+Definition: Typed indices enumerate encoder embeddings/positions/mask, each
+  physical layer's two mHC sites, Q/K/V/output, router, routed and shared experts,
+  and final norm. Decoder aliases add no independent fields.
+Source: Forward/Parameters.lean, Forward/Program.lean; CUDA weights.rs and
+  Rust forward_program tensor definitions supply the field inventory.
+Mathlib: Fintype, Fintype.card_congr, finite sums/sigma cardinality,
+  Fintype.equivFinOfCardEq, WithLp.equiv, EuclideanSpace, and Equiv.
+Proved: coordinates and flatEquiv are two-way bijections; cardinality equals
+  Program.parameterSlots symbolically, not by asserting the target integer.
+  Each actual tensor coordinate is a smooth linear projection of the full
+  parameter vector. Alias.perturbed proves a tied decoder embedding receives
+  exactly the same logical update as its encoder embedding.
+Requires: These statements concern all real fields of the fresh-index view.
+  They do not assert finiteness, admissibility, or source numeric execution.
+Opens: State the concrete objective and full-parameter perturbation on the
+  same Euclidean space; study component dependence without replacing P by a seed.
+Execution: Generic Fin numbering is not native packing or tensor-key addressing.
+
+CONSTRUCTION packing
+Definition: Distinguish independent logical parameters, physical buffers,
+  buffer element order, transposition, padding, and shared readout views.
+Source: cuda/src/model/weights.rs ProposalSpec/checkpoint_specs;
+  rust/crates/blckbaux/src/bf16_metal/layout.rs; Program.readout.
+Mathlib: Fin, product/sigma indices, Equiv, and finite cardinality are available.
+  No theorem equating the backend address maps is currently invoked.
+Proved: The structured real parameter enumeration is complete; readout sharing
+  is explicit in Program.readout. Physical-address refinement remains OPEN.
+Requires: A source-derived address map, bounds, coverage, and alias consistency.
+Opens: Transfer a logical proposal to all required physical views; distinguish
+  physical copy traffic from mathematical parameter count.
+Execution: CUDA embedding/readout have two physical views of one logical tensor.
+
+CONSTRUCTION encoder
+Definition: For an observed patch, sum position[index,column] times the token
+  embedding; masked patches return the mask vector. This is not mean pooling.
+Source: Forward/Encoder.lean; hnet_encode and forward_program/hnet.rs.
+Mathlib: Finset sums and real multiplication are invoked. Bilinear/linear-map
+  views are PROPOSED; no information-preservation theorem is inherited yet.
+Proved: Equal weighted contributions are indistinguishable; zero position
+  weights erase token distinctions in that real weight state.
+Requires: Claims about trained representations require additional properties
+  of the learned weights and task distribution.
+Opens: Joint weight/input sensitivity, null transformations, sufficient task
+  information, and counterexamples to compression preserving useful information.
+Execution: Ordered F32 accumulation, storage rounding, and patch alignment OPEN.
+
+CONSTRUCTION projections
+Definition: Finite weighted sums for Q/K/V, attention output, expert matrices,
+  router, and decoder projections; weights and inputs may both change.
+Source: Forward/Algebra.project; Regularity.projection; component definitions.
+Mathlib: ContDiff finite sums/products; continuous linear maps and operator
+  norms are available for fixed-weight analytical views.
+Proved: The exact real projection is smooth jointly along any smooth weights
+  and input paths. This is a property of the actual primitive formula.
+Requires: Norm/curvature caps are separate from smoothness; fixed-weight operator
+  bounds cannot silently cover changing parameters.
+Opens: Derive parameter-to-activation bounds and structure-aware arithmetic costs.
+Execution: Kernel packing, reduction order, padding, and mixed precision OPEN.
+
+CONSTRUCTION activations
+Definition: sigmoid(x)=1/(1+exp(-x)); silu(x)=x*sigmoid(x).
+Source: Forward/Algebra.lean; Regularity.sigmoid/silu; routed_activate.
+Mathlib: ContDiff division, composition, multiplication, exp, and Real.exp_pos.
+Proved: Both exact real functions are smooth; denominator nonvanishing is derived.
+Requires: Smoothness alone does not give a useful uniform derivative/Hessian cap.
+Opens: Component derivative bounds, alternative activation comparisons, and
+  propagation into expert-branch curvature.
+Execution: Real exp is not proof of the backend intrinsic or rounded activation.
+
+CONSTRUCTION normalization
+Definition: RMS multiplies each input by its norm weight and divides by the
+  square root of mean squared input plus epsilon.
+Source: Forward/Algebra.rms; Regularity.rms; Mixing.mix and model RMS kernels.
+Mathlib: ContDiff.sqrt, ContDiff.div, sums/products, Real.sqrt_pos.
+Proved: Positive epsilon makes the real RMS smooth jointly along smooth weight
+  and activation paths; denominator positivity is proved, not assigned.
+Requires: Full model shapes remain governed by Program.Valid. Useful sensitivity
+  caps require controlling epsilon, weights, and activation magnitudes.
+Opens: Quantify normalization's role in perturbation propagation and compare
+  alternative normalizers under identical objective/cost requirements.
+Execution: Accumulation and reciprocal/sqrt intrinsic correspondence OPEN.
+
+CONSTRUCTION attention
+Definition: Rotary-transformed queries/keys, shared K/V, finite causal support,
+  exp-normalized score-weighted values, and multihead output projection.
+Source: Forward/Attention.lean, Selection.lean; PISA kernels/model dispatcher.
+Mathlib: Finset sums, exp positivity; Regularity.probability invokes ContDiff.
+  A centerMass view of selected value mixing is PROPOSED, not yet connected.
+Proved: Fixed-support locality; ordinary finite-score probabilities normalize
+  and are smooth. Attention-wide sensitivity is not thereby established.
+Requires: Nonempty valid support, score-to-parameter bounds, and treatment of
+  changing support. Rotation identities require valid sine/cosine data.
+Opens: Fixed-support curvature, score/temperature sensitivity, approximate
+  attention with explicit objective error, and support-change probabilities.
+Execution: Cached shadow selection/chunked KV paths and storage refinement OPEN.
+
+CONSTRUCTION selection
+Definition: PISA tree summaries, mandatory nodes, causal eligibility, score
+  ordering, beam descent, and final pruning determine selected support.
+Source: Forward/Selection.lean; pisa_select/pisa_shadow_refine.
+Mathlib: Finset filters, List folds/mergeSort. Library sorting/order theory is
+  available, but whole-selection stability is not currently inherited.
+Proved: The final fresh support is causal by its explicit filter.
+Requires: All relevant score comparisons, pruning margins, tie rules, and
+  parameter-to-score changes; cached selection is a separate operational path.
+Opens: Stable selection regions, boundary-crossing error, alternate pruning
+  schemes, and accuracy/work tradeoffs.
+Execution: GPU slots, sentinels, cached summaries, and beam equivalence OPEN.
+
+CONSTRUCTION selection cells
+Definition: A chosen finite support is a local cell when every chosen score is
+  strictly greater than every unchosen score. A margin strengthens that order
+  by a common positive separation.
+Source: Forward/SelectionCell.lean; intended for both Experts.selected and the
+  score-ordered stages of Selection.descend/leaves.
+Mathlib: LipschitzWith.dist_le_mul, the real absolute-value order, and metric
+  trust-region distance.
+Proved: Coordinate score changes smaller than half the incumbent separation
+  preserve every chosen-versus-unchosen strict inequality. If every score is
+  L-Lipschitz in parameter state, L*dist(candidate,incumbent)<margin/2 keeps
+  the candidate inside the same abstract selection cell. The stronger
+  ballPreserve result keeps the entire closed trust ball in that cell when
+  L*radius<margin/2.
+Requires: Prove that the abstract chosen set equals the source mergeSort/take
+  expert set and every PISA beam/pruning set. Derive score Lipschitz constants;
+  preserve mandatory, eligibility, threshold, and tie-break decisions; refine
+  executed rounded arithmetic.
+Opens: A local, piecewise-smooth forward sensitivity L_cell and a trust radius
+  capped by the nearest selection boundary, instead of a false global
+  smoothness claim across routing or sparse-attention ties.
+Execution: No source top-k or PISA list equality is claimed yet.
+
+CONSTRUCTION local sensitivity
+Definition: On the closed parameter trust ball, the fixed-cell real forward
+  map is differentiable and its Frechet derivative has uniformly bounded
+  operator norm.
+Source: Forward/LocalSensitivity.lean; intended to discharge the supplied
+  constant in Forward/LossGeometry.trustRange.
+Mathlib: convex_closedBall and the mean-value theorem
+  Convex.lipschitzOnWith_of_nnnorm_fderiv_le.
+Proved: The derivative bound yields a LipschitzOnWith certificate on the whole
+  trust ball. Combined with the score-margin condition, a candidate both stays
+  in the incumbent abstract selection cell and has bounded forward-output
+  displacement.
+Requires: Differentiate the complete fixed-support exact-real Program map;
+  calculate a nonvacuous derivative-norm bound; prove source selection
+  refinement; add storage-rounding and executed-kernel residuals.
+Opens: Derive L_cell compositionally from operator norms rather than fitting a
+  calibration constant, then feed it into the logit, NLL, concentration, and
+  regret chain.
+Execution: The theorem converts a derivative certificate into a local bound;
+  it does not yet derive that certificate for the current 1,177,756,440-slot
+  source model.
+
+CONSTRUCTION nonsmooth controls
+Definition: Scalar lower flooring is x -> max(x,lower); interval clipping is
+  x -> min(max(x,lower),upper), matching the mHC lambda clamp after commuting
+  min/max arguments.
+Source: Forward/Clipping.lean; Transport row/column floors and seed clipping;
+  Mixing.predict residual-blend clipping; Decoder.advance floor.
+Mathlib: LipschitzWith.max_const and LipschitzWith.min_const.
+Proved: Both source-shaped scalar controls are globally one-Lipschitz despite
+  nondifferentiability at their boundaries.
+Requires: Compose these scalar facts through finite maximum, exponentiation on
+  the actually bounded seed interval, positive normalization denominators, and
+  the tensor norms used by the parameter metric.
+Opens: A hybrid complete-forward proof: derivative/operator-norm bounds for
+  smooth pieces and direct Lipschitz bounds for clips, rather than requiring a
+  globally differentiable program.
+Execution: The 1e-20 Sinkhorn denominator floor can make a naive reciprocal
+  bound enormous; positivity and normalization structure must be exploited.
+
+CONSTRUCTION projective transport
+Definition: ScaleEq identifies matrices differing by arbitrary left and right
+  diagonal scalings. Its division-free cross identity represents equality of
+  every two-by-two matrix cross-ratio.
+Source: Forward/Projective.lean; Transport.rowNormalize, columnNormalize, step,
+  and finite sinkhorn iteration.
+Mathlib: Finite matrices, function iteration, field normalization, and ring
+  identities.
+Proved: Each row pass, column pass, complete step, and arbitrary finite
+  Sinkhorn result is diagonally equivalent to its input. Consequently every
+  finite result preserves all division-free cross-ratio identities exactly,
+  independently of the 1e-20 floor.
+Requires: Bound the diagonal scaling factors in the executed four-stream
+  construction and relate projective displacement of two different seeds to
+  an absolute operator/output error. Add rounded-kernel refinement.
+Opens: Hilbert-projective or cross-ratio sensitivity that does not charge row
+  and column renormalization as independent ambient perturbations at every
+  iteration.
+Execution: Diagonal equivalence is not equality as a transport operator; its
+  left/right scale factors still affect the mixed activation and must be
+  controlled using mass/residual invariants.
+
+CONSTRUCTION finite residual
+Definition: Transport.residual is the sum of absolute row-mass and column-mass
+  errors from one. The actual mHC residual matrix is the clipped convex blend
+  of identity with the finite Sinkhorn result.
+Source: Forward/Residual.lean; Transport.residual/blend/sinkhorn and
+  Mixing.predict.
+Mathlib: Finite sums, absolute-value bounds, nonnegative matrix energy, and
+  convex scalar arithmetic.
+Proved: Total residual bounds every individual row and column mass in
+  [1-epsilon,1+epsilon]. A nonnegative matrix with residual epsilon amplifies
+  squared Euclidean stream energy by at most (1+epsilon)^2. Identity blending
+  scales residual exactly by lambda and gives the source-shaped bound
+  (1+lambda*residual)^2 after clipping lambda into [0,1].
+Requires: Bound or compute the final finite residual for all relevant predictor
+  states; refine the exact-real matrix/result to the executed ordered kernel;
+  control the difference between transports at two parameter states.
+Opens: Supplies the transport-cap term in the mHC forward sensitivity from a
+  measurable final residual instead of assuming unit operator norm.
+Execution: A small final residual controls amplification of one fixed
+  transport. It does not by itself bound predictor sensitivity across states.
+
+CONSTRUCTION seed sensitivity
+Definition: Mixing.rawMax is the exact finite foldl-max used by the source;
+  predictor seeds subtract that maximum, clip centered scores below at -80,
+  and exponentiate.
+Source: Forward/Mixing.lean and Forward/SeedSensitivity.lean; Mixing.predict and
+  Transport.seed.
+Mathlib: Finite-list folds, max order, Lipschitz max clipping, the mean-value
+  theorem, Real.exp derivative, and logarithm/exponential identities.
+Proved: rawMax dominates every raw entry and is attained. It is one-Lipschitz
+  under entrywise sup error. If raw predictor matrices differ by at most delta,
+  centered and clipped scores differ by at most 2*delta; both absolute seed
+  entries and their logarithms differ by at most 2*delta. The logarithmic bound
+  is independent of exponentially small seed magnitude.
+Requires: Propagate normalized-state movement through preceding layers;
+  combine with SinkhornRatio for finite Sinkhorn representative sensitivity;
+  refine source ordered arithmetic.
+Opens: A predictorLip term in projective coordinates without dividing by the
+  exp(-80) seed floor, followed by residual-controlled conversion to an
+  absolute transport difference.
+Execution: The source fold maximum is no longer an assumed valid maximum.
+
+CONSTRUCTION sinkhorn ratio
+Definition: Ratio factor first second asserts nonnegative matrices with
+  symmetric multiplicative entrywise bounds first <= factor * second and
+  second <= factor * first for factor >= 1.
+Source: Forward/SinkhornRatio.lean; Transport.rowNormalize, columnNormalize,
+  step, sinkhorn, and Residual.energy.
+Mathlib: Ordered real division, max_le_max, pow_mul, Finset sum inequalities,
+  and nonnegative quadratic forms.
+Proved: Because max(floor, S_A) <= factor * max(floor, S_B) when 0 <= floor and
+  1 <= factor, floored row normalization and floored column normalization each
+  square the multiplicative ratio factor (factor^2) without dividing by 1e-20,
+  even when weak columns hit the floor. One complete Sinkhorn step gives
+  factor^4, and k steps give factor^(4^k). Clipped seeds with raw-logit error
+  delta satisfy Ratio (exp(2*delta)). Any Ratio factor pair satisfies
+  |second_{i,j} - first_{i,j}| <= (factor - 1) * first_{i,j}, so Residual.energy
+  bounds ||(second - first) v||_2^2 <= (factor - 1)^2 * (1 + residual(first))^2 * ||v||_2^2.
+  sourceDiff specializes this to k-step finite Sinkhorn outputs from raw
+  predictor error delta with factor exp((4^k)*(2*delta)).
+Requires: Bound the incumbent finite Sinkhorn residual or sharpen the
+  worst-case 4^k multiplicative exponent on strictly positive seed cones via
+  Birkhoff contraction; refine ordered F32 kernel execution.
+Opens: Finite Sinkhorn transport-difference certificates that depend only on
+  log-seed displacement and incumbent residual, never charging 1/floor = 1e20.
+Execution: This is an exact-real finite-iteration bound; GPU reduction order
+  and rounding remain separate obligations.
+
+CONSTRUCTION mHC sensitivity
+Definition: The residual logit is the source bias plus its group control times
+  the dot product between RMS-normalized stream state and predictor weights.
+Source: Forward/Mixing.lean and Forward/MixingSensitivity.lean; fbt_moe.metal
+  and the corresponding CUDA predictor implement the same mathematical form.
+Mathlib: Finite-sum triangle inequalities, exact product decomposition, square
+  roots, division order, and nonnegative sums of squares.
+Proved: residual-dot movement splits exactly into normalized-state movement and
+  predictor-weight movement. Bias, control, predictor weight, and propagated
+  normalized-state caps give an explicit entrywise raw-logit error. Source RMS
+  normalization itself bounds every normalized state entry by
+  sqrt(streams*width), so no measured activation-size assumption remains.
+  A sharper Cauchy-Schwarz route proves total normalized-state energy at most
+  streams*width and expresses raw/log-seed error in predictor-weight and
+  normalized-state movement energies, without the entrywise dimension factor.
+Requires: Derive normalized-state movement recursively through every preceding
+  source layer and refine backend floating-point arithmetic.
+Opens: Trust-radius constraints can now be stated against named parameter
+  fields and propagated forward state rather than an opaque predictor
+  Lipschitz constant. The formula exposes which tensor blocks dominate it.
+Execution: This is an exact-real source-form certificate. It is not yet a
+  useful numerical radius or a BF16/FP16 error theorem.
+
+CONSTRUCTION RMS-normalized state sensitivity
+Definition: The source predictor multiplies each incoming state entry by the
+  reciprocal square root of its global mean squared activation plus 1/100000.
+Source: Forward/Mixing.stateScale and normState; Forward/NormSensitivity.lean.
+Mathlib: Nonnegative finite sums of squares, Cauchy-Schwarz, real square-root
+  identities, ordered division, and the squared sum bound.
+Proved: The squared source RMS scale is at most 100000. Its exact movement is
+  the activation-energy difference divided by the source grid size and the
+  product of both RMS roots and their sum. The energy difference is the inner
+  product of state movement with the sum of the states and is bounded by their
+  Euclidean energies. NormSensitivity.stateBound composes these facts into an
+  explicit normalized-state movement bound using only the two incoming states
+  and their displacement; it assumes no activation cap or fitted constant.
+  Decomposing around the incumbent scale instead (`incumbentSplit`,
+  `incumbentEnergy`) and canceling the candidate activation energy against the
+  candidate RMS denominator in `scaleRadius` (`scaleTerm`) yields the tight
+  incumbent-conditioned bound `incumbentBound`:
+    gridEnergy(normState second - normState first) <=
+      6 * stateScale(first)^2 * gridEnergy(second - first),
+  eliminating both the worst-case 200000 (2/eps) factor and candidate energy.
+Requires: Propagate incoming state displacement through the preceding source
+  operations, then connect this bound to the mHC predictor and finite Sinkhorn
+  representative. Prove ordered-float and storage refinement for backend use.
+Opens: Incumbent-conditioned forward sensitivity where normalized-state movement
+  scales with the observed incumbent RMS scale rather than 1/eps.
+Execution: No useful perturbation probability or regret statement follows from
+  state normalization alone.
+
+CONSTRUCTION source ENN scalar commit
+Definition: The retained weighted neighbor mean predicts incumbent reward;
+  candidate reward is negative candidate NLL. Scalar mode commits only when
+  candidate reward strictly exceeds predicted incumbent reward plus threshold.
+Source: Optimization/Neighbor.lean, Accuracy.lean, EnnCommit.lean;
+  bf16_metal/observations.rs and fbt_moe/long.rs.
+Mathlib: Absolute-value triangle inequality, nonnegative weighted sums, ordered
+  division, and the center-of-mass result with an explicit zero-anchor mass.
+Proved: Each retained observation error and its local value difference from
+  the incumbent contribute to an explicit weighted ENN reward-error radius.
+  The denominator floor contributes a separate bias term. A recorded move with
+  locally transported NLL gain is accepted by the strict scalar reward rule
+  when its gain exceeds this radius, candidate error, and threshold. Under an
+  additional retained-gain condition, the same commit contracts simple regret.
+  For a fixed aligned token sequence, logitBase obtains each local NLL
+  difference from per-token logit displacement using LossGeometry.averageBound;
+  its factor two is independent of vocabulary size and token count.
+  scheduleBase composes Sensitivity.scheduleBound across a multi-layer schedule
+  with a Lipschitz decoder head to supply the per-token logit radius consumed by
+  logitBase directly from Sensitivity.foldBound. windowShift and shiftSplit
+  decompose each historical window observation relative to the current window;
+  windowError and windowCommit prove that centering observations by a window
+  baseline whose shift tracks the incumbent shift within delta cancels common
+  window difficulty shift from the ENN incumbent prediction and scalar commit.
+Requires: Establish the local objective differences for retained states,
+  observation errors for actual natural windows, the actual neighbor/prefix
+  list and fitted weights, a useful history-conditioned move, and the machine
+  threshold's ordered-float refinement.
+Opens: Candidate-specific ENN errors can be calculated from independently
+  justified local evidence without a global parameter-space Lipschitz bound.
+Execution: Vector objective control can override the scalar accept decision.
+  No source calibration, move existence, or multi-round rate is proved here.
+
+CONSTRUCTION fixed-seed proposal support
+Definition: Conditional on a fixed long-run configuration and round index, the
+  root proposal seed is configured_seed + round. A completed ask selects one
+  candidate to evaluate, even when the procedural pool contains four rows.
+Source: fbt_moe/long.rs, bf16_metal/propose.rs, bf16_search.metal;
+  Optimization/SeedSupport.lean.
+Mathlib: Finite probability laws, finite-set cardinality, and the pigeonhole
+  principle.
+Proved: The selected candidate's useful-gain mass under a point-mass law is
+  exactly zero or one. For an arbitrary objective on a state space with more
+  points than the incumbent and finite pool, there is a target with unit gain
+  while every pool candidate has zero gain. Thus the finite proposal mechanism
+  alone cannot provide a positive objective-uniform improvement guarantee.
+Requires: An explicitly randomized seed experiment and a justified relation
+  between its law and the source generator, or a structural objective class
+  with a source-computable useful-move construction. The theorem does not
+  instantiate the enormous FP16 state cardinality or prove failure of HNet NLL.
+Opens: Separates genuinely probabilistic access from deterministic seeded
+  execution and forces useful-perturbation hypotheses to be falsifiable.
+Execution: The Gaussian generator label describes deterministic noise values
+  after fixing the seed. Candidate ranking by ENN cannot create states outside
+  the generated pool.
+
+CONSTRUCTION isotropic active-set energy
+Definition: Under a genuinely randomized, centered proposal law with equal
+  coordinate variance, an active parameter set is any finite subset of the
+  complete parameter index. Its energy is the sum of squared proposal entries.
+Source: Optimization/Moments.lean and ActiveEnergy.lean. This is an idealized
+  law, not the source Metal generator.
+Mathlib: Covariance identity, L2 integrability, finite-sum integration, and
+  Markov's inequality.
+Proved: Expected active energy equals active-set size times coordinate
+  variance. Its share of total expected energy is active-set size divided by
+  full parameter count. The chance of active energy exceeding a positive
+  threshold is at most active-set size times variance divided by that
+  threshold. Neither independence nor Gaussianity is required for these
+  conclusions once centered isotropic covariance is assumed. For source-style
+  block-scaled noise with unit diagonal variance, scaledMean gives expected
+  pre-rounding weighted energy exactly as radius squared times the sum of
+  weight times scale squared on the chosen set. The m/D share applies only
+  when scales and weights do not distort that share. activeShare proves that
+  zeroing block scales outside an active parameter set (routedScale) concentrates
+  100% of expected pre-rounding weighted energy onto the active set. deadzoneZero
+  and roundingGap bound post-rounding weighted energy (roundedEnergy), proving
+  zero realized energy on coordinates in the FP16 rounding deadzone and a
+  quadratic perturbation bound when coordinate rounding error is bounded.
+Requires: Justify any randomized law for the actual indexed seed generator;
+  derive its covariance after source block scaling and FP16 encoding; identify
+  an objective-dependent active set and prove that useful improvement requires
+  or follows from a particular amount and orientation of movement there.
+Opens: A dimension-aware obstruction and a design test for structured
+  directions. With bounded total energy, isotropic active energy shrinks as
+  active-set size/full dimension; increasing total energy may increase damage
+  elsewhere and is not automatically a remedy.
+Execution: The source radius multiplies per-block scales and then encodes to
+  FP16. It is not a fixed total Euclidean-energy radius. The selection.rs
+  latent_norm expression has the same weighted second-moment form before
+  rounding; its source comment already warns that it is not realized geometry.
+
+CONSTRUCTION experts
+Definition: Router scores select a prefix of ranked experts; selected sigmoid
+  weights combine gated SiLU expert branches plus a separate shared expert.
+Source: Forward/Experts.lean; routetopk/routed_activate/combine_routes.
+Mathlib: Finite sums/order, finite-list cardinality, finite-set pigeonhole,
+  extensionality, and ContDiff primitive composition. The checked margin
+  lemma is our own scalar arithmetic proof, not a whole top-k theorem.
+Proved: Two scores keep their strict ordering under the stated margin bounds.
+  At one fixed input, if router and shared weights agree and every selected
+  routed expert agrees, the branch output agrees. Selecting fewer routes than
+  available experts leaves one unselected; replacing that expert arbitrarily
+  leaves the branch output unchanged for this input.
+Requires: Full selected-set stability and all branch/weight sensitivity bounds;
+  lift local observability through the 1M-token window and feedback passes,
+  then refine the formal branch against the actual FP16 source forward path.
+Opens: Piecewise smooth objective regions, expert-specific perturbations,
+  behavior-preserving changes, and global exploration across routing boundaries.
+  A changed FP16 word can be irrelevant to one objective evaluation if its
+  expert is unselected at every dependent branch invocation.
+Execution: The extra shared expert and gate/up/down packing must remain explicit.
+  The Metal path already counts changed words and rejects a selected non-DUST
+  candidate with zero changes in analytic-pool mode. This checks actuation
+  somewhere, not objective-relevant movement.
+
+CONSTRUCTION transport
+Definition: Clipped exponential seed; row-then-column normalization with floors;
+  finite iteration; identity blending. Exact stochastic membership is separate.
+Source: Forward/Transport.lean; mhc_predict and Metal coefficient code.
+Mathlib: doublyStochastic, convex_doublyStochastic,
+  exists_eq_sum_perm_of_mem_doublyStochastic; Finset Cauchy-Schwarz.
+Proved: Exact stochastic transport preserves sums/constants and cannot increase
+  squared energy. Row/column mass caps bound approximate transport energy.
+  Given a valid supplied raw maximum, every clipped exponential seed lies in
+  [exp(-80),1]; an entry attaining the maximum becomes exactly one; every seed
+  row has strictly positive mass. Row.mass and Column.mass give the exact
+  post-floor total mass as min(1,mass/floor). For the actual four-stream,
+  1e-20-floor construction, the first complete pass puts every row above the
+  floor; every later pass retains at least 1/4 row mass. This holds at all
+  positive iteration counts and therefore at the configured twenty passes.
+Requires: Finite Sinkhorn membership/residual/convergence is not proved. Source
+  GPU row/column order differs from the Rust test reference at finite iteration.
+  Column-floor sensitivity and the foldl-maximum source refinement remain open;
+  the new invariant removes repeated row-floor amplification, not every floor.
+Opens: Residual-controlled stability and permutation-mixture constructions with
+  separately proved sampling error and work. Sampling one permutation is not
+  pointwise equivalent to applying the mixture matrix.
+Execution: Numeric floors/clipping and iteration ordering remain material.
+
+CONSTRUCTION mixing
+Definition: Coefficients depend on activations through predictors/RMS; the
+  update transports residual streams and adds an output-scaled branch.
+Source: Forward/Mixing.lean and Sensitivity.lean; mhc_predict/mix/update.
+Mathlib: ContinuousLinearMap, map_sub, le_opNorm, norm triangle inequalities.
+Proved: updateSplit and updateEntry retain input, residual-coefficient, branch,
+  and output-coefficient changes entrywise. The operator bound retains predictor
+  and branch sensitivity.
+Requires: Concrete branch Lipschitz constants and backend rounding refinement OPEN.
+Opens: Compare mixing mechanisms using complete block stability and objective
+  curvature, rather than asserting contraction from the transport matrix alone.
+Execution: Input normalization, branch generation, and coefficient rounding OPEN.
+
+CONSTRUCTION recurrence
+Definition: A finite source-derived list of physical layers is folded over the
+  activation state; repeated visits reuse the same weights.
+Source: Program.schedule/core; Forward/Sensitivity.lean; forward_program/recurrence.rs; enqueue_core.
+Mathlib: List folds and finite indices.
+Proved: Current schedule is 0,1,2,1,2,3,4. Aliased repeated visits add no new weights.
+  Sensitivity.foldBound, foldMono, and scheduleBound propagate single-layer
+  affine sensitivity bounds (scale * dist + shift) through arbitrary List.foldl
+  layer schedules, and EnnCommit.scheduleBase connects that recurrence to
+  per-token logit bounds.
+Requires: Instantiate per-layer scale and shift constants for the full routed
+  attention/MoE/mHC block and refine GPU execution.
+Opens: Structure-aware bounds for shared layers, recurrence alternatives, and
+  tradeoffs between representational effect and objective-evaluation work.
+Execution: Dispatcher scheduling, cache invalidation, and actual launches OPEN.
+
+CONSTRUCTION decoder
+Definition: Hierarchical vocabulary centroids/logits; separate sampled and
+  teacher-forced prefixes; target-path log losses; retained prefix updates.
+Source: Forward/Decoder.lean; hierarchical readout kernels.
+Mathlib: Real exp/log and finite sums; Regularity.logLoss uses ContDiff.log.
+  A full Measure/Kernel construction for generated trajectories is PROPOSED.
+Proved: Teacher prefix/losses agree with the loss-only decoder for any supplied
+  sampling inputs; target log loss is nonnegative.
+Requires: Uniform inputs are not assumed independent or uniform simply by name.
+Opens: Teacher-only NLL evaluation, decoder distribution laws, generation-quality
+  bounds, and approximations justified for the chosen evaluator.
+Execution: Integer PRNG, centroid quantization, and stable F32 log-sum-exp OPEN.
+
+CONSTRUCTION quality
+Definition: Compile/test evidence, held-out loss, runtime, and memory are separate
+  measurements; expected task failure uses an explicit finite output distribution.
+Source: Forward/Quality.lean; Optimization/Trajectory.lean.
+Mathlib: Current TV/reward proof uses finite sums and norm inequalities. Its
+  TrajectoryDist record is owned code, not Mathlib's probability-measure object.
+Proved: Bounded evaluator expectation is stable under the defined finite TV;
+  uniform objective approximation transfers comparator regret with 2*error.
+Requires: Actual decoder-to-output/evaluator correspondence; tests are not proof
+  of universal program correctness; NLL is not coding success.
+Opens: Distributional objectives, task-specific risk, evaluator-aware compression,
+  and rigorously scoped code-generation quality comparisons.
+Execution: Harness, task distribution, decoding budget, and evaluator semantics OPEN.
+
+CONSTRUCTION objective
+Definition: Generation, raw vector measurements, aggregation, and optimizer
+  observations are separate maps. Scalarization/Pareto order are explicit choices.
+Source: Objective/Construction, MultiObjective, Aggregation; Program.meanTeacher.
+Mathlib: Measure, Integrable, Bochner integral; finite linear algebra/order.
+Proved: Empirical unbiasedness under stated moment/equal-expectation conditions;
+  nonnegative scalarization respects weak dominance but does not imply its converse.
+  Concentration supplies upper and lower empirical-mean tails and their union
+  bound under explicit independent sub-Gaussian centered-sample hypotheses.
+Requires: Population target, comparator domain, evaluation law, and existence or
+  infimum treatment must be fixed. Empty-batch totalized formulas are not protocols.
+  A contiguous million-token corpus window does not satisfy sample independence
+  merely because it contains a million loss terms; a source law, mixing result,
+  conditional-MGF argument, or deterministic discrepancy bound is still needed.
+Opens: Multi-objective/constrained policies and guarantees tied to meaningful
+  application outcomes; each change creates a separately scoped research task.
+Execution: Program.Parameters.objective now acts on the full analytical state.
+
+CONSTRUCTION observations
+Definition: Paired patch differences, means/scatter, baseline accumulation, and
+  common evaluation worlds are explicit random variables and statistics.
+Source: Objective/Response.lean; CUDA run.rs and Metal rounds.rs.
+Mathlib: MemLp, covariance_eq_sub, variance_fun_sum/add/sub,
+  covariance_const_mul_left/right, Gaussian real distributions.
+Proved: Full covariance controls weighted variance; shared additive noise
+  cancels in a pair; changing evaluation worlds leaves drift. Identical Gaussian
+  patches give zero realized scatter but unit population mean variance.
+Requires: Reported source variances are not silently population variances.
+Opens: Valid noise combination, paired evaluation design, correlation-aware
+  confidence, and counterexamples to naive inverse-batch-size variance claims.
+Execution: Floating-point statistics, batching, caching, and missing evidence OPEN.
+
+CONSTRUCTION adaptivity
+Definition: Loss and center processes are adapted to a filtration; the next
+  center is already measurable in current history; centered losses have conditional MGF bounds.
+Source: Objective/Adaptive.lean and Concentration.lean.
+Mathlib: Filtration, StronglyAdapted, HasCondSubgaussianMGF,
+  measure_sum_ge_le_of_hasCondSubgaussianMGF.
+Proved: History-aware upper, lower, and two-sided tails around supplied centers;
+  fixed-target transfer requires an explicit drift bound. Independence is not
+  silently substituted. Lower tails expose unsafe candidate underestimation;
+  upper tails expose missed useful proposals.
+Requires: Instantiate the filtration/noise law for fitted scales, reused tasks,
+  selection, and resets; a fixed-time tail is not automatically anytime confidence.
+Opens: Adaptive query laws, stopping criteria, sequential confidence, and
+  calibration robust to changing incumbents and evaluation worlds.
+Execution: Define which information is available before each action.
+
+CONSTRUCTION surrogate
+Definition: Current bounded nearest-neighbor prediction uses supplied
+  dissimilarities, fitted noise/epistemic scales, adaptive prefix, and a clamped mean.
+Source: Optimization/Neighbor.lean and Accuracy.lean;
+  rust/crates/semantics/src/reliability/neighbor.rs.
+Mathlib: Finset.centerMass, Convex.centerMass_mem, ConvexOn.map_centerMass_le,
+  convexOn_univ_dist, LipschitzWith.dist_le_mul.
+Proved: Exact ordinary/zero-anchor barycenter views. Accuracy.clamped derives
+  weighted pointwise error plus an explicit zero-anchor bias term; geometric
+  composes actual metric regularity and bounded observation error.
+  With the floor inactive, common neighbor errors imply a uniform mean-score
+  bound across a declared candidate pool and then a 2*error+slack selector bound.
+  Candidate-specific envelopes instead charge only the selected and comparison
+  errors. Approximate neighbor radius distortion composes with metric bias, and
+  approximate envelope minimization gives an adaptive neighborhood oracle bound.
+  A simultaneous pool matches any reference update when one represented
+  candidate covers the reference progress plus its local selection penalty.
+  These connections are for mean-based scores, not an unproved UCB guarantee.
+  KnnLearning.sourceRadius proves the source distance/index tie sort's local
+  radius from retained close-point counts; metricRadius explicitly transfers
+  squared dissimilarity bounds to metric radii. sourceError remains valid after
+  response-dependent fitting. Calibration supplies a separate pathwise
+  inverse-precision confidence coefficient under its stated geometry/noise
+  premises; configured UCB/Thompson calibration remains OPEN.
+Requires: Source sampled dissimilarities are not assumed to be a metric;
+  regularity/noise bounds and simultaneous query coverage remain OPEN.
+Existing: The separate yubo formalization/enn-lean project already contains
+  Appendix C conditional MSE, random-design bounds, consistency and rate
+  transfers. ENN/Paper/AppendixC.lean indexes these results. Their hypotheses
+  are not established for the current fitted, adaptive BLCKBAUX process merely
+  by importing or restating the theorem. It is not yet an BLCKBAUX Lake dependency.
+Opens: Better geometry, local-dimensional error analysis, adaptive neighborhoods,
+  floor-aware bias control, vector response views, and meaningful estimator changes.
+Execution: Estimator error is not supplied by calling the function posterior.
+
+CONSTRUCTION fitting
+Definition: Sample parameter proposals, evaluate supplied held-out log-scores,
+  and retain the final maximizing proposal under the source tie rule.
+Source: Neighbor.likelihood/fit, Optimization/Fitting.lean;
+  rust/crates/semantics/src/reliability/neighbor.rs.
+Mathlib: List folds/order and Real.log. No general LOOCV risk/calibration theorem
+  is currently invoked; the score is not established as the true likelihood.
+Proved: Fitting.trialMax proves maximality of the real source-shaped fold over
+  the supplied finite trials. Fitting.scoreGap uses the normalized average
+  criterion to bound target-score deficit by coverage+2*criterion_error.
+  No decay of either error or prediction/regret consequence is asserted.
+Existing: Appendix C's separate ENN.Fit.argmax_limit, predictor_l1, fitted_prob,
+  fitted_l2, and measurable exact/approximate selectors already provide the
+  abstract convergence/stability machinery. Do not duplicate those proofs.
+Requires: Proposal and held-row RNG law, dependence, variance interpretation,
+  and bounds after fitting on adaptively collected observations. Finite-trial
+  maximality is not whole-box maximality. Match average versus summed criteria.
+Opens: Alternative fitting criteria, complexity penalties, robust calibration,
+  and the information/work tradeoff of fitting frequency.
+Execution: Numeric scoring, held-row sampling, and hyperparameter boundaries OPEN.
+
+CONSTRUCTION posterior
+Definition: A supplied prior and observation kernel induce a posterior kernel
+  through disintegration, rather than assigning a Gaussian to two fitted moments.
+Source: Optimization/Bayes.lean.
+Mathlib: ProbabilityTheory.posterior, IsMarkovKernel,
+  compProd_posterior_eq_map_swap; StandardBorelSpace and finite measures/kernels.
+Proved: Normalization and recovery of the swapped joint law in that library view.
+Requires: Identify a coherent law across actual adaptive optimizer rounds and
+  prove estimator correspondence if posterior language is intended.
+Opens: Alternative coherent likelihood/uncertainty constructions and conditioning
+  results; noncomputable posterior existence is not an extracted fast algorithm.
+Execution: The implemented ENN predictor is not yet this posterior kernel.
+
+CONSTRUCTION statistic
+Definition: A statistic is a measurable map from complete observed data to a
+  retained code. The compressed experiment is the original observation kernel
+  mapped through that statistic. "Summary" denotes the resulting code value;
+  it is not a separate mathematical primitive.
+Source: Optimization/Statistic.lean.
+Mathlib: Kernel.map, bayesRisk, bayesRisk_le_bayesRisk_map,
+  bayesRisk_le_bayesRisk_comp, IsMarkovKernel.
+Proved: Compression cannot lower optimal Bayes risk. If a Markov kernel
+  reconstructs the original experiment from the compressed experiment, the
+  statistic preserves Bayes risk for every loss and prior. Exact preservation
+  implies zero-error approximate preservation. The identity statistic is the
+  checked lossless baseline. Statistic.decisionRisk identifies a decision on
+  compressed data with its composition on the original experiment. riskSplit
+  separates excess risk into decision error and compression loss; decisionBound
+  composes approximate information preservation with decision accuracy.
+Requires: Define the BLCKBAUX full-history experiment, the retained code, and either
+  a reconstruction kernel or a decision-specific risk-loss bound. None follows
+  from the code being small, from retaining covariance, or from naming it a
+  sufficient statistic. Comparisons keep the experiment, loss, prior, and action
+  space fixed. Changing an adaptive policy changes the experiment. Unrestricted
+  Bayes risk is a lower benchmark; feasible continuations need extra constraints.
+Opens: Compare the distance archive, response moments, Gram geometry, and hybrid
+  codes by their decision-risk loss; prove an approximate Blackwell guarantee
+  for the chosen pretraining decision problem.
+Execution: Statistical sufficiency does not imply fast computation. Encoding,
+  incremental update, bytes, and candidate-query work need separate bounds.
+
+CONSTRUCTION proposal
+Definition: Distinguish source generation, full-parameter outputs, probability
+  law, reached support, mean, covariance, and directional objective alignment.
+Source: Perturbation/Moments/Field/Smooth/Search/ObjectiveSearch; indexed GPU
+  materialization.
+Mathlib: Measure, MemLp, multivariateGaussian, covariance_eq_sub, Matrix.trace,
+  map_add_eq_sum_add_integral_iteratedFDeriv, iteratedFDeriv, ContDiffAt.
+Proved: Energy identities, full quadratic-moment trace formula, Gaussian
+  specialization, segment-local Taylor remainder, and mirrored nonlinear bound.
+  Field models amplitude*(coefficient+spread*sign), derives mean/full covariance,
+  and proves diagonal covariance only under balanced unit uncorrelated signs.
+  Positive covariance additionally requires nonzero amplitude*spread at every
+  parameter. These conditions are not established for the source hash.
+  fromGroups explicitly shares fitted coefficients/spreads through a family map;
+  the output remains a full-parameter field, not a group-sized parameter state.
+  The source response posterior was rejected and removed. `round_condition`
+  advances the corpus window, condition seed, and evaluation seed on every
+  round, including rejected rounds. Its accumulated rows therefore did not meet
+  the common-condition premise needed to interpret them as observations of one
+  stationary response. No common-law or transport theorem was established, and
+  resetting every round leaves no learned response before selection. The Rust,
+  Metal, schema, tests, and Lean ResponseField mechanism were deleted together.
+  Persistent patch-index posteriors were removed because patch indices are not
+  stable statistical identities across corpus slices or rollout counts. Patches
+  now form one round mean/scatter statistic. PatchFeedback.meanPerm and
+  energyPerm prove the retained raw statistics are invariant under patch
+  reindexing; they do not establish a shared sampling law.
+  ObjectiveSearch places randomness over the seed that generates a complete
+  dependent candidate pool. A pool-hit probability and simultaneous score
+  accuracy yield expected selected progress without slot independence.
+Requires: A justified objective class under which source observations identify
+  the required group target projection, a quantitative coefficient-error bound,
+  signed-innovation control, actual curvature caps, and quantized reachability.
+  Patches retained at one incumbent still require a proved common evaluation
+  law or exchangeability argument across their corpus slices.
+Opens: Anisotropic full-support laws, exploratory mixtures, structural operators,
+  block covariance, and law-aware radius design without latent parameter restriction.
+Execution: Implicit covariance/curvature views must have affordable representations.
+  Gain is explicit; the rounded source constant is not assumed to square to 1/2.
+  Frozen-zero and zero-spread findings concern the pre-commit real view, not
+  arbitrary rounded/forced-ULP execution.
+
+CONSTRUCTION transfer guide
+Audit: Separate absolute-value transport costs erase the historical gain once
+  the incumbent is no worse than the old trial. See handoff section 68 and the
+  comments in TransferGuide.lean. Direct regularity of the move's gain is a
+  distinct candidate route. Its squared-distance identity is REPL-checked;
+  neither discovery of a useful move nor an NLL analogue is established.
+Definition: Select a previously evaluated move and regenerate that same move at
+  the current incumbent. The old source state, old realized gain, current source
+  distance, and transported-trial distance determine retained gain.
+Source: Optimization/TransferGuide.lean; source proposal seed/materializer and
+  bounded observation history are the intended refinement boundary.
+Mathlib: PseudoMetricSpace, LipschitzWith.dist_le_mul, absolute-value order, and
+  the existing ObjectiveSearch commit and simple-regret semantics.
+Proved: If the population objective is L-Lipschitz, a move with historical gain
+  g retains at least g-L*(r_base+r_trial) when replayed at a nearby incumbent.
+  If that retained gain clears incumbent error, candidate error, and acceptance
+  margin, the source-shaped modeled rule must accept it. If retained gain also
+  covers alpha times current simple regret minus beta, the committed state obeys
+    r_next <= (1-alpha)*r_current + beta.
+  No derivative, mirrored pair, ambient-dimensional cover, or candidate batch
+  is used. This gives ENN a precise proposal role: retrieve a locally transferable
+  successful move, while its prediction supplies the incumbent score envelope.
+Requires: Retain or reconstruct the move seed and scale data; prove source
+  regeneration correspondence; bound current-to-past and trial-to-trial distances
+  in a metric with population-NLL regularity; establish the candidate window and
+  ENN incumbent score errors. Historical acceptance alone is not a population-
+  gain certificate when evaluation windows differ.
+Opens: History-guided sequential perturbations whose contraction factor is
+  derived from transported gain, instead of blind isotropic capture in 1.178B
+  ambient dimensions. KNN or approximate KNN can retrieve the move source.
+Execution: The current sampled archive does not yet retain proposal metadata for
+  every logical observation, and the deployed calibration multiplier is empirical.
+  This theorem changes no Rust, Metal, CUDA, or TOML behavior.
+
+CONSTRUCTION pretraining regret
+Definition: One transported historical move is regenerated at the current
+  incumbent. ENN supplies the incumbent score and an adaptive natural token
+  window supplies the only candidate score used by the single-proposal commit.
+Source: Optimization/PretrainRegret.lean, TransferGuide.lean, EnnCommit.lean, and
+  Objective/Adaptive.lean; long.rs is the intended transaction refinement.
+Mathlib: Filtration, StronglyAdapted, conditional sub-Gaussian MGF,
+  Azuma--Hoeffding, measure monotonicity, LipschitzWith, and simple regret.
+Proved: If the transported population gain q satisfies both
+    base_error + window_bias + window_error + margin <= q
+  and
+    alpha * current_regret - beta <= q,
+  then the probability that the committed state violates
+    next_regret <= (1-alpha)*current_regret + beta
+  is at most
+    exp(-(n*window_error)^2 / (2*sum(token_scales))).
+  Failure is contained in candidate-loss overestimation: a certified useful
+  proposal is otherwise accepted. No paired incumbent evaluation is introduced.
+  For the marginal aligned-window law, sourceTail replaces abstract base scores
+  and assumed window ranges with the actual source Neighbor.mean (and its 1e-12
+  floor in EnnCommit.errorRadius), EnnCommit.scalarCommit, and the explicit
+  whole-window NLL range [0, log(width) + 2*(logitCap + logitLip*trustRadius)]
+  from LossGeometry.trustRange.
+Requires: Prove the actual natural-window losses and conditional centers form
+  AdaptiveBatch or refine the origin sampler to MarginalWindow.originMeasure,
+  and refine recorded move regeneration to source execution.
+  The current deterministic contiguous-window schedule does not discharge these
+  probability premises merely by evaluating 1M tokens.
+Opens: A source-auditable error budget and per-transaction alpha/beta sequence,
+  followed by horizon composition in token units. The target is now an explicit
+  inequality among proposal gain, transport loss, ENN error, window error, and
+  acceptance margin rather than an empirical calibration multiplier.
+Execution: No runtime behavior changes. Current scorer variance remains telemetry,
+  not the conditional-MGF scale or a confidence radius.
+
+CONSTRUCTION pretraining horizon
+Definition: A random regret path fails locally when its next population regret
+  exceeds factor*current_regret+penalty. The horizon failure event is the union
+  of those transaction events; evaluated tokens are counted separately.
+Source: Optimization/PretrainHorizon.lean and PretrainWorkload.lean.
+Mathlib: Finite indexed unions, measureReal_iUnion_fintype_le, finite sums,
+  geometric powers, and ordered-ring induction.
+Proved: Outside the failure union, terminal regret is at most
+    factor^steps*initial_regret + penalty*sum_{i<steps} factor^i.
+  The union probability is at most the sum of the local failure probabilities,
+  with no independence between adaptive transactions. A common local failure
+  bound delta therefore gives terminal failure at most steps*delta. Under the
+  active protocol, steps transactions equal steps*windowTokens evaluated tokens.
+  strictBound proves that when local transactions achieve strict contraction
+  (penalty = 0), terminal regret decays geometrically as factor^steps * initial_regret.
+  geomBound proves that for factor < 1, the series sum is bounded by 1 / (1 - factor),
+  establishing an asymptotic regret envelope initial_regret * factor^steps + penalty / (1 - factor).
+  goalBound connects this horizon envelope directly to PretrainWorkload.tokenClock
+  and PretrainWorkload.LossGoal.reached, bounding the probability of failing to
+  reach a base-model loss threshold after steps*windowTokens evaluated tokens.
+Requires: Instantiate every local event with PretrainRegret.regretTail or
+  sourceTail and the same population objective, establish a usable factor and
+  penalty uniformly or replace this uniform envelope with a varying-coefficient
+  theorem, and allocate a terminal confidence budget across the intended token
+  horizon.
+Opens: An anytime confidence sequence can improve on the plain finite union
+  budget. Token-indexed alpha/beta schedules can describe learning phases without
+  treating 1,000 transactions as the pretraining goal.
+Execution: This theorem does not select a horizon, assert a corpus law, or make
+  one million tokens statistically independent.
+
+CONSTRUCTION natural-window deterministic bias
+Definition: Finite-corpus population loss is the uniform mean over all aligned
+  contiguous-window origins. The source score is the current candidate's loss
+  at one origin selected from the fixed reference seed and transaction index.
+Source: Objective/NaturalWindow.lean and the causal_batch implementation in
+  rust/crates/artifact/src/pretrain.rs.
+Mathlib: Finite sums, the absolute-value triangle inequality, and exact field
+  arithmetic.
+Proved: If every aligned-origin loss for the current candidate lies within
+  radius of the selected-origin loss, then selected-window error against the
+  finite-corpus mean is at most radius. Candidate and origin selection may
+  depend on all earlier transactions. With two origins, selected loss can be
+  zero while population loss is gap/2 for arbitrary gap, so one selected window
+  alone admits no nontrivial population certificate.
+Requires: Establish a useful cross-origin loss-oscillation, discrepancy, or
+  mixing radius for each current candidate. The source hash and 1M-token count
+  establish none of those properties by themselves.
+Opens: A deterministic candidate-error input to PretrainRegret, or a corpus
+  partition whose local oscillations can be bounded through forward geometry.
+Execution: Scores from different transactions concern different candidates and
+  cannot be averaged as repeated samples of one candidate population loss.
+
+CONSTRUCTION marginal natural-window law
+Definition: The parameter-only population objective is the uniform mean of one
+  candidate's whole-window loss over the finite set of aligned corpus origins.
+  One stochastic observation is one complete window selected uniformly.
+Source: Objective/MarginalWindow.lean, Optimization/PretrainRegret.lean, and the
+  finite aligned-origin set constructed by causal_batch.
+Mathlib: PMF.uniformOfFintype, PMF.integral_eq_sum, Hoeffding's lemma for a
+  bounded random variable, sub-Gaussian Chernoff tails, and measure monotonicity.
+Proved: Uniform-origin expected loss is exactly the finite-corpus mean. If every
+  whole-window loss lies in [lower, upper], its centered loss is sub-Gaussian
+  with parameter ((upper-lower)/2)^2, with corresponding upper and lower tails.
+  adaptiveSubg and adaptiveTail prove this pointwise after every possible prior
+  history, so the candidate may be selected arbitrarily from earlier results;
+  the next origin alone must be a fresh uniform draw.
+  If a transported useful proposal clears ENN incumbent error, acceptance
+  margin, and a one-window error allowance, failure of the requested simple-
+  regret contraction is bounded by that whole-window upper tail.
+Requires: Replace or refine the fixed SplitMix/modulo schedule with a sampler
+  whose conditional law is uniform over origins, prove the corpus mean is the
+  intended population objective, and derive a useful whole-window loss range or
+  sharper conditional MGF scale. A finite cross-entropy bound itself requires
+  an explicit probability/logit floor or an equivalent model-output invariant.
+Opens: A product-space adaptive sampler in which the next parameter state is
+  history-measurable and the next origin is fresh conditionally uniform; sharper
+  concentration from corpus mixing, stratification, or without-replacement
+  sampling can replace the Hoeffding range without changing the marginal target.
+Execution: Window length is not the sample count. One 1M-token forward score is
+  one window observation. Its length helps only through a separately proved
+  reduction in the whole-window range or variance proxy.
+
+CONSTRUCTION contextual ENN obstruction
+Definition: A pretraining observation has joint input (parameter state, corpus
+  condition), while the deployed ENN pullback geometry observes only parameter
+  state and therefore assigns zero distance between conditions at fixed weights.
+Source: Optimization/ContextualEnn.lean, Metric.fiberNecessary, and the source
+  history/causal scoring paths.
+Mathlib: PseudoMetricSpace zero-distance fibers and absolute-value order.
+Proved: Any finite Lipschitz certificate for the joint loss in parameter-only
+  geometry forces loss to be exactly constant across all ignored conditions at
+  fixed parameters. A single pair of conditions with unequal loss rules out the
+  certificate for every proposed finite constant.
+Requires: Choose and refine one coherent surrogate target: either include a
+  corpus-condition representation in the ENN domain and prove joint regularity,
+  or define the parameter-only target as a marginal over conditions and prove
+  the source evaluation law estimates that marginal.
+Opens: Contextual KNN metrics, quotient-safe sufficient statistics for corpus
+  conditions, and deterministic online-loss analysis on the actual condition
+  sequence.
+Execution: Treating changing-window variation as an unnamed scalar variance does
+  not establish either joint regularity or marginal unbiasedness.
+
+CONSTRUCTION reachability
+Definition: A proposal is a Mathlib Markov kernel on outcome identities,
+  conditioned on retained history, incumbent state, and trust radius. An explicit
+  realization map sends each outcome to its complete parameter state; a separate
+  commit map retains or rejects it after scoring. Improvement sets are objective
+  sublevel sets; their finite-scale geometry is represented by Mathlib covering
+  and packing numbers. A finite executable `ProposalLaw` has a canonical
+  probability measure and constant single-round Markov-kernel interpretation.
+Source: Optimization/Reachability.lean and ObjectiveSearch.lean.
+Mathlib: ProbabilityTheory.Kernel, Metric.coveringNumber,
+  Metric.packingNumber, measure_mono, IsUnifLocDoublingMeasure.
+Proved: Near-optimal widths are monotone; external covering complexity respects
+  that inclusion. Objective regularity turns a metric ball around a better state
+  into an improvement set, so any conditional ball-mass lower bound transfers to
+  an improvement-capture lower bound. Capture probability multiplied by retained
+  gain lower-bounds expected nonnegative improvement for any accepted-update map.
+  For a safe update and a global comparator, post-update expected simple regret
+  plus expected improvement equals incumbent simple regret. Hence capture, or a
+  geometric accessibility certificate implying capture, gives an explicit
+  one-round expected-regret decrement. If retained gain times capture mass covers
+  a fixed fraction of incumbent regret, expected regret contracts by that same
+  fraction. Kernel capture for the finite interpretation is exactly the existing
+  finite-law `goodMass`; distinct move identities remain distinct even when they
+  realize the same candidate state. The implemented acceptance rule is safe when
+  its margin covers incumbent and candidate score error, and it retains captured
+  gain when the gain also clears that margin. These facts compose into a finite-law
+  expected-regret certificate. The implemented weighted KNN mean supplies the
+  candidate half of the score-error contract under its existing deterministic
+  error premises. A second certificate retains candidate-specific KNN envelopes:
+  safety charges each move's local error, and gain separation is required only
+  on moves inside the captured event. Thus adaptive neighborhoods need not be
+  collapsed to a pool-wide worst case. Objective regularity then composes metric
+  proposal mass near a better state, the candidate-specific estimator envelope,
+  and acceptance into one expected simple-regret inequality. For a finite law,
+  expected next regret plus expected accepted progress is exactly incumbent
+  regret in real arithmetic. This identity connects the transaction theorem to
+  the existing adaptive finite-oracle recurrence. A `RoundCertificate` records
+  each history-dependent law, proposal realization, local geometry, score
+  envelope, accepted state, and captured-gain lower bound; certificates for all
+  rounds imply the existing finite-horizon geometric regret envelope. The local
+  contraction factor can itself be derived: proposal mass at least p and retained
+  local gain at least a times incumbent regret minus e yield factor 1-p*a and
+  additive penalty p*e. It is not necessary to assign a desired rate as an axiom.
+  Local doubling compares direct-state proposal mass at different scales.
+  Isometric state encodings preserve internal covering complexity. A Mathlib
+  metric cover by executable candidate states yields an actual nearby move;
+  a lower bound on every move weight then yields a quantitative ball-mass floor.
+  Covering a near-optimal set at resolution epsilon gives factor 1-p with
+  additive term p times the objective modulus at epsilon. A uniform N-state
+  cover specializes this to factor 1-1/N and additive floor modulus(epsilon)/N.
+  Local uniform doubling transfers a positive reference-scale ball mass to a
+  smaller useful ball through Mathlib's scaling constant, and then into a
+  one-round regret decrement. A probability proposal assigning a common mass
+  floor p to N pairwise-disjoint useful regions must satisfy N*p <= 1; hence a
+  dimension-free accessibility claim needs history alignment or a restricted
+  objective class rather than uniform coverage of every plausible region.
+  The history-alignment route is now explicit for one proposed guide state. If
+  its predicted score gap exceeds the sum of the incumbent and guide-state
+  error envelopes, the guide has the declared true objective improvement. A
+  nonnegative-radius ball centered on that executable guide contains the guide,
+  so the guide's own proposal weight is a local mass floor. These two facts
+  compose with retained gain to give the contraction factor
+  1 - guide_weight*gain_share without an ambient-space coverage premise.
+  A sharper sequential theorem does not introduce a metric ball at all: safety
+  for every possible outcome plus acceptance and certified gain of one guide
+  atom yield the same weighted contraction directly. For a deterministic
+  one-proposal law, the guide weight is one and the factor is 1-gain_share. The
+  implemented weighted-neighbor mean instantiates these theorems from its
+  explicit denominator-floor, nonnegative-weight, and local-error premises.
+  Conversely, a pool
+  smaller than the external covering number cannot furnish that cover. Combining
+  this cardinal obstruction with the batch planner proves that covering number
+  times candidate-evaluation latency must fit accelerator width times deadline.
+Requires: A doubling law alone does not provide positive mass near a useful state.
+  The executable proposal still needs a quantitative history-dependent guide:
+  its certified score gap after local weighted-neighbor error must retain a fixed share of
+  incumbent regret, and its law weight must remain useful. Covering complexity
+  still needs connection to alternative global guarantees and to a
+  machine-feasible proposal construction.
+Opens: Compare proposal families through capture at the same objective resolution;
+  derive finite-budget rates from near-optimal geometry without identifying the
+  exponent with ambient parameter count; transport results across faithful encodings.
+Execution: The Markov kernel is mathematical semantics. Rust, Metal, and CUDA
+  generators require refinement proofs into move identities, weights, realized
+  parameter states, scores, and commits. The proved finite bridge then supplies
+  their single-round kernel semantics. Source policy state, oracle feedback, and
+  accepted updates still require refinement into `RoundCertificate` fields.
+
+CONSTRUCTION guide geometry
+Definition: Compare objective regret with distance to an optimum in a declared
+  task metric, and ask whether the history-conditioned proposal contracts that
+  distance. The optimum is proof-side data and is not passed to the optimizer.
+Source: Optimization/Guide.lean and Optimization/Information.lean.
+Mathlib: PseudoMetricSpace, dist_nonneg, finite weighted sums, and ordered-ring
+  arithmetic.
+Proved: No fixed proposal retains any positive share of simple regret for every
+  unrestricted objective when an unproposed state can contain the optimum. For
+  a structured class, if lower*distance is at most regret, regret is at most
+  upper*distance, the proposal contracts distance by ratio, and
+  upper*ratio <= factor*lower, then proposed regret is at most factor times
+  incumbent regret. Candidate-specific score accuracy and a sufficiently
+  separated acceptance margin transport this fact to the committed finite-law
+  update. A stochastic guide pays only its proposal weight in the resulting
+  factor; a deterministic guide pays no probability-mass penalty. An explicit
+  target-directed perturbation is step*(anchor-incumbent), while its update is
+  incumbent plus that perturbation. If the anchor's relative distance error is
+  estimate and step lies in [0,1], the proved distance-factor bound is
+  1-step+step*estimate. Its induced regret factor is
+  upper*(1-step+step*estimate)/lower and is strictly below one when the numerator
+  before division is strictly below lower. For a squared-distance objective,
+  one dense signed direction has exact progress
+  2*step*inner(best-incumbent,direction)-step^2*norm(direction)^2. A positive
+  step therefore improves with one evaluated candidate when alignment exceeds
+  the step-energy threshold; this does not require all coordinate signs to be
+  positive or a mirrored candidate. Scalar candidate scores do not
+  estimate the optimum state: pointwise score error, approximate minimization,
+  and one comparison candidate within a certified radius instead bound the
+  selected parameter state's distance to the optimum. A relative budget on
+  coverage, both local score errors, and selection slack makes that selected
+  state a valid perturbation anchor.
+Requires: Identify a pretraining objective class and a computationally usable
+  metric satisfying the two-sided growth bounds. Prove that the proposal derived
+  from retained history supplies a comparison candidate with sufficient metric
+  coverage; prove the weighted-neighbor score errors and selection slack fit the
+  selected-anchor relative-distance budget; and prove the resulting objective
+  gain clears the executable acceptance margin.
+Opens: Quotient and symmetry-aware metrics, learned metrics with proof-side
+  distortion bounds, local rather than global growth, variable contraction,
+  and alternative structural routes that do not use metric growth.
+Execution: This is a candidate theorem route, not a claim that Euclidean
+  parameter distance describes the source model or that the current proposal
+  satisfies contraction.
+
+CONSTRUCTION pair rotation
+Definition: The source program uses J(x,y)=(y,-x), forms
+  next=state+s*(a*J(state)+b*noise), and rounds to FP16. The signed scale is
+  s=sign*leaf.scale*radius. The mixture has a=0.7 or 0.3 and b=(1-a)*0.02
+  in source floating arithmetic. The actual program is not a learned matrix
+  commutator, a geodesic construction, or exact orthogonal multiplication.
+Source: Optimization/PairRotation.lean; bf16_search.metal::proposal_pair.
+  The canonical TOML generator is pair-rotation, replacing the misleading
+  lie-operator name. LieOperator.lean remains a separate matrix-theory view.
+Mathlib: Real ordered-field/ring identities, Finset sums, and finite proposal
+  laws. No derivatives, isotropy, or Gaussian posterior are required.
+Proved: The complete real pair-energy expansion retains noise cross terms.
+  With b=0, E(next)-E(state)=(s*a)^2*E(state), where E(x,y)=x^2+y^2.
+  No coefficient on that same chord, even an extrapolation coefficient,
+  reduces E. The result sums over all complete pairs; an unpaired source tail
+  has zero pure-rotation change. Under a separately proved centered finite
+  innovation law, expected raw energy is
+    (1+(s*a)^2)*E(state)+(s*b)^2*expected_noise_energy.
+  These are exact source-shaped real results, not assumed useful-move bounds.
+Requires: No conclusion about pretraining loss follows from squared energy.
+  The raw expectation does not bound progress after accept/reject. Hash/noise
+  centering and backend rounding semantics are not proved by these identities.
+Opens: Use the actual operator rather than transferring orthogonal-matrix
+  properties to an additive Euler step. See inverse for a constructive property
+  of this SAME operator, without an objective-curvature assumption.
+Execution: A regression reproduced different sampled and evaluated FP16 words
+  on the canonical one-candidate Gaussian program. Sampled geometry, scalar and
+  initial proposal paths, pool evaluation, and selected materialization now
+  share proposal_pair and a canonical seed operation. The sample pipeline uses
+  the materializer's arithmetic mode. Tests cover 1x1/1x4/2x2/4x1 layouts,
+  Gaussian/Rademacher, independent/pair-rotation methods, changing roots,
+  odd/singleton tensor boundaries, full materializations, and archived samples.
+  These are source/regression checks, not a Lean compiler or GPU ISA proof.
+  Unsupported pair-rotation geometry/distributions fail validation. No CUDA
+  implementation of this program is claimed; its adapter rejects partial TOMLs.
+
+CONSTRUCTION lie algebra generator and pairwise span
+Definition: Commutator [G, C] = GC - CG of weight Grammian G=W^T W and activation
+  covariance C generates so(n). Elementary pairwise rotation generators
+  pairGen(i, j) = single(i, j, 1) - single(j, i, 1) rotate coordinate i into j.
+Source: Optimization/LieOperator.lean::commutatorSkew, memSo, pairGen, pairSkew,
+  pairSo, pairComm, pairSum, skewTrace, frobeniusInvariant.
+Mathlib: LieAlgebra.Orthogonal.so, Matrix.single, transpose_single, single_mul_single_same,
+  single_mul_single_of_ne, Fintype.sum_eq_single, Matrix trace.
+Proved: [G, C]^T = -[G, C] and belongs to so(n) (memSo). Pairwise generators are
+  skew-symmetric and belong to so(n) (pairSkew, pairSo). The commutator of
+  adjacent pairwise generators yields the composed generator:
+    [pairGen(i, j), pairGen(j, k)] = pairGen(i, k) (pairComm).
+  Every skew-symmetric matrix decomposes as a weighted sum of pairwise generators:
+    A = (1/2) * sum_{i, j} A_{i, j} * pairGen(i, j) (pairSum),
+  proving that pairwise rotations generate the entire Lie algebra so(n).
+Requires: Exponentiation to exact orthogonal matrices requires an integration or
+  geodesic step; finite FP16/BF16 representation introduces deadzones.
+Opens: Connect pairwise commutator generators directly to multi-round reachability
+  in the discrete low-precision parameter space.
+Execution: The Metal kernel uses additive Euler steps rather than matrix exponentials.
+
+CONSTRUCTION inverse
+Definition: Construct the preceding real parameter pair from the complete
+  current pair, recorded innovation, and the actual fixed step coefficients.
+  A seed alone is NOT an encoding of the parameters. Let u=s*a and
+  c=next-s*b*noise. Then previous=(c.x-u*c.y,u*c.x+c.y)/(1+u^2).
+Source: Optimization/PairRotation.lean::inverse, equivalence, fullEquivalence,
+  tailEquivalence, tailError, inverseError, inverseNonexpansive, fullInverse.
+Mathlib: Equiv, Equiv.piCongrRight, Equiv.addRight, Equiv.trans, real fields and finite
+  sums. The source-shaped inverse is constructed, not supplied as a hypothesis.
+Proved: inverseCandidate and candidateInverse hold for ALL real coefficients;
+  1+u^2 is always positive. The constructed maps form an Equiv, and pointwise
+  Equiv assembly covers every complete parameter pair. Fixed recorded-trace
+  compositions inherit inverses. An unpaired zero-padded tail is a scalar
+  translation with exact error preservation under its inverse. If executed differs from the ideal forward
+  candidate, exact reverse computation has squared reconstruction error
+    forward_execution_error_energy/(1+u^2),
+  hence it never amplifies that error energy. The bound sums over full pairs.
+  No positive objective curvature, optimum anchor, posterior, centered noise,
+  or useful-proposal premise is used for the inverse and error identities.
+Requires: This is not exact reversibility of FP16 encoding or an adaptive
+  accept/reject optimizer. Real reverse arithmetic differs from a GPU reverse
+  implementation. Account for its error, accumulated multi-step errors,
+  recorded step scales/seeds/acceptance and correct source pairing/tail indexing.
+  The current archive has NOT been upgraded to reverse replay.
+Opens: Approximate retained-state reconstruction and history-dependent proposal
+  directions without an additional model-sized checkpoint. Reconstructing only
+  queried parameter pairs could permit refreshing sampled geometry without
+  materializing every historical model. This is an implementation/research
+  opportunity with an explicit error account, not a deployed memory guarantee.
+Execution: One pair inverse has fixed arithmetic work. Reconstructing D full
+  parameters through R recorded steps costs O(D*R), while selected S parameter
+  pairs cost O(S*R), plus noise generation and metadata access. These are
+  algorithmic operation counts, not a checked backend latency certificate.
+  No O(1) history replay, exact seed-only compression, regret rate, or 200 ms
+  claim follows. The learning-effectiveness question remains open.
+
+CONSTRUCTION interpolation
+Definition: Construct a new full parameter state z=(1-t)*x+t*y from an
+  incumbent x and a materializable retained state y. This is interpolation of
+  parameter states, NOT interpolation of scalar loss predictions, and not a
+  selector restricted to returning x or y. It is a conditional construction
+  study, not the deployed ENN proposal or a complete Bayesian optimizer.
+Source: Optimization/Interpolation.lean. The source Neighbors archive stores
+  sampled parameter values; bf16_metal/configuration.rs::release_history drops
+  independent full history rows and replay origin in the sampled-geometry mode.
+Mathlib: Mathlib.Analysis.Convex.Strong (module); UniformConvexOn and
+  StrongConvexOn (root declarations); norm/inner-product square identities.
+  Library documentation:
+  https://leanprover-community.github.io/mathlib4_docs/Mathlib/Analysis/Convex/Strong.html
+Proved: Let delta>=0 bound F(y)-F(x), and B>delta be a proved lower bound on
+  the uniform-convexity modulus at ||x-y||. The explicit coefficient
+  t=(B-delta)/(2*B) lies in (0,1/2], and the ideal gain is at least
+  (B-delta)^2/(4*B). No optimum or derivative is an algorithm input. For a trust
+  radius r and certified upper separation U>0, t=min((B-delta)/(2*B),r/U)
+  obeys the ideal radius and retains gain at least t*(B-delta)/2. Observation
+  errors give delta=observed_y-observed_x+error_x+error_y. Execution distance
+  error q costs L*q under a separately proved L-Lipschitz objective; reserving
+  q inside the ideal radius preserves the executed trust constraint.
+  Under strong convexity mu>=0 and |sampled_distance-distance^2|<=R,
+  B=(mu/2)*(sampled_distance-R) is a valid LOWER modulus bound, while
+  U=sqrt(sampled_distance+R) is an UPPER separation bound. The quadrature
+  certificate must concern this same metric, both states, and their actual
+  materialization; a tiny raw sampled distance is not a certificate by itself.
+  Whole-trajectory certified gains telescope at every finite horizon.
+  Squared distance to an arbitrary optimum satisfies Mathlib StrongConvexOn
+  with strong-convexity constant 2, giving modulus phi(r)=r^2; its chord
+  identity and predicted ideal gain are exact in any
+  real inner-product dimension. Opposite equally bad endpoints interpolate to
+  the optimum, demonstrating a new state with gain unavailable to endpoint-only
+  selection. This is a mathematical witness, not a pretraining result.
+Requires: Prove the modulus on the chosen convex region (the segment suffices),
+  not assume global strong convexity of neural-network loss. Certify endpoint
+  observations against one objective, the distance residual, state access, BF16
+  error, floating arithmetic, and the source acceptance rule. Construct/retain
+  useful pairs repeatedly and account for their discovery; this has not been
+  proved. Constant objectives admit no positive modulus, so ordinary convexity
+  or two scalar endpoint observations cannot simply supply positive curvature.
+  The source inverse offers a mathematical state-reconstruction route, with
+  execution error and trace/cost obligations; it is not installed in the archive.
+Opens: A precise history-to-parameter proposal obligation rather than assuming
+  an already accurate optimum anchor. KNN may select local retained pairs;
+  raw source KNN means, inverse-precision fitting, and posterior claims are not
+  replaced by this construction. General moduli permit other convexity classes.
+Execution: No Rust optimizer, sampler, kernel, TOML, or experiment is changed.
+  The construction is NOT a complete exploration policy: repeated interpolation
+  cannot leave the convex hull of the states supplied to it. Without new states
+  or an appropriate existing hull it need not reach an optimum. No uniform
+  gain share, end-to-end regret rate, learning effectiveness, or latency target
+  follows yet. One streamed x+t*(y-x) realization uses O(parameter_count)
+  arithmetic IF both states are accessible; retrieving/replaying them is a
+  separate potentially dominant cost. No backend cost certificate is claimed.
+
+CONSTRUCTION acquisition
+Definition: A feedback-based score selects among a declared candidate family;
+  scored, materialized, evaluated, and committed states are distinct objects.
+Source: Selection/Search/Batch.lean; linear_response.rs and source materializer.
+Mathlib: Current pool-regret result is owned arithmetic under UniformError and
+  ApproxMin/ApproxMax. Batch uses iIndepSet, meas_biInter, and measure_compl;
+  there is no imported GP-UCB theorem for ENN.
+Proved: Simultaneous score error and selection slack cost at most 2*error+slack;
+  Search composes this with nonlinear curvature and execution error. Any proved
+  joint pool-miss bound transfers through approximate selection; independence
+  is one sufficient specialization and is not required by the general theorem.
+Requires: UCB scores are not automatically uniformly close to true loss; source
+  scorer features must correspond to the materialized candidate they score;
+  the implemented proposal pool still needs a justified joint coverage law.
+Opens: Acquisition alternatives, confidence-driven or information-driven proofs,
+  dependence-aware coverage, and selector-specific guarantees.
+Execution: The three-candidate mirrored research core is not the deployed pool.
+
+CONSTRUCTION screening
+Definition: Select one output from a finite supplied candidate family under a
+  joint law that includes generation and acquisition randomness. The selected
+  output alone is evaluated. Screening is distinct from learning a new proposal
+  law, changing trust regions, or producing new candidates adaptively.
+Source: Optimization/Information.lean; singleton source case is configured in
+  performance/configs/hnet-1m-causal-1000.toml and bf16_search.metal::bf16_select.
+Mathlib: Finset.single_le_sum, finite weighted sums, sum_comm, and ordered
+  multiplication. These are finite union/sum bounds, not new bandit rate theory.
+Proved: screenBound bounds selected expected nonnegative useful value by the
+  sum of slot-wise expected useful values, without independence. screenCap
+  specializes equal marginal upper bounds b to K*b. Indicators give an
+  improvement-probability upper bound; positive-part true gains give an upper
+  bound on accepted progress for exact accept/reject. screenBudget derives the
+  necessary inequality gain*cost <= work*b when K*cost <= work. singletonLaw
+  shows valid selection from one represented candidate cannot change its state.
+Requires: An actual joint law, nonnegative useful value, and proved marginal
+  bounds. No small marginal bound for the actual pretraining objective is
+  established. Abstract work is not a wall-time or GPU-throughput certificate.
+Opens: Distinguish gains from better screening from gains due to a history-
+  conditioned generator changing its marginal proposal quality. Bounded
+  screening cannot remove a dimension-dependent marginal upper bound by more
+  than its candidate-count factor. Adaptive new proposals require their own
+  marginal analysis; they are not ruled out by assigning them the old base law.
+Execution: A one-scored-pilot/one-fallback prototype was tested and rejected as
+  a standalone solution to proposal accessibility. Both Rust and Lean prototype
+  sources were removed; only the general limitation remains. No GPU runner,
+  TOML, model, or data recipe was changed. This does not reject all screening or
+  establish that the current optimizer cannot learn. Invalid-score paths remain
+  outside the valid singleton-selection statement.
+
+CONSTRUCTION batch
+Definition: Separate raw candidate count, effective target coverage, parallel
+  batch width, sequential depth, and selector penalty.
+Source: Optimization/Batch.lean and procedural pool source.
+Mathlib: ProbabilityTheory.iIndepSet, iIndepSet.meas_biInter,
+  MeasurableSet.iInter, measure_compl, and ordered semiring arithmetic.
+Proved: Independent equal-miss candidates have joint miss probability q^N and
+  hit probability 1-q^N. A dependence-agnostic theorem accepts any certified
+  joint miss bound. It composes that bound with uniform score error and
+  approximate minimization to guarantee terminal simple regret at threshold
+  plus 2*error+slack. Equivalently, meeting benchmark regret R requires pool
+  coverage at R-(2*error+slack). Repeating one candidate any nonzero number of
+  times leaves the miss event unchanged. A deadline-feasible plan obeys
+  candidates*evaluation_time <= batch_width*deadline.
+Requires: Independence is not established for BLCKBAUX. The source proposal law,
+  target event, effective diversity, actual accelerator batch width, and complete
+  per-candidate evaluation cost must be supplied rather than inferred from N.
+Opens: Correlation-sensitive bounds, negative-dependence designs, diversity
+  objectives, adaptive batch/sequential policies, and coverage per machine cost.
+Execution: The active operator-BO examples resolve four arms with one candidate
+  per arm. Metal domain-separates the four arm roots and applies one reliability
+  radius. The deleted CurrentPool model described a legacy one-arm layout with
+  two direction streams crossed with two radii; its rank and covering claims do
+  not refine the active configuration. A replacement theorem must take the
+  resolved arm/slot layout as data and prove its seed and radius map against the
+  source before deriving diversity, rank, or coverage.
+
+CONSTRUCTION controller
+Definition: A radius/evidence state transition depends on acceptance, adequacy,
+  boundary response, calibration history, and configured limits.
+Source: Reliability/Adaptation.lean; reliability-radius source component.
+Mathlib: Metric.closedBall, metric inequalities, and algebraic recurrences.
+  No Beta-posterior calibration theorem is invoked by BetaState's name.
+Proved: Existing guarded/evidence/radius results are conditional and partial.
+Requires: Complete source transition and statistical meaning of reliability
+  evidence; one local radius rule is not global exploration or convergence.
+Opens: Multiple regions, restart rules, calibrated acceptance, and alternative
+  control theories with explicit interaction with proposal and observation laws.
+Execution: Discounting, quantile history, clamps, and floating-point transitions OPEN.
+
+CONSTRUCTION memory
+Definition: Explicit bounded observation arrays, distances, response state,
+  retained base, append, and compaction. Capacity is not total evaluations.
+Source: Neighbor.Data/compact/append; Cost.historyBytes; LocalMemory.lean;
+  Retention.lean; source optimizer state.
+Mathlib: Fin-indexed arrays/cardinality, List.filter/take, triangle inequality,
+  and IsTheta. Sufficiency is not inferred from bounded array types.
+Proved: Real compaction preserves the retained base; logical array payload is
+  Theta(H^2) when capacity H grows. No universal D or D^2 requirement is proved.
+  LocalMemory.recordLaw constructs bounded-state maintenance of latest-k
+  observations per supplied cover cell; slotBound gives at most k*cell_count
+  observation slots independently of horizon. sourceRecall supplies the source
+  sort's squared-radius premise with explicit resident/injective/coherent slots.
+  This alternative is not adopted by the Rust/Metal/CUDA archive.
+Requires: Valid histories, adaptive forgetting, what conditional law memory
+  determines, losses caused by discarded information, and an affordable task
+  cover. Current compaction does not have the constructed local-recall guarantee.
+Opens: Streaming summaries, bounded-memory regret, local geometry, lower bounds,
+  and joint search for a policy and sufficient retained state.
+Execution: Allocator overhead and fixed-H versus growing-H regimes remain distinct.
+
+CONSTRUCTION recent memory
+Definition: The current implicit archive's oldest-non-incumbent eviction on
+  sequential observation IDs, composed with realized trial/commit trajectories.
+Source: Optimization/RecentMemory.lean; bf16_metal/history.rs
+  absolute_objectives/record_observation; sampled slots in neighbors.rs.
+Mathlib: Finset.min', erase cardinality, finite natural interval cardinality,
+  dist_le_Ico_sum_of_dist_le, and the existing SampledEnn source-sort/error bounds.
+Proved: The constructed ID trace never exceeds capacity H and retains the most
+  recent H-1 observations for every protected-ID sequence. A retained incumbent
+  is not evicted. Consequently k < H supplies k distinct recent observation IDs
+  after k observations, without a metric-cover assumption or independence.
+  Realized trial displacements at most R and stay/accept commits imply recent
+  trial distance at most (k+2)*R. With coherent active/injective native slots,
+  fixed-metric objective regularity L, observation error noise, sampled squared-
+  distance error G, nonnegative fitted scales/variances/distances, and inactive
+  mean floor, the actual source mean has error bounded by
+    noise + L*sqrt(((k+2)*R)^2 + 2*G).
+  The k-close-observations premise is derived, not supplied as another certificate.
+Requires: Prove native slot/sample and integer-ID refinement, bound actual
+  realized displacement in the chosen fixed metric, and justify observation,
+  distance, and forward-objective regularity bounds. R is NOT TOML radius.
+  An active changing learned metric needs an additional transport account.
+  L, R, and G may depend on parameter dimension; this is not dimension-free
+  learning, nor a reason by itself to reduce the production history capacity.
+Opens: Local retained-data accuracy from source retention and trajectory motion,
+  separately from the global usefulness/accessibility of a proposed next state.
+Execution: A source-shaped logical model and mathematical consequence, not a
+  replacement Rust archive or a proved pretraining/regret/200 ms result. No full
+  historical parameter vectors are assumed retained by the sampled backend.
+  Explicit archive compaction, resets, and cross-region activation require
+  separate transition/refinement accounts; they are not ordinary insertions.
+
+CONSTRUCTION retention
+Definition: Compare objectives agreeing on retained observations; examine the
+  information erased by the actual archive compaction, separately from all
+  other optimizer state.
+Source: Optimization/Retention.lean; Neighbor.compact; bf16_metal/state.rs.
+Mathlib: Metric.infDist, infDist_le_infDist_add_dist, compact nearest-point attainment,
+  LipschitzOnWith.extend_real, metric triangle inequality.
+Proved: predictionLower and necessaryRadius derive unavoidable error at least
+  L*distance(query,archive) for arbitrary predictors on a Lipschitz class with
+  zero observed values. ambiguityBound bounds disagreement of compatible
+  objectives by 2*noise+2*L*distance. radiusTransfer bounds forgetting's added
+  geometric error when retained points cover all prior observations.
+  compactChoice gives two globally Lipschitz objectives with identical compacted
+  two-row archives, but opposite best choices between two next states. Any
+  archive-only chooser incurs a gap of 2 on one world; the original archive
+  distinguishes the worlds. Both forgotten values are worse than the incumbent.
+Requires: These are explicit metric-class and archive-only statements, not a
+  proof that actual pretraining or the entire optimizer suffers that loss.
+  The counterexample is at capacity two, not an unproved capacity-128 theorem.
+Opens: Decision-specific memory lower bounds, geometric retention, and analysis
+  of additional retained state rather than universal-sufficiency claims.
+Execution: Source compaction is conditional, not an unconditional periodic reset.
+
+CONSTRUCTION calibration
+Definition: Relate the actual weighted-neighbor mean to total precision W,
+  with a coefficient derived from fitted scales, regularity, and observation
+  errors. No exact posterior or independent fitted-weight assumption is used.
+Source: Optimization/Calibration.lean; Neighbor.mean/weight/denominator;
+  bf16_search.metal acquisition_score uses pure epistemic scale for UCB/Thompson.
+Mathlib: ConvexOn.map_centerMass_le for translated squared loss,
+  Even.convexOn_pow, Finset.sum_mul_sq_le_sq_mul_sq, sqrt order/product laws.
+Proved: Residual_i^2 <= C*denominator_i implies mean_error^2 <= C*k/W.
+  If dissimilarity_i >= metric_distance_i^2, the objective is L-Lipschitz,
+  and all selected observation errors are <= epsilon, C is
+  L^2/epistemic + epsilon^2/aleatoric. Thus absolute mean error is bounded by
+  sqrt(k*C)*sqrt(1/W), pathwise after fitting and adaptive query selection.
+  residualBound preserves arbitrary additive per-observation residuals through
+  the actual mean. sourceRemainder accepts metric_distance_i^2 <= distance_i+R_i
+  and bounds absolute error by sqrt(C*(k/W+epistemic*Rbar)), where Rbar is the
+  source-precision-weighted mean of R_i. Original distances and weights remain
+  unchanged. Zero remainders recover the earlier theorem and all existing APIs.
+Requires: Positive fitted scales, nonnegative stored variances, an inactive
+  mean denominator floor, simultaneous observation bounds, and the stated
+  squared geometry. The sampled shadow metric does not automatically dominate
+  full parameter distance. If the source multiplies sqrt(1/W) by yScale, the
+  confidence multiplier must account for yScale as well.
+Opens: Prove a sufficient configured beta, derive probabilistic observation
+  bounds from the actual corpus law, and improve a justified task metric.
+Execution: This is exact-real semantics, not floating-point or timing parity.
+
+CONSTRUCTION sampled enn
+Definition: Combine source KNN selection/prediction with deterministic error
+  in its supplied sampled squared distances. Full weighted Euclidean coordinates
+  include every parameter; a positive-weight inverse keeps the physical
+  objective unchanged. This is not a latent search representation.
+Source: Optimization/SampledEnn.lean, Calibration.lean, Quadrature.lean;
+  actual Neighbor.ordered/mean and the sampled-history source path.
+Mathlib: EuclideanSpace.real_norm_sq_eq, sqrt order, weighted Jensen, finite
+  set-cardinality monotonicity, and the source sort's lexicographic-order proof.
+Proved: quadratureBound composes exact full-metric identity, stratified residual,
+  source fitting scales, and observation accuracy into the unchanged mean's
+  error certificate. rowValid exposes that certificate to the constructed
+  finite query selector. radiusDistortion proves selected true radius at most
+  sqrt(r^2+2*R) if k eligible retained points lie within r and active squared-
+  distance errors are at most R. distortedError gives source prediction error
+  at most noise+L*sqrt(r^2+2*R). The source sort is not changed to exact distances.
+Requires: Useful residual bounds, source index/sample/proposal correspondence,
+  objective regularity in the full weighted metric, observation error, positive
+  precision parameters, inactive normalization floor, and numeric refinement.
+  Metric weights may be fitted, but regularity must then hold in that fitted
+  geometry; it is not established automatically by the fitting procedure.
+Opens: Choose samples/refresh policies and generators by required uncertainty
+  versus actual cost. Additional residuals are certificate penalties, not
+  demonstrated actual-error floors or proofs of an achieved regret rate.
+Execution: No production sampler, acquisition, kernel, or configuration changed.
+  Self-tuned distance normalization needs an additional source residual account.
+
+CONSTRUCTION decision
+Definition: Cache a state, predicted mean, and certified error for each supplied
+  candidate. Scan mean-error with stable ties and return one query state. The
+  selector does not receive the true objective or optimum.
+Source: Optimization/KnnDecision.lean; sourceRow/precisionRow use the existing
+  real Neighbor mean and the checked geometric/precision envelopes.
+Mathlib: List.argmin, List.argmin_mem, List.le_of_mem_argmin; the earlier KNN
+  radius, convexity, and finite pigeonhole results.
+Proved: scanLaw refines the stable list argmin, queryMember preserves candidate
+  identity, and comparisons counts N-1 scalar comparisons for N cached rows.
+  scanAppend gives incremental maintenance without retaining the old prefix.
+  recommendation derives the source-mean lower bound from a minimum-observation
+  recommendation, retained-row provenance, bounded observation error, and source
+  convexity. horizonBound derives optimistic selection rather than assuming it,
+  yielding terminal gap <= 2*noise+2*L*cover_radius+L*candidate_coverage_radius.
+  stopBound gives a terminal certificate from a final objective upper bound and
+  the smallest optimistic score, with the same explicit coverage penalty.
+Requires: Actual metric/observation bounds, local recall, source numeric
+  refinement, a candidate family covering the intended comparator, and its
+  generation/scoring costs. This does not construct the complete adaptive
+  source policy or prove an affordable acquisition search.
+Opens: Analyze source proposal accessibility instead of assigning a desired
+  captured gain; replace exhaustive search only with a proved search-gap bound.
+Execution: N is symbolic; the selector returns one query, not N objective
+  evaluations. For N=1 it returns the sole candidate and does not repair poor
+  generation. Real comparisons are semantics, not a verified BF16/F32 kernel.
+
+CONSTRUCTION localized queries
+Definition: Count selected evaluations with uncertainty in (w/2,w]. Accuracy
+  and optimism place their states in {x : f(x)-reference <= 2*w+slack}.
+  Cover only this level set at radius r. Count a recall loss when at least k
+  earlier evaluations from this band lie within 2*r of the query but fewer
+  than k such nearby observations are available in memory.
+Source: Optimization/Localized.lean; KnnDecision.localizedQueries connects the
+  constructed finite selector. Earlier sourceRadius/sourceError/sourceValid
+  results supply ingredients, not an automatic deployed-policy instantiation.
+Mathlib: Metric.coveringNumber, finite_minimalCover, isCover_minimalCover,
+  encard_minimalCover, Set.Finite.encard_eq_coe_toFinset_card, finite-cardinality
+  injections and unions, metric triangle inequality, and ordered real arithmetic.
+Proved: localizedCount gives band_size <= k*covering_number + recall_losses,
+  provided k available local observations force uncertainty <= w/2.
+  scaleCount sums this bound over a finite family covering the uncertainty
+  values. lowError then forces a query with error <= epsilon once the horizon
+  exceeds the bound on queries with error > epsilon. terminalBound yields
+  final_loss-reference <= 2*epsilon+slack+recommendation_penalty.
+  KnnDecision.localizedQueries derives optimism from its finite scan, a valid
+  comparison row, and Lipschitz comparator coverage; slack is L*candidate_radius.
+Requires: Valid adaptive source uncertainty, uncertainty contraction from actual
+  local observations, useful finite level-set covering numbers, controlled
+  recall losses, and affordable comparator access. Scale coverage includes
+  initial uncertainty. The reference becomes a global optimum only with a
+  separate proof. Recommendation penalty must follow from the actual selection
+  rule and observation errors. Capacity alone does not bound recall losses.
+Falsifier: forgottenCount proves T-k recall losses for repeated queries of one
+  point with empty memory (k>0). The count then gives
+  no shrinking-error guarantee. A singleton candidate family need not cover a
+  good comparator. A small metric cover is not a free acquisition search oracle.
+Opens: Analyze which observations must survive at each resolution and which
+  objective/metric classes have useful level-set covers, rather than demanding
+  a population improvement at every evaluation. No new rate is claimed for
+  pretraining or for the current archive/generator.
+Execution: One selected full-state objective evaluation per round; rejected
+  trials can still contribute observations. Proof-side covers are not runtime
+  data structures. No Rust, Metal, CUDA, or experiment configuration changed.
+
+CONSTRUCTION envelope
+Definition: For records (x_i,[a_i,b_i]) and fixed Lipschitz constant L, define
+  lower(x)=max_i(a_i-L*d(x_i,x)) and upper(x)=min_i(b_i+L*d(x_i,x)).
+  These describe compatible objective values, not a posterior distribution.
+Source: Optimization/Envelope.lean; Retention.sourceBound specializes the
+  prediction bound to Neighbor.mean. Existing Retention.compactChoice remains
+  an obstruction to unrestricted sufficiency of the source compaction map.
+Mathlib: LipschitzWith.of_le_add_mul, le_add_mul, max_const, min,
+  Finset.sup'_le, le_sup', le_inf', inf'_le, exists_mem_eq_inf', metric triangle
+  inequalities, and linarith. No derivative or stochastic independence enters.
+Proved: feasibleIff characterizes existence by the finite inequalities
+  a_i <= b_j+L*d(x_i,x_j). valueIff constructs an admissible objective for
+  every value in [lower(x),upper(x)]. retentionIff proves deletion is lossless
+  exactly when the retained envelopes satisfy every original interval at its
+  recorded state. All witnesses must survive the deletion together.
+  retentionBound relaxes those finite tests by epsilon and proves the lower
+  envelope decreases by at most epsilon and the upper increases by at most
+  epsilon at EVERY query. estimateBound bounds any prediction's absolute error
+  by its farther interval endpoint; attainedError constructs a compatible
+  objective attaining that error. saturated shows f(0)=0, f(1)=1 and L=1 force
+  f(x)=x on [0,1], despite positive nearest-observation distance inside it.
+Requires: Justified metric regularity and observation intervals for the SAME
+  objective; source state/interval correspondence; useful small retained sets;
+  actual distance and selection costs. sourceBound accepts arbitrary ENN
+  weights/fit and does not turn its standard deviation into a valid radius.
+Falsifier: Exact preservation need not allow any deletion. For distinct exact
+  zero-valued observations and L>0, an omitted state at positive distance from
+  retained states permits a nonzero Lipschitz extension. Retention's existing
+  distance-to-archive construction supplies it. No fixed memory bound follows.
+Opens: Measure information loss in objective-value units, including observation
+  values rather than distance alone. This is classical envelope/set-membership
+  mathematics newly checked here, not a novel regret theorem or an ENN advantage.
+Execution: No production change. A direct finite deletion test uses up to
+  |full|*|retained| distances; each query envelope scans the retained records.
+  These are algorithmic counts, not Lean-verified costs or latency measurements.
+  Changing the metric or L requires rechecking deletion validity; earlier
+  deletion tests for a different class cannot be reused without another proof.
+References: https://arxiv.org/html/2310.07039v1 (bounded-noise interpolation);
+  https://arxiv.org/html/2606.04670v1 (LipFit, section 3). The latter's displayed
+  covering-radius equality after equation (3) is not generally an equality
+  conditional on fixed response values: saturated is a counterexample. See
+  handoff section 70 for the distinction from a worst case over responses.
+
+CONSTRUCTION envelope memory
+Definition: Fix N reference states c_j. Store A_j=max_i(a_i-L*d(x_i,c_j)) and
+  B_j=min_i(b_i+L*d(x_i,c_j)). Update these two scalars with each fresh interval
+  observation; no historical parameter vector is read. At query x use
+  [A_j-L*d(c_j,x), B_j+L*d(c_j,x)] for a chosen reference j.
+Source: Optimization/EnvelopeMemory.lean, imported by BlckbauxResearch.lean.
+Mathlib: Finset.sup'_insert/inf'_insert, sup'_singleton/inf'_singleton,
+  range_add_one; Envelope's checked Lipschitz functions; le_add_mul;
+  order, absolute-value, and real arithmetic lemmas. No derivative is used.
+Proved: recordLaw and streamLaw establish the exact summary invariant for
+  arbitrary observation sequences. readValid proves interval validity.
+  readBounds bounds each endpoint's widening relative to complete history by
+  2*L*r when d(c_j,x)<=r. estimateBound applies to any predictor, and radiusBound
+  adds at most 2*L*r to the full-history radius around that SAME predictor.
+  midpointBound gives full_history_half_width+2*L*r. localError specializes to
+  noise+L*observation_distance+2*L*r when a nearby observation has width<=2*noise.
+  excluded proves an entire radius-r ball is worse than an incumbent whenever
+  A_j-L*r exceeds its validated objective upper bound. This remains true for
+  later incumbents satisfying the same upper bound and the same objective.
+Requires: Fixed geometry, L, and observation-interval semantics; a small
+  reference cover at the desired precision; valid simultaneous pretraining
+  error bounds; and affordable distance evaluation/reference lookup. The
+  summary is not an ENN posterior or sufficient statistic for ENN fitting.
+Falsifier: refinementLoss gives histories from f(x)=x and f(x)=-x at states
+  0 and 1. Both summarize to [0,0] at reference 0, but differ at reference 1.
+  Moving/refining references cannot recover complete old information from the
+  previous scalar summary alone. It may conservatively transport bounds.
+Opens: Separate run duration from target accuracy. At fixed geometry and
+  resolution the summary has 2*N real fields, independent of observation count;
+  its extra error does not accumulate with T. Shrinking the error may require
+  finer references, more memory, new evaluations, or additional structure.
+Execution: Exact real max/min are not finite-bit storage or BF16/F32 arithmetic
+  proofs. Reference-state storage/regeneration and excluded-region bookkeeping
+  are additional costs. Updating uses N distances from the fresh state; a
+  dense parameter metric can make this O(N*parameter_count). No kernel or
+  production policy changed and no latency claim follows from the memory law.
+References: Zhu and Huang, Lipschitz Bandits in Optimal Space, ICLR 2025:
+  https://proceedings.iclr.cc/paper_files/paper/2025/file/06b1652d342f3677b412951f79740475-Paper-Conference.pdf
+  This is a different, limited-memory regret construction using controlled
+  revisits, not uniform preservation of full-history uncertainty. Its theorem
+  is not formalized here. See section 71 for assumptions and precision cautions.
+
+CONSTRUCTION quadrature
+Definition: Partition all parameter indices into strata, take one representative
+  per stratum, and weight its squared displacement by stratum size and tensor
+  weight. The representative map is fixed; no random-sampling law is assigned.
+Source: Optimization/Quadrature.lean; bf16_metal/neighbors.rs and the
+  bf16_sample_distances kernel in bf16_search.metal.
+Mathlib: Finset filter partitions, finite-sum interchange, sum_erase_add,
+  finite-sum absolute-value and ordered multiplication inequalities.
+Proved: fullSplit counts every parameter once. errorBound bounds absolute
+  full-minus-sampled squared distance by the weighted sum of unsampled counts
+  times within-stratum squared-displacement oscillation. distanceUpper gives
+  full <= sampled+remainder. constantExact proves exactness for constant squared
+  displacement per stratum; signExact specializes it to unrounded, constant-
+  amplitude unit-sign updates relative to their own base. missedEnergy gives an
+  omitted-parameter counterexample to unqualified sampled-distance domination.
+  distanceSquared identifies full energy with Mathlib weighted Euclidean
+  distance. embedInjective/unembedEmbed prove positive weights preserve all
+  parameters and their physical values. energyPerturbation proves
+  |executed^2-ideal^2| <= error*(2*amplitude+error); roundedError propagates both
+  representative and unsampled execution errors into stratum oscillation.
+Requires: Source stratum/sample coherence, accurate sampled values of the actual
+  proposal, floating-point refinement, and useful oscillation bounds. The
+  remainder may be large. Gaussian fields, rounded unit-sign updates, and
+  distances to older states do not inherit signExact automatically.
+Opens: SampledEnn now propagates residuals through the actual ENN weights.
+  Derive tight generator/rounding residuals and prove source correspondence.
+Execution: No resampling was implemented. Fresh indices require matching values
+  for both query and every historical state; the sampled archive alone does not
+  contain those values. Per-round refresh is a separate design/proof question.
+
+CONSTRUCTION loss geometry
+Definition: The actual Forward.logLoss is log(sum exp(logits))-target_logit;
+  compare it on aligned targets and evaluation indices.
+Source: Forward/LossGeometry.lean and Forward/Algebra.lean.
+Mathlib: Real.exp_le_exp, Real.exp_add, Real.log_le_log, Real.log_mul,
+  finite-sum inequalities, Pi sup metric, and LipschitzWith.comp.
+Proved: marginBound controls loss discrepancy by target-relative logit
+  discrepancy with coefficient one. logitBound gives coefficient two for
+  uncentered coordinate discrepancies, independently of vocabulary size.
+  averageBound preserves the average discrepancy rather than multiplying by
+  token count. logitLipschitz provides the Mathlib Lipschitz object;
+  parameterBound composes a supplied parameter-to-logit constant with it.
+  rangeBound proves that logits bounded in absolute value by B give token NLL
+  in [0, log(vocabulary size)+2B]. windowRange proves that an arbitrarily long
+  window mean stays in that same interval; worst-case range does not decay merely
+  because more dependent tokens were averaged. trustRange derives the candidate
+  envelope B+L*r from an incumbent envelope B, a parameter-to-logit Lipschitz
+  constant L, and trust-region radius r, then returns the corresponding complete
+  window-loss interval.
+Requires: Full-model parameter-to-logit control in the optimizer's actual
+  geometry is not established. Fixed aligned indices do not equate different
+  corpus windows or independently generated token trajectories.
+Opens: Quantitative layer/routing/quantization bounds and certified cheaper
+  geometry with an explicit residual, rather than a guessed objective constant.
+Execution: Computing a logit distance is not claimed to be a cheap acquisition
+  operation; exact-real loss does not certify rounded backend evaluation.
+
+CONSTRUCTION learning
+Definition: Optimistic query selection, local KNN recall, and a terminal
+  recommendation are analyzed without assuming a constant regret contraction.
+Source: Optimization/KnnLearning.lean and LocalMemory.lean.
+Mathlib: Finite pigeonhole principle, finite maximum, lexicographic order,
+  merge-sort pairwise ordering, convex barycenters, and metric regularity.
+Proved: A query sequence longer than k*cell_count has a query preceded by at
+  least k observations in its own cell. With preserved local recall and
+  optimistic selection slack, queryBudget yields terminal gap at most
+  2*noise+2*L*cover_radius+selection_slack. sourceFloor derives the required
+  lower bound on source means from retained observations and convexity.
+  KnnDecision.horizonBound replaces assumed optimistic selection by a specified
+  finite scan and adds the explicit represented-candidate coverage penalty.
+Requires: A finite metric cover, adequate retained observations, coherent
+  source slots, bounded observation errors, and the stated optimistic selection
+  property. The deployed acquisition/perturbation/controller is not yet proved
+  to meet those properties. Finite target coverage is not a cheap search oracle.
+Opens: Covering-profile rates and approximate retrieval with explicit cost;
+  distinguish useful task geometry from ambient billion-dimensional coverage.
+Execution: Memory slots, full-state representation, search work, token budgets,
+  and 200/1000 ms transaction feasibility remain separate quantities.
+
+CONSTRUCTION precision
+Definition: BF16 and FP16 finite stored words, decode/round contracts, proposal
+  admissibility, and commit; ideal real state and executed state are distinct.
+Source: Precision/*; backend numeric kernels and converters.
+Mathlib: Fin, subtypes, Euclidean analytical embedding, and metric/order reasoning.
+  No complete backend IEEE quantizer refinement is currently invoked.
+Proved: Abstract zero-update/round-trip and stored-effect results under contracts.
+Requires: Exact conversion, overflow/NaN handling, tie rules, rounded proposal
+  support, and objective error from executed-state differences.
+Opens: Finite-state regret, precision-aware proposals/radii, and proofs separating
+  quantization effects from statistical estimation errors.
+Execution: Finite-word storage does not imply every real proposal changes a weight.
+
+CONSTRUCTION regret
+Definition: A common fixed-world experiment trace exposes terminal gap,
+  cumulative gap, target hitting, pairwise excess, and matched-budget dominance
+  as separate views. Global optimality remains separate from a finite-pool or
+  named-algorithm comparator.
+Source: Semantics/Experiment.lean, Regret/Rate.lean; Search.Certificate supplies
+  local ingredients and ResearchProblem supplies machine-resource contracts.
+Mathlib: Geometric sums and tendsto_pow_atTop_nhds_zero_of_lt_one are invoked.
+  General ENN regret is not an imported Mathlib theorem.
+Proved: Coverage/selector composition; local dominance implies a finite-horizon
+  geometric envelope. Fixed additive error gives an envelope floor. Zero error,
+  actual contraction, and a global comparator imply vanishing expected regret.
+  Shared-comparator terminal gaps subtract to pairwise excess for minimization
+  and maximization. Stable traces transfer a reached target to the horizon;
+  without stability, an explicit counterexample shows that transfer is invalid.
+  Monotone componentwise resource use transfers feasibility to earlier horizons.
+  Accounted trace snapshots refine to RunResult; trace fairness and one-query
+  evidence transfer to the existing typed run-comparison contracts.
+Requires: Establish dominance/coverage for a justified objective/noise class;
+  refine source executions to traces and select the guarantee appropriate to the
+  pretraining question rather than treating simple regret as the universal goal.
+Opens: Other rates, information-based guarantees, restricted-domain comparisons,
+  stopping-time and target-hitting analyses, finite-precision optima, and
+  comparison with Muon under identical objective worlds and equal resources.
+Execution: An upper-envelope floor is not proof that actual progress stops there.
+
+CONSTRUCTION process
+Definition: A measurable finite conditional oracle induces a transition kernel
+  on the existing policy memory. Mathlib's Ionescu-Tulcea trajectory has all the
+  existing finite terminal laws as its marginals, with one policy across horizons.
+Source: Optimization/Process.lean; existing Synthesis.Policy/Oracle/expected.
+Mathlib: Kernel.traj, partialTraj, traj_map_frestrictLe,
+  map_partialTraj_succ_self, kernel composition, integral_comp, finite atomic
+  integrability, integral_map_of_stronglyMeasurable.
+Proved: oracleKernel is Markov from the exact existing weights and transitions.
+  prefixLaw and marginal identify all finite terminal distributions.
+  expectedIntegral and pathIntegral identify the existing real expectation with
+  integration under the terminal law and complete trajectory. pathBound transfers
+  an existing finite policy certificate to that same Mathlib trajectory law.
+Requires: Measurable conditional weights, measurable memory transitions, measurable
+  terminal loss, and measurable memory singletons for the finite oracle adapter.
+  The true source conditional law and memory sufficiency remain unproved.
+Opens: Filtrations, conditional expectations, adaptive hitting events, and stopping
+  times on one run law without rebuilding probability or assuming independent rounds.
+Execution: A mathematical kernel is not a verified GPU RNG or a latency result.
+  No new progress, KNN calibration, posterior correspondence, or rate was assumed.
+
+CONSTRUCTION synthesis
+Definition: Fixed nonempty environment class, policy interface, feedback law,
+  horizon, regret target, and declared work; one policy must satisfy all environments.
+  Target adds a complete resource vector, machine, workload dimensions, and a
+  per-round deadline without identifying abstract work with milliseconds.
+Source: Synthesis.lean, Target.lean, Witness.lean; Rate connects local progress
+  to regret; Process connects the existing finite model to Mathlib trajectories.
+Mathlib: Finite expectation algebra and componentwise ordered arithmetic;
+  Kernel.traj and finite marginals through Process. Martingale applications OPEN.
+Proved: Potential/credit certificate composition and a finite interface witness.
+  Machine certificates jointly imply expected terminal regret, componentwise
+  cumulative resource feasibility along every feedback path, and the per-round
+  wall-time bound. The active envelope fixes 1,177,756,440 parameters, 1,048,576
+  context tokens, and the 200 ms operating target. The horizon remains arbitrary
+  with an explicit cumulative evaluated-token budget.
+Requires: Source policy instantiation, actual class membership, computable runtime
+  dependencies, measured resource charges, and a search procedure.
+Opens: Joint algorithm/proof discovery. Changing the task after a failed proof
+  is a new research proposal, not success on the original class.
+Execution: Classical analysis is allowed in proofs, not as an executable oracle.
+
+CONSTRUCTION resources
+Definition: Separate arithmetic work, traffic, storage, launches, synchronization,
+  query count, batch width, sequential depth, and full machine transaction time.
+Source: Forward/Work.lean; Optimization/Cost.lean; ResearchProblem resources.
+Mathlib: IsBigO, IsTheta, explicit filters and elementary ordered arithmetic.
+Proved: Logical payload/candidate-write scaling and partial scan/projection counts.
+  Batch.Plan.capacity separately bounds candidate work by width times deadline
+  when one candidate evaluation cost and sequential-depth feasibility are given.
+Requires: Sorting, sampling retries, packing, cache work, reductions, hardware
+  envelopes, and complete source-path work/traffic accounting.
+Opens: Operator/kernel co-design, fusion alternatives, parallel evaluation,
+  and feasible regret-versus-memory-versus-latency frontiers.
+Execution: Neither peak FLOPs nor a Big-O class establishes 200 ms or 1000 ms.
+
+CONSTRUCTION contracts
+Definition: First-order predicates on complete optimizer trials encode
+  comparison obligations; Core/View/Finding separates operation, exploration,
+  and mathematical consequences.
+Source: Semantics/ModelTheory.lean, Protocol.lean, Agenda.lean, ResearchProblem.
+Mathlib: FirstOrder.Language, Structure, Sentence, and Realize are invoked.
+Proved: Trial-level implication/realization results for declared relations.
+Requires: Interpretation of relations as actual executions/evidence. These
+  objects are not a model-theoretic proof of neural-network learning properties.
+Opens: Explicit cross-view hypotheses and comparison contracts while retaining
+  analytic/probabilistic/operator views appropriate to each research question.
+Execution: Muon comparison needs identical objective, start, evaluation world,
+  feasible domain, and resource account; those semantics are still incomplete.

@@ -6,11 +6,11 @@ from pathlib import Path
 
 import numpy as np
 
-from ennx import create_optimizer
-from ennx.turbo.config import (
-    AcqType,
-    ENNFitConfig,
-    ENNSurrogateConfig,
+from blckbaux import create_optimizer
+from blckbaux.turbo.config import (
+    AcquisitionKind,
+    SurrogateFit,
+    ENNSurrogate,
     turbo_enn,
 )
 
@@ -37,8 +37,8 @@ def assert_ci() -> None:
         py_best = float(cell["python_best_y"])
         bounds = np.tile(np.array([[0.0, 1.0]], dtype=float), (dim, 1))
         config = turbo_enn(
-            acq_type=AcqType.UCB,
-            enn=ENNSurrogateConfig(k=10, fit=ENNFitConfig(num_samples=10)),
+            acquisition=AcquisitionKind.UCB,
+            enn=ENNSurrogate(k=10, fit=SurrogateFit(num_samples=10)),
             num_init=min(10, 2 * dim),
         )
         rust_best = y_best(

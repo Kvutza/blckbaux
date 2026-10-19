@@ -1,0 +1,28 @@
+load("//buck2:reindeer_rules.bzl", "app_rust_library")
+load("//build:targets.bzl", "NEIGHBOR_INDEX_CRATES", "NEIGHBOR_INDEX_TEST_CRATES", "RUST_EDITION")
+
+filegroup(
+    name = "source",
+    srcs = glob(["src/**/*.rs"]) + ["Cargo.toml"],
+    visibility = ["PUBLIC"],
+)
+
+app_rust_library(
+    name = "neighbor-index",
+    srcs = glob(["src/**/*.rs"]),
+    crate = "blckbaux_neighbor_index",
+    crate_root = "src/lib.rs",
+    edition = RUST_EDITION,
+    visibility = ["PUBLIC"],
+    deps = ["//rust:" + crate for crate in NEIGHBOR_INDEX_CRATES] + ["//rust/crates/artifact:artifact"],
+)
+
+rust_test(
+    name = "neighbor-index-unit",
+    srcs = glob(["src/**/*.rs"]),
+    crate = "blckbaux_neighbor_index",
+    crate_root = "src/lib.rs",
+    edition = RUST_EDITION,
+    visibility = ["//buck2/tests:all"],
+    deps = ["//rust:" + crate for crate in NEIGHBOR_INDEX_TEST_CRATES] + ["//rust/crates/artifact:artifact"],
+)

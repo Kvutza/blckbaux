@@ -6,7 +6,7 @@ import time
 import numpy as np
 import pytest
 
-from ennx.turbo.config.eidxdrv import ENNIndexDriver
+from blckbaux.turbo.config.surrogate import NeighborIndex
 
 pytestmark = pytest.mark.slow
 
@@ -66,7 +66,7 @@ def test_parseindexdriver(name: str):
     from ops.stress import parse_driver2
 
     driver = parse_driver2(name)
-    assert isinstance(driver, ENNIndexDriver)
+    assert isinstance(driver, NeighborIndex)
 
 
 def test_004():
@@ -84,7 +84,7 @@ def test_005():
     num_obs = 30
     rows = list(
         enn_stress(
-            index_driver=ENNIndexDriver.FLAT,
+            index_driver=NeighborIndex.FLAT,
             num_obs=num_obs,
             config=EnnAddStressConfig(num_dim=4, seed=0, query_n=10, query_seed=1),
         )
@@ -112,7 +112,7 @@ def test_006(monkeypatch):
     num_obs = 30
     list(
         enn_stress(
-            index_driver=ENNIndexDriver.FLAT,
+            index_driver=NeighborIndex.FLAT,
             num_obs=num_obs,
             config=EnnAddStressConfig(num_dim=4, seed=0, query_n=5, query_seed=1),
         )
@@ -123,7 +123,7 @@ def test_006(monkeypatch):
 @pytest.mark.parametrize(
     "driver,subdir",
     [
-        (ENNIndexDriver.BPANN_DISK, "bpann"),
+        (NeighborIndex.BPANN_DISK, "bpann"),
     ],
 )
 def test_007(monkeypatch, tmp_path, driver, subdir):
@@ -173,7 +173,7 @@ def test_008(monkeypatch, tmp_path):
     num_obs = 30
     list(
         enn_stress(
-            index_driver=ENNIndexDriver.BPANN_DISK,
+            index_driver=NeighborIndex.BPANN_DISK,
             num_obs=num_obs,
             config=EnnAddStressConfig(
                 num_dim=4,
@@ -193,7 +193,7 @@ def test_009():
     num_obs = 30
     rows = list(
         enn_stress(
-            index_driver=ENNIndexDriver.FLAT,
+            index_driver=NeighborIndex.FLAT,
             num_obs=num_obs,
             config=EnnAddStressConfig(
                 num_dim=4,
@@ -224,7 +224,7 @@ def test_010(monkeypatch, tmp_path):
     batch_size = 7
     list(
         enn_stress(
-            index_driver=ENNIndexDriver.BPANN_DISK,
+            index_driver=NeighborIndex.BPANN_DISK,
             num_obs=num_obs,
             config=EnnAddStressConfig(
                 num_dim=4,
@@ -286,7 +286,7 @@ def test_012(monkeypatch):
 
     rows = list(
         enn_stress(
-            index_driver=ENNIndexDriver.FLAT,
+            index_driver=NeighborIndex.FLAT,
             num_obs=3,
             config=EnnAddStressConfig(
                 num_dim=2, seed=0, query_n=2, query_seed=1, batch_size=3
@@ -299,7 +299,7 @@ def test_012(monkeypatch):
 
 
 def test_013(monkeypatch):
-    from ennx.ennx.enn_fitter import ENNStatefulFitter
+    from blckbaux.enn.enn_fitter import ENNFitter
 
     tell_calls: list[int] = []
     ask_calls: list[int] = []
@@ -310,14 +310,14 @@ def test_013(monkeypatch):
     def _countask2(self, *args, **kwargs):
         ask_calls.append(1)
 
-    monkeypatch.setattr(ENNStatefulFitter, "tell", _counttell2)
-    monkeypatch.setattr(ENNStatefulFitter, "ask", _countask2)
+    monkeypatch.setattr(ENNFitter, "tell", _counttell2)
+    monkeypatch.setattr(ENNFitter, "ask", _countask2)
 
     from ops.stress import EnnAddStressConfig, enn_stress
 
     list(
         enn_stress(
-            index_driver=ENNIndexDriver.FLAT,
+            index_driver=NeighborIndex.FLAT,
             num_obs=30,
             config=EnnAddStressConfig(num_dim=4, seed=0, query_n=5, query_seed=1),
         )
@@ -367,7 +367,7 @@ def test_015(monkeypatch):
 
     rows = list(
         enn_stress(
-            index_driver=ENNIndexDriver.FLAT,
+            index_driver=NeighborIndex.FLAT,
             num_obs=3,
             config=EnnAddStressConfig(num_dim=2, seed=0, query_n=2, query_seed=1),
         )

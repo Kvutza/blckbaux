@@ -1,8 +1,7 @@
-"""Package a CUDA-enabled ENNx extension as a CPython 3.12 Linux wheel."""
+"""Package a CUDA-enabled Blckbaux extension as a CPython 3.12 Linux wheel."""
 
 from __future__ import annotations
 
-import argparse
 import base64
 import csv
 import hashlib
@@ -13,6 +12,8 @@ import sysconfig
 import tempfile
 import zipfile
 from pathlib import Path
+
+import click
 
 TAG = "cp312-cp312-manylinux_2_28_x86_64"
 
@@ -41,29 +42,30 @@ def build_wheel(root: Path, extension: Path, output: Path, version: str) -> Path
 
     version = version + "+cuda75"
     output.mkdir(parents=True, exist_ok=True)
-    wheel = output / f"ennx-{version}-{TAG}.whl"
-    with tempfile.TemporaryDirectory(prefix="ennx-cuda-wheel-") as directory:
+    wheel = output / f"blckbaux-{version}-{TAG}.whl"
+    with tempfile.TemporaryDirectory(prefix="blckbaux-cuda-wheel-") as directory:
         stage = Path(directory)
-        package = stage / "ennx"
+        package = stage / "blckbaux"
         shutil.copytree(
-            root / "src/ennx",
+            root / "src/blckbaux",
             package,
             ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.so"),
         )
-        shutil.copy2(extension, package / f"ennx_rust{suffix}")
+        shutil.copy2(extension, package / f"blckbaux_rust{suffix}")
 
-        dist = stage / f"ennx-{version}.dist-info"
+        dist = stage / f"blckbaux-{version}.dist-info"
         _write(
             dist / "METADATA",
             "\n".join(
                 [
                     "Metadata-Version: 2.3",
-                    "Name: ennx",
+                    "Name: blckbaux",
                     f"Version: {version}",
                     "Summary: Epistemic Nearest Neighbors with CUDA-Oxide sm_75 support",
                     "Requires-Python: >=3.12,<3.13",
                     "Requires-Dist: numpy>=2.1",
                     "Requires-Dist: scipy>=1.11",
+                    "Requires-Dist: click==8.5.0",
                     "Requires-Dist: botorch>=0.18.1,<0.19",
                     "Requires-Dist: optuna>=5.0,<5.1",
                     "Requires-Dist: ax-platform>=1.3.1,<1.4",
@@ -76,14 +78,18 @@ def build_wheel(root: Path, extension: Path, output: Path, version: str) -> Path
             "\n".join(
                 [
                     "Wheel-Version: 1.0",
-                    "Generator: ennx.cuda_wheel",
+                    "Generator: blckbaux.cuda_wheel",
                     "Root-Is-Purelib: false",
                     f"Tag: {TAG}",
                     "",
                 ]
             ),
         )
-        _write(dist / "top_level.txt", "ennx\n")
+        _write(dist / "top_level.txt", "blckbaux\n")
+        _write(
+            dist / "entry_points.txt",
+            "[console_scripts]\nblckbaux-cuda = blckbaux.cuda:main\n",
+        )
         license_dir = dist / "licenses"
         license_dir.mkdir(parents=True)
         shutil.copy2(root / "LICENSE", license_dir / "LICENSE")
@@ -112,16 +118,24 @@ def build_wheel(root: Path, extension: Path, output: Path, version: str) -> Path
     return wheel
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("extension", type=Path)
-    parser.add_argument("output", type=Path)
-    parser.add_argument(
-        "--root", type=Path, default=Path(__file__).resolve().parents[1]
-    )
-    parser.add_argument("--version", required=True)
-    args = parser.parse_args()
-    print(build_wheel(args.root, args.extension, args.output, args.version))
+@click.command(help=__doc__)
+@click.argument(
+    "extension", type=click.Path(exists=True, dir_okay=False, path_type=Path)
+)
+@click.argument("output", type=click.Path(file_okay=False, path_type=Path))
+@click.option(
+    "--root",
+    type=click.Path(exists=True, file_okay=False, path_type=Path),
+    default=Path(__file__).resolve().parents[1],
+    show_default=True,
+)
+@click.option("--version", required=True)
+def main(extension: Path, output: Path, root: Path, version: str) -> None:
+    try:
+        wheel = build_wheel(root, extension, output, version)
+    except (FileNotFoundError, RuntimeError, ValueError) as error:
+        raise click.ClickException(str(error)) from error
+    click.echo(wheel)
 
 
 if __name__ == "__main__":

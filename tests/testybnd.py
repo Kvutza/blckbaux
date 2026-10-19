@@ -3,9 +3,9 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from ennx import ENN
-from ennx.ennx.enn_params import ENNParams
-from ennx.turbo.config import ENNSurrogateConfig
+from blckbaux import ENN
+from blckbaux.enn.enn_params import ENNParams
+from blckbaux.turbo.config import ENNSurrogate
 
 
 def _model() -> ENN:
@@ -41,7 +41,7 @@ def test_001() -> None:
 
 def test_002() -> None:
     bounds = np.array([[0.0, 1.0]])
-    config = ENNSurrogateConfig(y_bounds=bounds)
+    config = ENNSurrogate(y_bounds=bounds)
     np.testing.assert_array_equal(config.y_bounds, bounds)
     with pytest.raises(ValueError, match="shape"):
-        ENNSurrogateConfig(y_bounds=np.array([0.0, 1.0]))
+        ENNSurrogate(y_bounds=np.array([0.0, 1.0]))
