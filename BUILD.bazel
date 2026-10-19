@@ -67,7 +67,7 @@ py_wheel(
     ],
     strip_path_prefixes = ["src"],
     summary = "Epistemic Nearest Neighbors",
-    version = "0.2.2",
+    version = "0.2.3",
     deps = [
         ":python_sources",
         ":wheel_extension",

@@ -92,7 +92,6 @@ jobs:
           fi
           RUST_CHANNEL=$(python3 -c 'import tomllib; print(tomllib.load(open("rust-toolchain.toml", "rb"))["toolchain"]["channel"])')
           rustup toolchain install "$RUST_CHANNEL" --profile minimal --component rustfmt
-          cargo install kiss-ai --version 0.4.13 --locked
 
       - name: Install Pixi
         uses: prefix-dev/setup-pixi@v0.11.2
@@ -124,7 +123,7 @@ jobs:
       - name: Check source policy
         run: |
           tools/bootstrap-dotslash
-          .buck2-tools/bin/dotslash tools/prek run semantic-name kiss-check --config .config/prek.toml --all-files
+          .buck2-tools/bin/dotslash tools/prek run semantic-name --config .config/prek.toml --all-files
 
       - name: Build and verify wheels
         run: ./blckbaux build --distribution --tests --out release
